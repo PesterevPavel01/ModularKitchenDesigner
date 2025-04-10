@@ -1,5 +1,4 @@
 ﻿using Interceptors;
-using ModularKitchenDesigner.Domain.Interfaces;
 
 namespace ModularKitchenDesigner.Domain.Entityes
 {
@@ -8,10 +7,12 @@ namespace ModularKitchenDesigner.Domain.Entityes
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public required string Title { get; set; }
-        
-        public PriceSegment PriceSegment { get; set; }
-        public List<Kitchen> Kitchens { get; set; }
-        public MaterialItem MaterialItem { get; set; }
+        public required string Code { get; set; }
 
+        public PriceSegment PriceSegment { get; set; }
+        public Guid PriceSegmentId { get; set; }
+        public MaterialItem MaterialItem { get; set; }
+        public Guid MaterialItemId { get; set; }
+        public List<Kitchen> Kitchens { get; set; } = [];
     }
 }

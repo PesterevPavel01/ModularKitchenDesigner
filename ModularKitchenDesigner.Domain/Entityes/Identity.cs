@@ -1,4 +1,4 @@
-﻿namespace ModularKitchenDesigner.Domain.Interfaces
+﻿namespace ModularKitchenDesigner.Domain.Entityes
 {
     public class Identity
     {

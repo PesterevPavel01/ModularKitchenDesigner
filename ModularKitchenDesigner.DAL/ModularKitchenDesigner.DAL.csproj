@@ -13,10 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Interceptors\Interceptors.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Configurations\" />
+    <ProjectReference Include="..\ModularKitchenDesigner.Domain\ModularKitchenDesigner.Domain.csproj" />
   </ItemGroup>
 
 </Project>
