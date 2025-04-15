@@ -11,6 +11,7 @@ namespace ModularKitchenDesigner.Domain.Entityes
         public Guid ComponentTypeId { get; set; }
         public Material Material { get; set; }
         public Guid MaterialId { get; set; }
-        public List<KitchenType> KitchenTypes { get; set; }
+        public KitchenType KitchenType { get; set; }
+        public Guid KitchenTypeId { get; set; }
     }
 }

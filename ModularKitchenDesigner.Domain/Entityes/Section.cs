@@ -6,7 +6,7 @@ namespace ModularKitchenDesigner.Domain.Entityes
     {
         public DateTime CreatedAt { get ; set ; }
         public DateTime UpdatedAt { get ; set ; }
-        public required short Quantity { get; set; }
+        public short Quantity { get; set; }
 
         public Kitchen Kitchen { get; set; }
         public Guid KitchenId { get; set; }

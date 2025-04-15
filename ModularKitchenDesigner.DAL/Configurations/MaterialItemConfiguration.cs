@@ -23,9 +23,9 @@ namespace ModularKitchenDesigner.DAL.Configurations
                 .HasPrincipalKey(x => x.Id)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasMany(x => x.KitchenTypes)
-                .WithOne(x => x.MaterialItem)
-                .HasForeignKey(x => x.MaterialItemId)
+            builder.HasOne(x => x.KitchenType)
+                .WithMany(x => x.MaterialItems)
+                .HasForeignKey(x => x.KitchenTypeId)
                 .HasPrincipalKey(x => x.Id)
                 .OnDelete(DeleteBehavior.Restrict);
         }

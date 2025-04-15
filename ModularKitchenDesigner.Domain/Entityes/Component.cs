@@ -2,12 +2,12 @@
 
 namespace ModularKitchenDesigner.Domain.Entityes
 {
-    public class Component : Identity, IAuditable
+    public sealed class Component : Identity, IAuditable
     {
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public required string Title { get; set; }
-        public required string Code { get; set; }
+        public string Title { get; set; }
+        public string Code { get; set; }
         public required double Price { get; set; }
 
         public ComponentType ComponentType { get; set; }

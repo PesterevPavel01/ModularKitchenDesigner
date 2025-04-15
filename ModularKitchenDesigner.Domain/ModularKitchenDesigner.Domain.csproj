@@ -12,11 +12,12 @@
 
   <ItemGroup>
     <Folder Include="Enum\" />
-    <Folder Include="Interfaces\" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Interceptors\Interceptors.csproj" />
+    <ProjectReference Include="..\Repository\Repository.csproj" />
+    <ProjectReference Include="..\Result\Result.csproj" />
   </ItemGroup>
 
 </Project>

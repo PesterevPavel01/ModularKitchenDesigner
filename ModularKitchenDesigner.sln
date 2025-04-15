@@ -27,9 +27,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repository", "Repository\Re
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModularKitchenDesigner.WebUI", "ModularKitchenDesigner.WebUI\ModularKitchenDesigner.WebUI.csproj", "{F331F626-2F6A-4DE5-BB2E-B50CF30DC7A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularKitchenDesigner.NUnitTests", "ModularKitchenDesigner.NUnitTests\ModularKitchenDesigner.NUnitTests.csproj", "{462EBD14-1F98-4F07-AB1F-4F97B7AE2FE3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModularKitchenDesigner.NUnitTests", "ModularKitchenDesigner.NUnitTests\ModularKitchenDesigner.NUnitTests.csproj", "{462EBD14-1F98-4F07-AB1F-4F97B7AE2FE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularKitchenDesigner.Application", "ModularKitchenDesigner.Application\ModularKitchenDesigner.Application.csproj", "{76802747-BDC4-4C42-9047-91B100E021E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModularKitchenDesigner.Application", "ModularKitchenDesigner.Application\ModularKitchenDesigner.Application.csproj", "{76802747-BDC4-4C42-9047-91B100E021E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularKitchenDesigner.Api", "ModularKitchenDesigner.Api\ModularKitchenDesigner.Api.csproj", "{6597BC1D-C81A-43BB-BCB4-5D3FBB7C235A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,6 +83,10 @@ Global
 		{76802747-BDC4-4C42-9047-91B100E021E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{76802747-BDC4-4C42-9047-91B100E021E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{76802747-BDC4-4C42-9047-91B100E021E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6597BC1D-C81A-43BB-BCB4-5D3FBB7C235A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6597BC1D-C81A-43BB-BCB4-5D3FBB7C235A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6597BC1D-C81A-43BB-BCB4-5D3FBB7C235A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6597BC1D-C81A-43BB-BCB4-5D3FBB7C235A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -90,6 +96,7 @@ Global
 		{5180BB2D-BD31-41E6-BA77-4AD2B3A26572} = {454F105C-B290-466A-B6A3-2B512100D645}
 		{F331F626-2F6A-4DE5-BB2E-B50CF30DC7A4} = {48BF7C48-DD6A-4D08-AB2B-F5FB95852B16}
 		{76802747-BDC4-4C42-9047-91B100E021E8} = {454F105C-B290-466A-B6A3-2B512100D645}
+		{6597BC1D-C81A-43BB-BCB4-5D3FBB7C235A} = {48BF7C48-DD6A-4D08-AB2B-F5FB95852B16}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5B382757-7FF5-45CE-B4B6-1E393E81A795}

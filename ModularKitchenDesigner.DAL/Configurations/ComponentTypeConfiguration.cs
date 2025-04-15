@@ -9,6 +9,8 @@ namespace ModularKitchenDesigner.DAL.Configurations
         public void Configure(EntityTypeBuilder<ComponentType> builder)
         {
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
+            builder.Property(x => x.Code).IsRequired().HasMaxLength(50);
+            builder.HasIndex(x => x.Code).IsUnique();
             builder.Property(x => x.Title).IsRequired().HasMaxLength(255);
             builder.HasIndex(x => x.Title).IsUnique();
 

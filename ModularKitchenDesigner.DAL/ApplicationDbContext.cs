@@ -1,5 +1,6 @@
 ﻿using Interceptors;
 using Microsoft.EntityFrameworkCore;
+using ModularKitchenDesigner.Domain.Entityes;
 using System.Reflection;
 
 namespace ModularKitchenDesigner.DAL
@@ -19,17 +20,16 @@ namespace ModularKitchenDesigner.DAL
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-            /*
-            modelBuilder.Entity<Employee>().HasData(
-            new Employee
+
+            modelBuilder.Entity<PriceSegment>().HasData(
+            new PriceSegment
             {
-                Id = 1,
-                Name = "tech",
-                Code = "default",
+                Id = Guid.NewGuid(),
+                Title = "Эконом",
+                Code = "00000000001",
                 CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now,
-            });
-            */
+                UpdatedAt = default,
+            });           
         }
     }
 }

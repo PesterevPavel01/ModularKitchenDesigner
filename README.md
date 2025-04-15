@@ -8,7 +8,7 @@ class Kitchen{
     + DateTime CreatedAt
     + DateTime UpdatedAt
 
-    + Type required Type
+    + required Type Type
     + List~Section~ Sections
 }
 class Kitchen:::someClass
@@ -18,10 +18,10 @@ class Type{
     + Guid Id 
     + DateTime CreatedAt
     + DateTime UpdatedAt
-    + String required Title // required, maxLength: 255
+    + required String Title // required, maxLength: 255
     
     + PriceSegment PriceSegment
-    + MaterialList Materials
+    + List~Material~ Materials
     + List~Kitchen~ Kitchens
 }
 class Type:::someClass
@@ -46,6 +46,7 @@ class Material{
     + DateTime CreatedAt
     + DateTime UpdatedAt
     + String Title  // required, maxLength: 255
+    + String Code  // required, maxLength: 15
     
     + List~Component~ Components
     + List~MaterialItem~ MaterialItems
@@ -76,6 +77,10 @@ class ModuleType{
     <<enumeration>>
     Верхний
     Нижний
+
+    + Guid Id
+    + String Code  // required, maxLength: 50
+    + String Title // required, maxLength: 255
 }
 class ModuleType:::someClass
 
@@ -86,6 +91,7 @@ class Module{
     + DateTime UpdatedAt
     + String Title // required, maxLength: 255 
     + String PreviewImageSrc
+    + double Width
 
     + ModuleType ModuleType
     + List~Block~ Blocks
@@ -123,6 +129,10 @@ class ComponentType{
     Сушка
     Фасад
     Корпус
+
+    + Guid Id
+    + String Code  // required, maxLength: 50
+    + String Title // required, maxLength: 255
 }
 class ComponentType:::someClass
 

@@ -1,0 +1,6 @@
+@ModularKitchenDesigner.Api_HostAddress = http://localhost:5276
+
+GET {{ModularKitchenDesigner.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
