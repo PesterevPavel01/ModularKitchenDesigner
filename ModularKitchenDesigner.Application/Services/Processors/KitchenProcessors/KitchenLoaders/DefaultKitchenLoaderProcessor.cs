@@ -35,7 +35,7 @@ namespace ModularKitchenDesigner.Application.Services.Processors.KitchenProcesso
                         include: query => query.Include(x => x.KitchenType),
                         predicate: predicate),
                     preffix: "",
-                    suffix: "Object: DefaultKitchenTypeLoaderProcessor.ProcessAsync(Expression<Func<KitchenType, bool>> predicate)");
+                    suffix: "Object: DefaultKitchenTypeLoaderProcessor.ProcessAsync(Expression<Func<Kitchen, bool>> predicate)");
 
             return new()
             {

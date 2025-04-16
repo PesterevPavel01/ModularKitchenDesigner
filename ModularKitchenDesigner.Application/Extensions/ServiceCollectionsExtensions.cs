@@ -21,6 +21,7 @@ namespace ModularKitchenDesigner.Application.Extensions
 
             services.AddScoped<IValidatorFactory, ValidatorFactory>();
 
+            services.AddScoped<IProcessorFactory<Block, BlockDto>, ProcessorFactory<Block, BlockDto>>();
             services.AddScoped<IProcessorFactory<Kitchen, KitchenDto>, ProcessorFactory<Kitchen, KitchenDto>>();
             services.AddScoped<IProcessorFactory<KitchenType,KitchenTypeDto>, ProcessorFactory<KitchenType, KitchenTypeDto>>();
             services.AddScoped<IProcessorFactory<Component, ComponentDto>, ProcessorFactory<Component, ComponentDto>>();
