@@ -11,8 +11,8 @@ namespace ModularKitchenDesigner.Application.Services.Processors.BlockProcessor.
 {
     public sealed class SingleBlockCreatorProcessor : ICreatorProcessor<BlockDto>
     {
-        private IRepositoryFactory _repositoryFactory;
-        private IValidatorFactory _validatorFactory;
+        private IRepositoryFactory _repositoryFactory = null!;
+        private IValidatorFactory _validatorFactory = null!;
         public ICreatorProcessor<BlockDto> SetRepositoryFactory(IRepositoryFactory repositoryFactory)
         {
             _repositoryFactory = repositoryFactory;
