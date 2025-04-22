@@ -33,6 +33,7 @@ class MaterialItem{
     + DateTime CreatedAt
     + DateTime UpdatedAt
     
+    + ModuleType ModuleType
     + Type Type
     + ComponentType ComponentType
     + List~Material~ Materials
