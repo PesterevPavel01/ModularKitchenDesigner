@@ -95,22 +95,10 @@ class Module{
     + double Width
 
     + ModuleType ModuleType
-    + List~Block~ Blocks
     + List~Section~ Sections
     + List~ModelItem~ ModelItems //Список допустимых Моделей
 }
 class Module:::someClass
-
-class Block{
-    + Guid Id
-    + DateTime CreatedAt
-    + DateTime UpdatedAt
-    + short Quantity
-
-    + Component Component
-    + Module Module
-}
-class Block:::someClass
 
 class ModelItem{
     + Guid Id
@@ -158,7 +146,6 @@ class Component{
     + PriceSegment? Segment
     + Model Model
     + Material Material
-    + List~Block~ Blocks
 }
 class Component:::someClass
 
