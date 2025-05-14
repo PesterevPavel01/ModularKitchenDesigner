@@ -158,11 +158,9 @@ MaterialItem "1" --> "1" ComponentType
 Kitchen "1" --> "1..*" Section
 Section "1" --> "1" Module
 Module "1..*" --> "1" ModuleType
-Module "1" --> "1..*" Block
 Module "1" --> "1..*" ModelItem
 ModelItem "1..*" --> "1" Model
 PriceSegment "1" --> "1..*" Component 
-Block "1" --> "1..*" Component 
 Component "1..*" --> "1" Material
 Model "1" --> "1" Component 
 
