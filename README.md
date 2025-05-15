@@ -9,9 +9,21 @@ class Kitchen{
     + DateTime UpdatedAt
 
     + required Type Type
+    + List~MaterialsSpecificationItem~ MaterialsSpecificationItems
     + List~Section~ Sections
 }
 class Kitchen:::someClass
+
+class MaterialsSpecificationItem{
+    + Guid Id 
+    + DateTime CreatedAt
+    + DateTime UpdatedAt
+
+    + ModuleType ModuleType
+    + MaterialSelectionItem MaterialSelectionItem
+    + Kitchen Kitchen
+}
+class Type:::someClass
 
 class Type{
     <<Тип Кухонь, например АЗАЛИЯ>>
@@ -21,7 +33,7 @@ class Type{
     + required String Title // required, maxLength: 255
     
     + PriceSegment PriceSegment
-    + List~Material~ Materials
+    + List~MaterialSelectionItem~ MaterialSelectionItems
     + List~Kitchen~ Kitchens
 }
 class Type:::someClass
@@ -37,6 +49,7 @@ class MaterialSelectionItem{
     + Type Type
     + ComponentType ComponentType
     + List~Material~ Materials
+    + List~MaterialsSpecificationItem~ MaterialsSpecificationItems
 }
 class MaterialSelectionItem:::someClass
 
@@ -149,12 +162,16 @@ class Component{
 }
 class Component:::someClass
 
+Kitchen "1" --> "1..*" MaterialsSpecificationItem
+MaterialsSpecificationItem "1" --> "1..*" MaterialSelectionItem
+MaterialsSpecificationItem "1" --> "1" ModuleType
 Kitchen "1..*" --> "1" Type
 ComponentType "1..*" --> "1..*" Component
 Type "1..*" --> "1" PriceSegment
 Type "1" --> "1" MaterialSelectionItem
 MaterialSelectionItem "1" --> "1..*" Material
 MaterialSelectionItem "1" --> "1" ComponentType
+MaterialSelectionItem "1" --> "1" ModuleType
 Kitchen "1" --> "1..*" Section
 Section "1" --> "1" Module
 Module "1..*" --> "1" ModuleType
