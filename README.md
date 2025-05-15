@@ -26,7 +26,7 @@ class Type{
 }
 class Type:::someClass
 
-class MaterialItem{
+class MaterialSelectionItem{
 
     <<Материал из которого сделана Кухня, например МДФ Макадами>>
     + Guid Id 
@@ -38,7 +38,7 @@ class MaterialItem{
     + ComponentType ComponentType
     + List~Material~ Materials
 }
-class MaterialItem:::someClass
+class MaterialSelectionItem:::someClass
 
 class Material{
 
@@ -50,7 +50,7 @@ class Material{
     + String Code  // required, maxLength: 15
     
     + List~Component~ Components
-    + List~MaterialItem~ MaterialItems
+    + List~MaterialSelectionItem~ MaterialSelectionItems
 }
 class Material:::someClass
 
@@ -152,9 +152,9 @@ class Component:::someClass
 Kitchen "1..*" --> "1" Type
 ComponentType "1..*" --> "1..*" Component
 Type "1..*" --> "1" PriceSegment
-Type "1" --> "1" MaterialItem
-MaterialItem "1" --> "1..*" Material
-MaterialItem "1" --> "1" ComponentType
+Type "1" --> "1" MaterialSelectionItem
+MaterialSelectionItem "1" --> "1..*" Material
+MaterialSelectionItem "1" --> "1" ComponentType
 Kitchen "1" --> "1..*" Section
 Section "1" --> "1" Module
 Module "1..*" --> "1" ModuleType
@@ -165,4 +165,4 @@ Component "1..*" --> "1" Material
 Model "1" --> "1" Component 
 
 classDef someClass fill:#ECDBDB,color:black,stroke:#333,stroke-width:2px,font-size:12pt
-    ```
+```
