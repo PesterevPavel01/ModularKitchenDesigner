@@ -45,10 +45,9 @@ class MaterialSelectionItem{
     + DateTime CreatedAt
     + DateTime UpdatedAt
     
-    + ModuleType ModuleType
     + Type Type
     + ComponentType ComponentType
-    + List~Material~ Materials
+    + Material Material
     + List~MaterialsSpecificationItem~ MaterialsSpecificationItems
 }
 class MaterialSelectionItem:::someClass
@@ -162,23 +161,22 @@ class Component{
 }
 class Component:::someClass
 
+Kitchen "1..*" --> "1" Type
 Kitchen "1" --> "1..*" MaterialsSpecificationItem
 MaterialsSpecificationItem "1" --> "1..*" MaterialSelectionItem
 MaterialsSpecificationItem "1" --> "1" ModuleType
-Kitchen "1..*" --> "1" Type
 ComponentType "1..*" --> "1..*" Component
 Type "1..*" --> "1" PriceSegment
 Type "1" --> "1" MaterialSelectionItem
-MaterialSelectionItem "1" --> "1..*" Material
 MaterialSelectionItem "1" --> "1" ComponentType
-MaterialSelectionItem "1" --> "1" ModuleType
+MaterialSelectionItem "1" --> "1..*" Material
 Kitchen "1" --> "1..*" Section
 Section "1" --> "1" Module
 Module "1..*" --> "1" ModuleType
 Module "1" --> "1..*" ModelItem
 ModelItem "1..*" --> "1" Model
 PriceSegment "1" --> "1..*" Component 
-Component "1..*" --> "1" Material
+Material "1..*" --> "1" Component
 Model "1" --> "1" Component 
 
 classDef someClass fill:#ECDBDB,color:black,stroke:#333,stroke-width:2px,font-size:12pt
