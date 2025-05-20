@@ -15,13 +15,13 @@ namespace ModularKitchenDesigner.DAL.Configurations
             builder.HasIndex(x => x.Title).IsUnique();
             builder.HasIndex(x => x.Title);
 
-            builder.HasMany<Component>(x => x.Components)
+            builder.HasMany(x => x.Components)
                 .WithOne(x => x.Material)
                 .HasForeignKey(x => x.MaterialId)
                 .HasPrincipalKey(x => x.Id)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasMany<MaterialItem>(x => x.MaterialItems)
+            builder.HasMany(x => x.MaterialItems)
                 .WithOne(x => x.Material)
                 .HasForeignKey(x => x.MaterialId)
                 .HasPrincipalKey(x => x.Id)

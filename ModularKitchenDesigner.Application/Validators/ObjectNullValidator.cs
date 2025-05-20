@@ -1,11 +1,12 @@
 ﻿using ModularKitchenDesigner.Domain.Interfaces.Validators;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace ModularKitchenDesigner.Application.Validators
 {
     internal class ObjectNullValidator : IObjectNullValidator
     {
-        public TEntity Validate<TEntity>(TEntity model, string preffix = "", params string[] suffix)
+        public TEntity Validate<TEntity>(TEntity model, string preffix = "", [CallerMemberName] string methodName = null, params string[] suffix)
              where TEntity : class
         {
             if (model is null) 
@@ -17,6 +18,7 @@ namespace ModularKitchenDesigner.Application.Validators
                 
                 stringBuilder.AppendLine($"Entity: {typeof(TEntity).Name}");
                 stringBuilder.AppendLine("ErrorMessage: Запись не найдена!");
+                stringBuilder.AppendLine($"MethodName: {methodName}");
 
                 if (suffix.Count() > 0)
                     foreach (var param in suffix)

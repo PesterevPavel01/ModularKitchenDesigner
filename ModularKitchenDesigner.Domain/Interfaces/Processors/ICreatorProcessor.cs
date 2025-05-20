@@ -4,11 +4,11 @@ using Result;
 
 namespace ModularKitchenDesigner.Domain.Interfaces.Processors
 {
-    public interface ICreatorProcessor<TDto>
-        where TDto : class
+    public interface ICreatorProcessor<TData, TResult>
+        where TResult : BaseResult
     {
-        ICreatorProcessor<TDto> SetValidatorFactory(IValidatorFactory validatorFactory);
-        ICreatorProcessor<TDto> SetRepositoryFactory(IRepositoryFactory repositoryFactory);
-        Task<BaseResult<TDto>> ProcessAsync(TDto model);
+        ICreatorProcessor<TData, TResult> SetValidatorFactory(IValidatorFactory validatorFactory);
+        ICreatorProcessor<TData, TResult> SetRepositoryFactory(IRepositoryFactory repositoryFactory);
+        Task<TResult> ProcessAsync(TData data);
     }
 }

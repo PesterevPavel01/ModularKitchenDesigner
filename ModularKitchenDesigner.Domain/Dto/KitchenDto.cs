@@ -9,18 +9,21 @@ namespace ModularKitchenDesigner.Domain.Dto
 
         public KitchenDto(Kitchen kitchen)
         {
-            Title = kitchen.Title;
-            Code = kitchen.Code;
+            UserLogin = kitchen.UserLogin;
+            UserId = kitchen.UserId;
             KitchenType = kitchen.KitchenType.Title;
+            Guid = kitchen.Id;
         }
 
-        [Required(ErrorMessage = "Title cannot be null or empty.")]
-        public string Title { get; set; }
+        [Required(ErrorMessage = "UserLogin cannot be null or empty.")]
+        public string UserLogin { get; set; }
 
-        [Required(ErrorMessage = "Code cannot be null or empty.")]
-        public string Code { get; set; }
+        [Required(ErrorMessage = "UserId cannot be null or empty.")]
+        public string UserId { get; set; }
 
         [Required(ErrorMessage = "KitchenType cannot be null or empty.")]
         public string KitchenType { get; set; }
+
+        public Guid Guid { get; set; }
     }
 }

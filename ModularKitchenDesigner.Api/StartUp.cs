@@ -35,6 +35,13 @@ namespace ModularKitchenDesigner.Api
                     Title = "Сервис ModularKitchenDesigner.Api",
                     Description = "Версия 2.0",
                 });
+
+                options.SwaggerDoc("v3", new OpenApiInfo()
+                {
+                    Version = "v3",
+                    Title = "Сервис ModularKitchenDesigner.Api",
+                    Description = "Версия 3.0",
+                });
             });
         }
     }

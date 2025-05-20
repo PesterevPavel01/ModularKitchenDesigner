@@ -10,6 +10,7 @@ namespace ModularKitchenDesigner.DAL.Configurations
         {
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
             builder.Property(x => x.Quantity).IsRequired();
+            builder.HasIndex(x => new { x.ModelId, x.ModuleId }).IsUnique();
 
             builder.HasOne(x => x.Module)
                 .WithMany(x => x.ModelItems)

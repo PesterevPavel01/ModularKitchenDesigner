@@ -10,7 +10,7 @@ namespace Repository
         Task<List<TEntity>> GetAllAsync(
             Expression<Func<TEntity, bool>>? predicate = null,
             Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null,
-            TrackingType trackingType = TrackingType.Tracking,
+            TrackingType trackingType = TrackingType.NoTracking,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null);
 
         Task<List<TResult>> GetAllAsync<TResult>(

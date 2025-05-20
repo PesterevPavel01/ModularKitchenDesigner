@@ -1,5 +1,5 @@
-﻿using ModularKitchenDesigner.Domain.Entityes;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using ModularKitchenDesigner.Domain.Entityes;
 
 namespace ModularKitchenDesigner.Domain.Dto
 {

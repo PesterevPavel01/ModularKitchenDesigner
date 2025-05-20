@@ -25,8 +25,8 @@ namespace ModularKitchenDesigner.DAL
             new PriceSegment
             {
                 Id = Guid.NewGuid(),
-                Title = "Эконом",
-                Code = "00000000001",
+                Title = "default",
+                Code = "00000000DEF",
                 CreatedAt = DateTime.Now,
                 UpdatedAt = default,
             });           

@@ -1,16 +1,13 @@
 ﻿using Interceptors;
-using ModularKitchenDesigner.Domain.Interfaces;
+using ModularKitchenDesigner.Domain.Entityes.Base;
 
 namespace ModularKitchenDesigner.Domain.Entityes
 {
-    public class ComponentType : Identity, IAuditable, ISimpleEntity
+    public class ComponentType : SimpleEntity<ComponentType>, IAuditable
     {
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public string Title { get; set; }
-        public string Code { get; set; }
         public List<Component> Components { get; set; } = [];
-        public List<MaterialItem> MaterialItems { get; set; } = [];
-
+        public List<MaterialSelectionItem> MaterialItems { get; set; } = [];
     }
 }

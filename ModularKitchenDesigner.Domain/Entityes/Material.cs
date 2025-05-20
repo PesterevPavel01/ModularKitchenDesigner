@@ -1,20 +1,16 @@
-﻿using Interceptors;
-using ModularKitchenDesigner.Domain.Interfaces;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using Interceptors;
+using ModularKitchenDesigner.Domain.Entityes.Base;
 
 namespace ModularKitchenDesigner.Domain.Entityes
 {
-    public class Material : Identity, IAuditable, ISimpleEntity
+    public sealed class Material : SimpleEntity<Material>, IAuditable
     {
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        [Required]
-        public string Title { get; set; } = default;
-        [Required]
-        public string Code { get; set; } = default;
 
         public List<Component> Components { get; set; } = [];
-        public List<MaterialItem> MaterialItems { get; set; } = [];
+        public List<MaterialSelectionItem> MaterialItems { get; set; } = [];
 
         public Material() { }
     }

@@ -179,5 +179,9 @@ PriceSegment "1" --> "1..*" Component
 Material "1..*" --> "1" Component
 Model "1" --> "1" Component 
 
+<<<<<<< HEAD
+```
+=======
 classDef someClass fill:#ECDBDB,color:black,stroke:#333,stroke-width:2px,font-size:12pt
 ```
+>>>>>>> 9cf6f1a4f7ff67bacd597260f7361b003b26aad8

@@ -1,11 +1,12 @@
 ﻿using ModularKitchenDesigner.Domain.Interfaces.Validators;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace ModularKitchenDesigner.Application.Validators
 {
     internal class EmptyListValidator : IEmptyListValidator
     {
-        public List<TEntity> Validate<TEntity>(List<TEntity> models, string preffix = "", params string[] suffix)
+        public List<TEntity> Validate<TEntity>(List<TEntity> models, string preffix = "", [CallerMemberName] string methodName = null, params string[] suffix)
             where TEntity : class
         {
             if (!models.Any())
@@ -15,8 +16,9 @@ namespace ModularKitchenDesigner.Application.Validators
                 if (!String.IsNullOrEmpty(preffix))
                     stringBuilder.AppendLine(preffix);
 
-                stringBuilder.AppendLine($"Entiry: {typeof(TEntity).Name}");
+                stringBuilder.AppendLine($"Entity: {typeof(TEntity).Name}");
                 stringBuilder.AppendLine("ErrorMessage: Нет ни одной записи, удовлетворяющей установленным условиям!");
+                stringBuilder.AppendLine($"MethodName: {methodName}");
 
                 if (suffix.Count() > 0)
                     foreach (var param in suffix)
