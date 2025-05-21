@@ -23,7 +23,7 @@ class MaterialsSpecificationItem{
     + MaterialSelectionItem MaterialSelectionItem
     + Kitchen Kitchen
 }
-class Type:::someClass
+class MaterialsSpecificationItem:::someClass
 
 class Type{
     <<Тип Кухонь, например АЗАЛИЯ>>
