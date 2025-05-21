@@ -1,5 +1,4 @@
 ﻿using Interceptors;
-using ModularKitchenDesigner.Application.Converters;
 using ModularKitchenDesigner.Application.Processors.SimpleEntityProcessors;
 using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes.Base;
@@ -9,7 +8,6 @@ using ModularKitchenDesigner.Domain.Interfaces.Processors;
 using ModularKitchenDesigner.Domain.Interfaces.Processors.SimpleEntity;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
 using Repository;
-using Result;
 
 namespace ModularKitchenDesigner.Application.Processors
 {
@@ -17,8 +15,6 @@ namespace ModularKitchenDesigner.Application.Processors
     {
         #region fields
 
-        private Dictionary<Type, object> _creators = null!;
-        private Dictionary<Type, object> _updators = null!;
         private Dictionary<Type, object> _loaders = null!;
         private Dictionary<Type, object> _removeProcessors = null!;
 
@@ -28,8 +24,6 @@ namespace ModularKitchenDesigner.Application.Processors
             _validatorFactory = validatorFactory;
             _repositoryFactory = repositoryFactory;
             _converterFactory = converterFactory;
-            _creators = [];
-            _updators = [];
             _loaders = [];
             _removeProcessors = [];
         }
@@ -42,21 +36,6 @@ namespace ModularKitchenDesigner.Application.Processors
 
         #endregion
 
-        public ICreatorProcessor<TData, TResult> GetCreatorProcessor<TProcessor, TResult, TData>()
-            where TProcessor : class, ICreatorProcessor<TData, TResult>, new()
-            where TResult : BaseResult
-        {
-            var type = typeof(TProcessor);
-
-            if (!_creators.ContainsKey(type))
-            {
-                _creators[type] = new TProcessor()
-                    .SetValidatorFactory(_validatorFactory)
-                    .SetRepositoryFactory(_repositoryFactory);
-            }
-
-            return (ICreatorProcessor<TData, TResult>)_creators[type];
-        }
         public ILoaderProcessor<TEntity, SimpleDto> GetLoaderProcessor<TProcessor, TEntity>()
             where TEntity : Identity, ISimpleEntity, IAuditable
             where TProcessor : class, ILoaderProcessor<TEntity, SimpleDto>, new()
@@ -70,22 +49,6 @@ namespace ModularKitchenDesigner.Application.Processors
 
             return (ILoaderProcessor<TEntity, SimpleDto>)_loaders[type];
         }
-
-        public IUpdaterProcessor<SimpleDto,BaseResult<SimpleDto>, TEntity> GetUpdaterProcessor<TEntity>()
-            where TEntity : class, ISimpleEntity, IConvertibleToDto<TEntity,SimpleDto>, new()
-        {
-            var type = typeof(TEntity);
-
-            if (!_updators.ContainsKey(type))
-                _updators[type] = new SimpleEntitySingleUpdaterProcessor<TEntity,SimpleEntityConverter<TEntity>>()
-                    .SetValidatorFactory(_validatorFactory)
-                    .SetRepositoryFactory(_repositoryFactory)
-                    .SetDtoToEntityConverterFactory(_converterFactory);
-
-            return (IUpdaterProcessor<SimpleDto, BaseResult<SimpleDto>, TEntity>)_updators[type];
-        }
-
-
 
         public ISimpleEntityRemoveProcessor GetRemoveProcessor<TEntity>()
             where TEntity : class, ISimpleEntity, new()

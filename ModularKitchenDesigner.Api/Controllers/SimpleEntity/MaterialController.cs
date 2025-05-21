@@ -7,7 +7,6 @@ using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
 using ModularKitchenDesigner.Domain.Interfaces.Processors.SimpleEntity;
-using Result;
 
 namespace ModularKitchenDesigner.Api.Controllers.SimpleEntity
 {
@@ -20,8 +19,7 @@ namespace ModularKitchenDesigner.Api.Controllers.SimpleEntity
         {
             _materialProcessorFactory = materialProcessorFactory;
             _simpleEntityService = simpleEntityService;
-            _creator = simpleEntityService.GetCreatorProcessor<SimpleEntityCreatorProcessor<Material>, BaseResult<SimpleDto>, SimpleDto>();
-            _updater = simpleEntityService.GetUpdaterProcessor<Material>();
+ 
             _loader = simpleEntityService.GetLoaderProcessor<SimpleEntityLoaderProcessor<Material>, Material>();
             _removeProcessor = simpleEntityService.GetRemoveProcessor<Material>();
         }
@@ -29,8 +27,6 @@ namespace ModularKitchenDesigner.Api.Controllers.SimpleEntity
         private readonly ISimpleEntityProcessorFactory _simpleEntityService;
         private readonly IProcessorFactory<Material, SimpleDto> _materialProcessorFactory;
 
-        private readonly ICreatorProcessor<SimpleDto, BaseResult<SimpleDto>> _creator;
-        private readonly IUpdaterProcessor<SimpleDto, BaseResult<SimpleDto>, Material> _updater;
         private readonly ILoaderProcessor<Material, SimpleDto> _loader;
         private readonly ISimpleEntityRemoveProcessor _removeProcessor;
 
@@ -51,28 +47,27 @@ namespace ModularKitchenDesigner.Api.Controllers.SimpleEntity
         public async Task<IActionResult> GetByTitle(string name)
             => Ok(await _loader.ProcessAsync(predicate: x => x.Title == name));
 
-        [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromBody] SimpleDto model)
-            => Ok(await _creator.ProcessAsync(model));
-
-        [HttpPost("Update")]
-        public async Task<IActionResult> Update([FromBody] SimpleDto model)
-            => Ok(await _updater.ProcessAsync(model,null));
-
         [HttpDelete("{code}")]
         public async Task<IActionResult> Remove(string code)
             => Ok(await _removeProcessor.RemoveAsync(code));
 
         [HttpPost("CreateMultiple")]
         public async Task<IActionResult> CreateMultiple([FromBody] List<SimpleDto> models)
-            => Ok(await _simpleEntityService.GetCreatorProcessor<SimleEntityMultipleCreatorProcessor<Material>, CollectionResult<SimpleDto>, List<SimpleDto>>().ProcessAsync(models));
+            => Ok(
+                await _materialProcessorFactory
+                .GetCreatorProcessor<CommonMultipleCreatorProcessor<Material, SimpleDto, SimpleEntityConverter<Material>>>()
+                .ProcessAsync(
+                    data: models,
+                    predicate: entity => models.Select(model => model.Code).Contains(entity.Code),
+                    findEntityByDto: model => entity => model.GetId() == entity.Id));
 
         [HttpPost("UpdateMultiple")]
         public async Task<IActionResult> UpdateMultiple([FromBody] List<SimpleDto> models)
-            => Ok(await _materialProcessorFactory.GetUpdaterProcessor<CommonMultipleUpdaterProcessor<Material, SimpleDto, SimpleEntityConverter<Material>>, CollectionResult<SimpleDto>>()
+            => Ok(await _materialProcessorFactory.GetCreatorProcessor<CommonMultipleUpdaterProcessor<Material, SimpleDto, SimpleEntityConverter<Material>>>()
                 .ProcessAsync(
-                data: models,
-                predicate: entity => models.Select(model => model.Code).Contains(entity.Code)));
+                    data: models,
+                    predicate: entity => models.Select(model => model.Code).Contains(entity.Code), 
+                    findEntityByDto: model => entity => model.Code == entity.Code));
 
     }
 }

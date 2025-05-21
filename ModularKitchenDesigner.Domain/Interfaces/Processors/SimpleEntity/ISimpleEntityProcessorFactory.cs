@@ -11,13 +11,6 @@ namespace ModularKitchenDesigner.Domain.Interfaces.Processors.SimpleEntity
             where TEntity : Identity, ISimpleEntity, IAuditable
             where TProcessor : class, ILoaderProcessor<TEntity, SimpleDto>, new();
 
-        ICreatorProcessor<TData, TResult> GetCreatorProcessor<TProcessor, TResult, TData>()
-            where TProcessor : class, ICreatorProcessor<TData, TResult>, new()
-            where TResult : BaseResult;
-
-        IUpdaterProcessor<SimpleDto, BaseResult<SimpleDto>, TEntity> GetUpdaterProcessor<TEntity>()
-            where TEntity : class, ISimpleEntity, IConvertibleToDto<TEntity, SimpleDto>, new();
-
         ISimpleEntityRemoveProcessor GetRemoveProcessor<TEntity>()
             where TEntity : class, ISimpleEntity, new();
     }

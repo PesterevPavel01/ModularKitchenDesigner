@@ -24,7 +24,7 @@ namespace ModularKitchenDesigner.Application.Converters
             return this;
         }
         
-        public async Task<List<Module>> Convert(List<ModuleDto> models, List<Module> entities, string[] validatorSuffix)
+        public async Task<List<Module>> Convert(List<ModuleDto> models, List<Module> entities, Func<ModuleDto, Func<Module, bool>> findEntityByDto, string[] validatorSuffix)
         {
             var moduleTypeResult = _validatorFactory
                 .GetObjectNullValidator()
@@ -38,7 +38,7 @@ namespace ModularKitchenDesigner.Application.Converters
                 Module? entity = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
-                    model: entities.FirstOrDefault(entity => model.Code == entity.Code),
+                    model: entities.FirstOrDefault(findEntityByDto(model)),
                     suffix: validatorSuffix,
                     preffix: $"Элемент вызвавший ошибку: {JsonConvert.SerializeObject(model, Formatting.Indented)}"
                 );
@@ -47,7 +47,13 @@ namespace ModularKitchenDesigner.Application.Converters
                 entity.Code = model.Code;
                 entity.Width = model.Width;
                 entity.PreviewImageSrc = model.PreviewImageSrc;
-                entity.ModuleTypeId = moduleTypeResult.Where(type => type.Title == model.Type).FirstOrDefault().Id;
+
+                entity.ModuleTypeId = _validatorFactory
+                    .GetObjectNullValidator()
+                    .Validate(
+                        model: moduleTypeResult.Find(x => x.Title == model.Type),
+                        suffix: validatorSuffix
+                        )?.Id ?? entity.ModuleTypeId;
             }
 
             return entities;

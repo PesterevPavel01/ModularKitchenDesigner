@@ -23,6 +23,12 @@ namespace ModularKitchenDesigner.Domain.Entityes
             =>
             query => query.Include(x => x.PriceSegment);
 
+        public KitchenType ConvertFromDtoWithRequiredFields(KitchenTypeDto model)
+        {
+            Code = model.Code;
+            return this;
+        }
+
         public KitchenTypeDto ConvertToDto()
             => new()
             {

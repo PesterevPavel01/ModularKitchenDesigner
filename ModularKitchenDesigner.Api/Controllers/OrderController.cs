@@ -1,10 +1,8 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
-using ModularKitchenDesigner.Application.Processors.OrdersProcessors;
 using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
-using Result;
 
 namespace ModularKitchenDesigner.Api.Controllers
 {
@@ -25,11 +23,5 @@ namespace ModularKitchenDesigner.Api.Controllers
         [HttpGet("test")]
         public async Task<IActionResult> Test()
             => Ok($"URL: {Request.Path}");
-
-
-        [HttpPost("CustomKitchen")]
-        public async Task<IActionResult> Create([FromBody] OrderDto model)
-            => Ok(await _orderProcessorFactory.GetCreatorProcessor<OrderCreatorProcessor, BaseResult<OrderDto>, OrderDto>().ProcessAsync(model));
-
     }
 }

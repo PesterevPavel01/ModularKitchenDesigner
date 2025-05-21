@@ -2,11 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using ModularKitchenDesigner.Application.Converters;
 using ModularKitchenDesigner.Application.Processors.CommonProcessors;
-using ModularKitchenDesigner.Application.Processors.ModuleProcessors.ModuleCreators;
 using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
-using Result;
 
 namespace ModularKitchenDesigner.Api.Controllers
 {
@@ -36,21 +34,24 @@ namespace ModularKitchenDesigner.Api.Controllers
         public async Task<IActionResult> GetByModuleType(String ModuleType)
             => Ok(await _moduleProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Module, ModuleDto>>().ProcessAsync(predicate: x => x.Type.Title == ModuleType));
 
-        [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromBody] ModuleDto model)
-            => Ok(await _moduleProcessorFactory.GetCreatorProcessor<SingleModuleCreatorProcessor, BaseResult<ModuleDto>, ModuleDto>().ProcessAsync(model));
-
         [HttpPost("CreateMultiple")]
         public async Task<IActionResult> CreateMultiple([FromBody] List<ModuleDto> models)
-            => Ok(await _moduleProcessorFactory.GetCreatorProcessor<MultipleModuleCreatorProcessor, CollectionResult<ModuleDto>, List<ModuleDto>>().ProcessAsync(models));
+            => Ok(
+                await _moduleProcessorFactory
+                .GetCreatorProcessor<CommonMultipleCreatorProcessor<Module, ModuleDto, ModuleConverter>>()
+                .ProcessAsync(
+                    data: models,
+                    predicate: entity => models.Select(model => model.Code).Contains(entity.Code),
+                    findEntityByDto: model => entity => model.GetId() == entity.Id));
 
         [HttpPost("UpdateMultiple")]
         public async Task<IActionResult> Update([FromBody] List<ModuleDto> models)
             => Ok(
                 await _moduleProcessorFactory
-                .GetUpdaterProcessor<CommonMultipleUpdaterProcessor<Module, ModuleDto, ModuleConverter>, CollectionResult<ModuleDto>>()
+                .GetCreatorProcessor<CommonMultipleUpdaterProcessor<Module, ModuleDto, ModuleConverter>>()
                 .ProcessAsync(
                     data: models,
-                    predicate: entity => models.Select(model => model.Code).Contains(entity.Code)));
+                    predicate: entity => models.Select(model => model.Code).Contains(entity.Code),
+                    findEntityByDto: model => entity => model.Code == entity.Code));
     }
 }

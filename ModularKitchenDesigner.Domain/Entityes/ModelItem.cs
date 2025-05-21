@@ -1,4 +1,5 @@
-﻿using Interceptors;
+﻿using System.Reflection;
+using Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using ModularKitchenDesigner.Domain.Dto;
@@ -22,6 +23,13 @@ namespace ModularKitchenDesigner.Domain.Entityes
         => query => query
         .Include(x => x.Module)
         .Include(x => x.Model);
+
+        public ModelItem ConvertFromDtoWithRequiredFields(ModelItemDto model)
+        {
+            Module = new() { Code = model.ModuleCode };
+            Model = new() { Code = model.ModelCode };
+            return this;
+        }
 
         public ModelItemDto ConvertToDto()
         => new()

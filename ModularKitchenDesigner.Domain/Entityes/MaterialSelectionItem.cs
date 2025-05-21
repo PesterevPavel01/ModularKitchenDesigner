@@ -27,6 +27,13 @@ namespace ModularKitchenDesigner.Domain.Entityes
         .Include(x => x.ComponentType)
         .Include(x => x.KitchenType);
 
+        public MaterialSelectionItem ConvertFromDtoWithRequiredFields(MaterialSelectionItemDto model)
+        {
+            model.Guid = Guid.NewGuid();
+            Id =model.Guid;
+            return this;
+        }
+
         public MaterialSelectionItemDto ConvertToDto()
         => new()
         {

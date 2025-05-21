@@ -35,6 +35,11 @@ namespace ModularKitchenDesigner.Domain.Entityes
                 Material = Material.Title,
                 Model = Model.Title,
             };
+        public Component ConvertFromDtoWithRequiredFields(ComponentDto model)
+        {
+            Code = model.Code;
+            return this;
+        }
 
         public static Func<IQueryable<Component>, IIncludableQueryable<Component, object>> IncludeRequaredField()
             =>  
@@ -43,5 +48,6 @@ namespace ModularKitchenDesigner.Domain.Entityes
                 .Include(x => x.PriceSegment)
                 .Include(x => x.Material)
                 .Include(x => x.Model);
+
     }
 }

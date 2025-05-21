@@ -1,9 +1,10 @@
 ﻿using ModularKitchenDesigner.Domain.Entityes;
+using ModularKitchenDesigner.Domain.Entityes.Base;
 using System.ComponentModel.DataAnnotations;
 
 namespace ModularKitchenDesigner.Domain.Dto
 {
-    public class MaterialSpecificationItemDto
+    public class MaterialSpecificationItemDto : PrivateIdentity
     {
         public MaterialSpecificationItemDto() { }
 

@@ -19,18 +19,13 @@ namespace ModularKitchenDesigner.Api.Controllers.SimpleEntity
         public ComponentTypeController(ISimpleEntityProcessorFactory simpleEntityProcessorFactory, IProcessorFactory<ComponentType, SimpleDto> componentTypeProcessorFactory)
         {
             _componentTypeProcessorFactory = componentTypeProcessorFactory;
-            _simpleEntityProcessorFactory = simpleEntityProcessorFactory;
-            _creator = simpleEntityProcessorFactory.GetCreatorProcessor<SimpleEntityCreatorProcessor<ComponentType>, BaseResult<SimpleDto>, SimpleDto>();
-            _updater = simpleEntityProcessorFactory.GetUpdaterProcessor<ComponentType>();
+
             _loader = simpleEntityProcessorFactory.GetLoaderProcessor <SimpleEntityLoaderProcessor<ComponentType>, ComponentType>();
             _removeProcessor = simpleEntityProcessorFactory.GetRemoveProcessor<ComponentType>();
         }
 
-        private readonly ISimpleEntityProcessorFactory _simpleEntityProcessorFactory;
         private readonly IProcessorFactory<ComponentType, SimpleDto> _componentTypeProcessorFactory;
 
-        private readonly ICreatorProcessor<SimpleDto, BaseResult<SimpleDto>> _creator;
-        private readonly IUpdaterProcessor<SimpleDto, BaseResult<SimpleDto>, ComponentType> _updater;
         private readonly ILoaderProcessor<ComponentType, SimpleDto> _loader;
         private readonly ISimpleEntityRemoveProcessor _removeProcessor;
 
@@ -50,14 +45,6 @@ namespace ModularKitchenDesigner.Api.Controllers.SimpleEntity
         [HttpGet("GetByTitle/{name}")]
         public async Task<IActionResult> GetByTitle(string name)
             => Ok(await _loader.ProcessAsync(predicate: x => x.Title == name));
-
-        [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromBody] SimpleDto model)
-            => Ok(await _creator.ProcessAsync(model));
-
-        [HttpPost("Update")]
-        public async Task<IActionResult> Update([FromBody] SimpleDto model)
-            => Ok(await _updater.ProcessAsync(model, null));
         
         [HttpDelete("{code}")]
         public async Task<IActionResult> Remove(string code)
@@ -65,13 +52,20 @@ namespace ModularKitchenDesigner.Api.Controllers.SimpleEntity
 
         [HttpPost("CreateMultiple")]
         public async Task<IActionResult> CreateMultiple([FromBody] List<SimpleDto> models)
-            => Ok(await _simpleEntityProcessorFactory.GetCreatorProcessor<SimleEntityMultipleCreatorProcessor<ComponentType>, CollectionResult<SimpleDto>, List<SimpleDto>>().ProcessAsync(models));
+            => Ok(
+                await _componentTypeProcessorFactory
+                .GetCreatorProcessor<CommonMultipleCreatorProcessor<ComponentType, SimpleDto, SimpleEntityConverter<ComponentType>>>()
+                .ProcessAsync(
+                    data: models,
+                    predicate: entity => models.Select(model => model.Code).Contains(entity.Code),
+                    findEntityByDto: model => entity => model.GetId() == entity.Id));
 
         [HttpPost("UpdateMultiple")]
         public async Task<IActionResult> UpdateMultiple([FromBody] List<SimpleDto> models)
-            => Ok(await _componentTypeProcessorFactory.GetUpdaterProcessor<CommonMultipleUpdaterProcessor<ComponentType, SimpleDto, SimpleEntityConverter<ComponentType>>, CollectionResult<SimpleDto>>()
+            => Ok(await _componentTypeProcessorFactory.GetCreatorProcessor<CommonMultipleUpdaterProcessor<ComponentType, SimpleDto, SimpleEntityConverter<ComponentType>>>()
                 .ProcessAsync(
                 data:models,
-                predicate: entity => models.Select(model => model.Code).Contains(entity.Code)));
+                predicate: entity => models.Select(model => model.Code).Contains(entity.Code),
+                findEntityByDto: model => entity => model.Code == entity.Code));
     }
 }

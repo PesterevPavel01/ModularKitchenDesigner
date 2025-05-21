@@ -7,7 +7,6 @@ using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
 using ModularKitchenDesigner.Domain.Interfaces.Processors.SimpleEntity;
-using Result;
 
 namespace ModularKitchenDesigner.Api.Controllers.SimpleEntity
 {
@@ -20,8 +19,6 @@ namespace ModularKitchenDesigner.Api.Controllers.SimpleEntity
         {
             _priceSegmentProcessorFactory = priceSegmentProcessorFactory;
             _simpleEntityService = simpleEntityService;
-            _creator = simpleEntityService.GetCreatorProcessor<SimpleEntityCreatorProcessor<PriceSegment>, BaseResult<SimpleDto>, SimpleDto>();
-            _updater = simpleEntityService.GetUpdaterProcessor<PriceSegment>();
             _loader = simpleEntityService.GetLoaderProcessor<SimpleEntityLoaderProcessor<PriceSegment>, PriceSegment>();
             _removeProcessor = simpleEntityService.GetRemoveProcessor<PriceSegment>();
         }
@@ -29,8 +26,6 @@ namespace ModularKitchenDesigner.Api.Controllers.SimpleEntity
         private readonly ISimpleEntityProcessorFactory _simpleEntityService;
         private readonly IProcessorFactory<PriceSegment, SimpleDto> _priceSegmentProcessorFactory;
 
-        private readonly ICreatorProcessor<SimpleDto, BaseResult<SimpleDto>> _creator;
-        private readonly IUpdaterProcessor<SimpleDto, BaseResult<SimpleDto>, PriceSegment> _updater;
         private readonly ILoaderProcessor<PriceSegment, SimpleDto> _loader;
         private readonly ISimpleEntityRemoveProcessor _removeProcessor;
 
@@ -51,27 +46,28 @@ namespace ModularKitchenDesigner.Api.Controllers.SimpleEntity
         public async Task<IActionResult> GetByTitle(string name)
             => Ok(await _loader.ProcessAsync(predicate: x => x.Title == name));
 
-        [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromBody] SimpleDto model)
-            => Ok(await _creator.ProcessAsync(model));
-
-        [HttpPost("Update")]
-        public async Task<IActionResult> Update([FromBody] SimpleDto model)
-            => Ok(await _updater.ProcessAsync(model, null));
-
         [HttpDelete("{code}")]
         public async Task<IActionResult> Remove(string code)
             => Ok(await _removeProcessor.RemoveAsync(code));
 
         [HttpPost("CreateMultiple")]
         public async Task<IActionResult> CreateMultiple([FromBody] List<SimpleDto> models)
-            => Ok(await _simpleEntityService.GetCreatorProcessor<SimleEntityMultipleCreatorProcessor<PriceSegment>, CollectionResult<SimpleDto>, List<SimpleDto>>().ProcessAsync(models));
+            => Ok(
+                await _priceSegmentProcessorFactory
+                .GetCreatorProcessor<CommonMultipleCreatorProcessor<PriceSegment, SimpleDto, SimpleEntityConverter<PriceSegment>>>()
+                .ProcessAsync(
+                    data: models,
+                    predicate: entity => models.Select(model => model.Code).Contains(entity.Code),
+                    findEntityByDto: model => entity => model.GetId() == entity.Id));
 
         [HttpPost("UpdateMultiple")]
         public async Task<IActionResult> UpdateMultiple([FromBody] List<SimpleDto> models)
-            => Ok(await _priceSegmentProcessorFactory.GetUpdaterProcessor<CommonMultipleUpdaterProcessor<PriceSegment, SimpleDto, SimpleEntityConverter<PriceSegment>>, CollectionResult<SimpleDto>>()
+            => Ok(
+                await _priceSegmentProcessorFactory
+                .GetCreatorProcessor<CommonMultipleUpdaterProcessor<PriceSegment, SimpleDto, SimpleEntityConverter<PriceSegment>>>()
                 .ProcessAsync(
-                data: models,
-                predicate: entity => models.Select(model => model.Code).Contains(entity.Code)));
+                    data: models,
+                    predicate: entity => models.Select(model => model.Code).Contains(entity.Code), 
+                    findEntityByDto: model => entity => model.Code == entity.Code));
     }
 }

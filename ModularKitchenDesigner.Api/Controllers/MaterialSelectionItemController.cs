@@ -1,11 +1,11 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using ModularKitchenDesigner.Application.Converters;
 using ModularKitchenDesigner.Application.Processors.CommonProcessors;
-using ModularKitchenDesigner.Application.Processors.MaterialSelectionItemProcessors.MaterialSelectionItemCreators;
 using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
-using Result;
+
 
 namespace ModularKitchenDesigner.Api.Controllers
 {
@@ -47,12 +47,33 @@ namespace ModularKitchenDesigner.Api.Controllers
         public async Task<IActionResult> GetByComponentTypeCode(String ComponentTypeCode)
             => Ok(await _materialSelectionItemProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<MaterialSelectionItem, MaterialSelectionItemDto>>().ProcessAsync(predicate: x => x.ComponentType.Code == ComponentTypeCode));
 
-        [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromBody] MaterialSelectionItemDto model)
-            => Ok(await _materialSelectionItemProcessorFactory.GetCreatorProcessor<SingleMaterialSelectionItemCreatorProcessor, BaseResult<MaterialSelectionItemDto>, MaterialSelectionItemDto>().ProcessAsync(model));
-
         [HttpPost("CreateMultiple")]
         public async Task<IActionResult> CreateMultiple([FromBody] List<MaterialSelectionItemDto> models)
-            => Ok(await _materialSelectionItemProcessorFactory.GetCreatorProcessor<MultipleMaterialSelectionItemCreatorProcessor, CollectionResult<MaterialSelectionItemDto>, List<MaterialSelectionItemDto>>().ProcessAsync(models));
+            => Ok(
+                await _materialSelectionItemProcessorFactory
+                .GetCreatorProcessor<CommonMultipleCreatorProcessor<MaterialSelectionItem, MaterialSelectionItemDto, MaterialSelectionItemConverter>>()
+                .ProcessAsync(
+                    data: models,
+                    predicate: entity => 
+                        models.Select(model => model.KitchenType).Contains(entity.KitchenType.Title)
+                        && models.Select(model => model.Material).Contains(entity.Material.Title)
+                        && models.Select(model => model.ComponentType).Contains(entity.ComponentType.Title),
+                    findEntityByDto: model => entity => model.GetId() == entity.Id));
+
+        [HttpPost("UpdateMultiple")]
+        public async Task<IActionResult> UpdateMultiple([FromBody] List<MaterialSelectionItemDto> models)
+            => Ok(
+                await _materialSelectionItemProcessorFactory
+                .GetCreatorProcessor<CommonMultipleUpdaterProcessor<MaterialSelectionItem, MaterialSelectionItemDto, MaterialSelectionItemConverter>>()
+                .ProcessAsync(
+                    data: models,
+                    predicate: entity =>
+                        models.Select(model => model.KitchenType).Contains(entity.KitchenType.Title)
+                        && models.Select(model => model.Material).Contains(entity.Material.Title)
+                        && models.Select(model => model.ComponentType).Contains(entity.ComponentType.Title),
+                    findEntityByDto: model => entity => 
+                        model.KitchenType == entity.KitchenType.Title
+                        && model.Material == entity.Material.Title
+                        && model.ComponentType == entity.ComponentType.Title));
     }
 }

@@ -2,11 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using ModularKitchenDesigner.Application.Converters;
 using ModularKitchenDesigner.Application.Processors.CommonProcessors;
-using ModularKitchenDesigner.Application.Processors.ComponentProcessors.ComponentCreators;
 using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
-using Result;
 
 namespace ModularKitchenDesigner.Api.Controllers
 {
@@ -40,24 +38,25 @@ namespace ModularKitchenDesigner.Api.Controllers
         public async Task<IActionResult> GetByPriceSegmentTitle(String priceSegmentTitle)
             => Ok(await _componentProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Component, ComponentDto>>().ProcessAsync(predicate: x => x.PriceSegment.Title == priceSegmentTitle));
 
-        [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromBody] ComponentDto model)
-            => Ok(await _componentProcessorFactory.GetCreatorProcessor<SingleComponentCreatorProcessor, BaseResult<ComponentDto>, ComponentDto>().ProcessAsync(model));
-
         [HttpPost("CreateMultiple")]
         public async Task<IActionResult> CreateMultiple([FromBody] List<ComponentDto> models)
             => Ok(
                 await _componentProcessorFactory
-                .GetCreatorProcessor<MultipleComponentCreatorProcessor, CollectionResult<ComponentDto>, List<ComponentDto>>()
-                .ProcessAsync(models));
+                .GetCreatorProcessor<CommonMultipleCreatorProcessor<Component, ComponentDto, ComponentConverter>>()
+                .ProcessAsync(
+                    data: models,
+                    predicate: entity => models.Select(model => model.Code).Contains(entity.Code),
+                    findEntityByDto: model => entity => model.GetId() == entity.Id));
 
         [HttpPost("UpdateMultiple")]
         public async Task<IActionResult> Update([FromBody] List<ComponentDto> models)
             => Ok(
                 await _componentProcessorFactory
-                .GetUpdaterProcessor<CommonMultipleUpdaterProcessor<Component, ComponentDto, ComponentConverter>, CollectionResult<ComponentDto>>()
+                .GetCreatorProcessor<CommonMultipleUpdaterProcessor<Component, ComponentDto, ComponentConverter>>()
                 .ProcessAsync(
                     data:models,
-                    predicate: entity => models.Select(model => model.Code).Contains(entity.Code)));
+                    predicate: entity => 
+                        models.Select(model => model.Code).Contains(entity.Code),
+                    findEntityByDto: model => entity => model.Code == entity.Code));
     }
 }

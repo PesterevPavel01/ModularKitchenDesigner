@@ -1,10 +1,11 @@
 ﻿using ModularKitchenDesigner.Domain.Entityes;
+using ModularKitchenDesigner.Domain.Entityes.Base;
 using ModularKitchenDesigner.Domain.Interfaces;
 using System.ComponentModel.DataAnnotations;
 
 namespace ModularKitchenDesigner.Domain.Dto
 {
-    public class KitchenTypeDto : ISimpleEntity
+    public class KitchenTypeDto : PrivateIdentity, ISimpleEntity
     {
         public KitchenTypeDto(){}
 

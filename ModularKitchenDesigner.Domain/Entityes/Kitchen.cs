@@ -23,6 +23,13 @@ namespace ModularKitchenDesigner.Domain.Entityes
                 query => query
                     .Include(x => x.KitchenType);
 
+        public Kitchen ConvertFromDtoWithRequiredFields(KitchenDto model)
+        {
+            model.Guid = Guid.NewGuid();
+            Id = model.Guid;
+            return this;
+        }
+
         public KitchenDto ConvertToDto()
             => new()
             {

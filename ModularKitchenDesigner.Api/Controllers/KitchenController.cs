@@ -1,11 +1,10 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using ModularKitchenDesigner.Application.Converters;
 using ModularKitchenDesigner.Application.Processors.CommonProcessors;
-using ModularKitchenDesigner.Application.Processors.KitchenProcessors.KitchenCreators;
 using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
-using Result;
 
 namespace ModularKitchenDesigner.Api.Controllers
 {
@@ -41,14 +40,26 @@ namespace ModularKitchenDesigner.Api.Controllers
 
         [HttpGet("GetByTitle/{Title}")]
         public async Task<IActionResult> GetByTitle(String Title)
-    => Ok(await _kitchenProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Kitchen, KitchenDto>>().ProcessAsync(predicate: x => x.UserLogin == Title));
-
-        [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromBody] KitchenDto model)
-            => Ok(await _kitchenProcessorFactory.GetCreatorProcessor<SingleKitchenCreatorProcessor, BaseResult<KitchenDto>, KitchenDto>().ProcessAsync(model));
+            => Ok(await _kitchenProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Kitchen, KitchenDto>>().ProcessAsync(predicate: x => x.UserLogin == Title));
 
         [HttpPost("CreateMultiple")]
         public async Task<IActionResult> CreateMultiple([FromBody] List<KitchenDto> models)
-            => Ok(await _kitchenProcessorFactory.GetCreatorProcessor<MultipleKitchenCreatorProcessor, CollectionResult<KitchenDto>, List<KitchenDto>>().ProcessAsync(models));
+            => Ok(
+                await _kitchenProcessorFactory
+                .GetCreatorProcessor<CommonMultipleCreatorProcessor<Kitchen,KitchenDto,KitchenConverter>>()
+                .ProcessAsync(
+                    data: models,
+                    predicate: entity => models.Select(model => model.GetId()).Contains(entity.Id),
+                    findEntityByDto: model => entity => model.GetId() == entity.Id));
+
+        [HttpPost("UpdateMultiple")]
+        public async Task<IActionResult> UpdateMultiple([FromBody] List<KitchenDto> models)
+            => Ok(
+                await _kitchenProcessorFactory
+                .GetCreatorProcessor<CommonMultipleUpdaterProcessor<Kitchen, KitchenDto, KitchenConverter>>()
+                .ProcessAsync(
+                    data: models,
+                    predicate: entity => models.Select(model => model.Guid).Contains(entity.Id),
+                    findEntityByDto: model => entity => model.Guid == entity.Id));
     }
 }

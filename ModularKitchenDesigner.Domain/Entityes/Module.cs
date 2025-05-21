@@ -24,6 +24,12 @@ namespace ModularKitchenDesigner.Domain.Entityes
         public static Func<IQueryable<Module>, IIncludableQueryable<Module, object>> IncludeRequaredField()
         => query => query.Include(x => x.Type);
 
+        public Module ConvertFromDtoWithRequiredFields(ModuleDto model)
+        {
+            Code = model.Code;
+            return this;
+        }
+
         public ModuleDto ConvertToDto()
         => new()
         {

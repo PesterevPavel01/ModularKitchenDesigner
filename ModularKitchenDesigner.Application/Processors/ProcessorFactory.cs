@@ -4,7 +4,6 @@ using ModularKitchenDesigner.Domain.Interfaces.Convertors;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
 using Repository;
-using Result;
 
 namespace ModularKitchenDesigner.Application.Processors
 {
@@ -23,23 +22,7 @@ namespace ModularKitchenDesigner.Application.Processors
             _validatorFactory = validatorFactory;
             _converterFactory = converterFactory;
         }
-
-        public ICreatorProcessor<TData, TResult> GetCreatorProcessor<TProcessor, TResult, TData>()
-            where TProcessor : class, ICreatorProcessor<TData, TResult>, new()
-            where TResult: BaseResult
-        {
-            var type = typeof(TProcessor);
-
-            if (!_processors.ContainsKey(type))
-            {
-                _processors[type] = new TProcessor()
-                    .SetValidatorFactory(_validatorFactory)
-                    .SetRepositoryFactory(_repositoryFactory);
-            }
-
-            return (ICreatorProcessor<TData, TResult>)_processors[type];
-        }
-
+        
         public ILoaderProcessor<TEntity, TDto> GetLoaderProcessor<TProcessor>()
             where TProcessor : class, ILoaderProcessor<TEntity, TDto>, new()
         {
@@ -54,10 +37,9 @@ namespace ModularKitchenDesigner.Application.Processors
 
             return (ILoaderProcessor<TEntity, TDto>)_processors[type];
         }
-
-        public IUpdaterProcessor<List<TDto>, TResult, TEntity> GetUpdaterProcessor<TProcessor, TResult>()
-            where TProcessor : class, IUpdaterProcessor<List<TDto>, TResult, TEntity>, new()
-            where TResult : BaseResult
+        
+        public ICreatorProcessor<TDto, TEntity> GetCreatorProcessor<TProcessor>()
+            where TProcessor : class, ICreatorProcessor<TDto, TEntity>, new()
         {
             var type = typeof(TProcessor);
 
@@ -69,7 +51,7 @@ namespace ModularKitchenDesigner.Application.Processors
                     .SetDtoToEntityConverterFactory(_converterFactory);
             }
 
-            return (IUpdaterProcessor<List<TDto>, TResult, TEntity>)_processors[type];
+            return (ICreatorProcessor<TDto, TEntity>)_processors[type];
         }
     }
 }

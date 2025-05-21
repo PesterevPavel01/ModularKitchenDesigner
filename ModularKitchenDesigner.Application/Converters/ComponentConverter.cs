@@ -23,7 +23,7 @@ namespace ModularKitchenDesigner.Application.Converters
             _validatorFactory = validatorFactory;
             return this;
         }
-        public async Task<List<Component>> Convert(List<ComponentDto> models, List<Component> entities, string[] validatorSuffix)
+        public async Task<List<Component>> Convert(List<ComponentDto> models, List<Component> entities, Func<ComponentDto, Func<Component, bool>> findEntityByDto, string[] validatorSuffix)
         {
             var componentTypeResult = _validatorFactory
                 .GetObjectNullValidator()
@@ -46,7 +46,6 @@ namespace ModularKitchenDesigner.Application.Converters
                     preffix: "",
                     suffix: validatorSuffix);
 
-
             var modelResult = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
@@ -59,7 +58,7 @@ namespace ModularKitchenDesigner.Application.Converters
                 Component? entity = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
-                    model: entities.FirstOrDefault(entity => model.Code == entity.Code),
+                    model: entities.FirstOrDefault(findEntityByDto(model)),
                     suffix: validatorSuffix,
                     preffix: $"Элемент вызвавший ошибку: {JsonConvert.SerializeObject(model, Formatting.Indented)}"
                 );
@@ -67,10 +66,30 @@ namespace ModularKitchenDesigner.Application.Converters
                 entity.Title = model.Title;
                 entity.Code = model.Code;
                 entity.Price = model.Price;
-                entity.ComponentTypeId = componentTypeResult.Where(type => type.Title == model.ComponentType).FirstOrDefault().Id;
-                entity.PriceSegmentId = priceSegmentResult.Where(segment => segment.Title == model.PriceSegment).FirstOrDefault().Id;
-                entity.MaterialId = materialResult.Where(material => material.Title == model.Material).FirstOrDefault().Id;
-                entity.ModelId = modelResult.Where(currentModel => currentModel.Title == model.Model).FirstOrDefault().Id;
+                
+                entity.ComponentTypeId = _validatorFactory
+                .GetObjectNullValidator()
+                .Validate(
+                    model: componentTypeResult.Find(type => type.Title == model.ComponentType),
+                    suffix: validatorSuffix)?.Id ?? entity.ComponentTypeId;
+
+                entity.PriceSegmentId = _validatorFactory
+                .GetObjectNullValidator()
+                .Validate(
+                    model: priceSegmentResult.Find(segment => segment.Title == model.PriceSegment),
+                    suffix: validatorSuffix)?.Id ?? entity.PriceSegmentId;
+
+                entity.MaterialId = _validatorFactory
+                .GetObjectNullValidator()
+                .Validate(
+                    model: materialResult.Find(material => material.Title == model.Material),
+                    suffix: validatorSuffix)?.Id ?? entity.MaterialId;
+
+                entity.ModelId = _validatorFactory
+                .GetObjectNullValidator()
+                .Validate(
+                    model: modelResult.Find(currentModel => currentModel.Title == model.Model),
+                    suffix: validatorSuffix)?.Id ?? entity.ModelId;
             }
             
             return entities;

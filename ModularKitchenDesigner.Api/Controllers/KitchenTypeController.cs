@@ -2,11 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using ModularKitchenDesigner.Application.Converters;
 using ModularKitchenDesigner.Application.Processors.CommonProcessors;
-using ModularKitchenDesigner.Application.Processors.KitchenTypeProcessors.KitchenTypeCreators;
 using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
-using Result;
 
 namespace ModularKitchenDesigner.Api.Controllers
 {
@@ -41,23 +39,26 @@ namespace ModularKitchenDesigner.Api.Controllers
         public async Task<IActionResult> GetAll()
             => Ok(await _kitchenTypeProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<KitchenType, KitchenTypeDto>>().ProcessAsync());
 
-        [HttpPost("Create")]
-
-        public async Task<IActionResult> Create([FromBody] KitchenTypeDto model)
-            => Ok(await _kitchenTypeProcessorFactory.GetCreatorProcessor<SingleKitchenTypeCreatorProcessor, BaseResult<KitchenTypeDto>, KitchenTypeDto>().ProcessAsync(model));
-
         [HttpPost("CreateMultiple")]
         public async Task<IActionResult> CreateMultiple([FromBody] List<KitchenTypeDto> models)
-            => Ok(await _kitchenTypeProcessorFactory.GetCreatorProcessor<MultipleKitchenTypeCreatorProcessor, CollectionResult<KitchenTypeDto>, List<KitchenTypeDto>>().ProcessAsync(models));
+            => Ok(
+                await _kitchenTypeProcessorFactory
+                .GetCreatorProcessor<CommonMultipleCreatorProcessor<KitchenType, KitchenTypeDto, KitchenTypeConverter>>()
+                .ProcessAsync(
+                    data: models,
+                    predicate: entity => models.Select(model => model.Code).Contains(entity.Code),
+                    findEntityByDto: model => entity => model.GetId() == entity.Id));
 
         [HttpPost("UpdateMultiple")]
         public async Task<IActionResult> Update([FromBody] List<KitchenTypeDto> models)
             => Ok(
                 await _kitchenTypeProcessorFactory
-                .GetUpdaterProcessor<CommonMultipleUpdaterProcessor<KitchenType, KitchenTypeDto, KitchenTypeConverter>, CollectionResult<KitchenTypeDto>>()
+                .GetCreatorProcessor<CommonMultipleUpdaterProcessor<KitchenType, KitchenTypeDto, KitchenTypeConverter>>()
                 .ProcessAsync(
                     data: models,
-                    predicate: entity => models.Select(model => model.Code).Contains(entity.Code)));
+                    predicate: entity => models.Select(model => model.Code).Contains(entity.Code),
+                    findEntityByDto: model => entity => entity.Code == model.Code
+                    ));
 
     }
 }

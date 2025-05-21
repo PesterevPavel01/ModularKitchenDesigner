@@ -1,4 +1,5 @@
 ﻿using ModularKitchenDesigner.Domain.Dto;
+using ModularKitchenDesigner.Domain.Entityes.Base;
 using ModularKitchenDesigner.Domain.Interfaces;
 using ModularKitchenDesigner.Domain.Interfaces.Convertors;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
@@ -8,7 +9,7 @@ using Repository;
 namespace ModularKitchenDesigner.Application.Converters
 {
     public sealed class SimpleEntityConverter<TEntity> : IDtoToEntityConverter<TEntity, SimpleDto>
-        where TEntity : class, ISimpleEntity, new()
+        where TEntity : Identity, ISimpleEntity, new()
     {
         private IRepositoryFactory _repositoryFactory = null!;
         private IValidatorFactory _validatorFactory = null!;
@@ -24,14 +25,14 @@ namespace ModularKitchenDesigner.Application.Converters
             return this;
         }
 
-        public async Task<List<TEntity>> Convert(List<SimpleDto> models, List<TEntity> entityes, string[] validatorSuffix)
+        public async Task<List<TEntity>> Convert(List<SimpleDto> models, List<TEntity> entities, Func<SimpleDto, Func<TEntity, bool>> findEntityByDto, string[] validatorSuffix)
         {
             foreach (SimpleDto model in models) 
             {
                 TEntity? entity  = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
-                    model: entityes.FirstOrDefault(entity  => model.Code == entity.Code),
+                    model: entities.FirstOrDefault(findEntityByDto(model)),
                     suffix: validatorSuffix,
                     preffix: $"Элемент вызвавший ошибку: {JsonConvert.SerializeObject(model, Formatting.Indented)}"
                 );
@@ -39,7 +40,7 @@ namespace ModularKitchenDesigner.Application.Converters
                 entity.Title = model?.Title;
             }
            
-            return entityes;
+            return entities;
         }
     }
 }

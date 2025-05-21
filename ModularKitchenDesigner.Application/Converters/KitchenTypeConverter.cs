@@ -1,5 +1,6 @@
 ﻿using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes;
+using ModularKitchenDesigner.Domain.Entityes.Base;
 using ModularKitchenDesigner.Domain.Interfaces.Convertors;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
 using Newtonsoft.Json;
@@ -24,7 +25,7 @@ namespace ModularKitchenDesigner.Application.Converters
             return this;
         }
 
-        public async Task<List<KitchenType>> Convert(List<KitchenTypeDto> models, List<KitchenType> entities, string[] validatorSuffix)
+        public async Task<List<KitchenType>> Convert(List<KitchenTypeDto> models, List<KitchenType> entities, Func<KitchenTypeDto, Func<KitchenType, bool>> findEntityByDto, string[] validatorSuffix)
         {
             var priceSegmentResult = _validatorFactory
                 .GetObjectNullValidator()
@@ -38,16 +39,19 @@ namespace ModularKitchenDesigner.Application.Converters
                 KitchenType? entity = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
-                    model: entities.FirstOrDefault(entity => model.Code == entity.Code),
+                    model: entities.FirstOrDefault(findEntityByDto(model)),
                     suffix: validatorSuffix,
                     preffix: $"Элемент вызвавший ошибку: {JsonConvert.SerializeObject(model, Formatting.Indented)}"
                 );
 
                 entity.Title = model.Title;
                 entity.Code = model.Code;
-                entity.PriceSegmentId = priceSegmentResult.Where(segment => segment.Title == model.PriceSegment).FirstOrDefault().Id;
+                entity.PriceSegmentId = _validatorFactory
+                .GetObjectNullValidator()
+                .Validate(
+                    model: priceSegmentResult.Find(segment => segment.Title == model.PriceSegment),
+                    suffix: validatorSuffix)?.Id ?? entity.PriceSegmentId;
             }
-
             return entities;
         }
 

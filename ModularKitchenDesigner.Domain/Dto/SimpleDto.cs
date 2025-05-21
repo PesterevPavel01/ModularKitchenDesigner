@@ -1,9 +1,10 @@
-﻿using ModularKitchenDesigner.Domain.Interfaces;
+﻿using ModularKitchenDesigner.Domain.Entityes.Base;
+using ModularKitchenDesigner.Domain.Interfaces;
 using System.ComponentModel.DataAnnotations;
 
 namespace ModularKitchenDesigner.Domain.Dto
 {
-    public sealed class SimpleDto : ISimpleEntity
+    public sealed class SimpleDto : PrivateIdentity, ISimpleEntity
     {
         [Required(ErrorMessage = "Title cannot be null or empty.")]
         public string Title { get; set; }

@@ -1,9 +1,10 @@
 ﻿using ModularKitchenDesigner.Domain.Entityes;
+using ModularKitchenDesigner.Domain.Entityes.Base;
 using System.ComponentModel.DataAnnotations;
 
 namespace ModularKitchenDesigner.Domain.Dto
 {
-    public class MaterialSelectionItemDto
+    public class MaterialSelectionItemDto : PrivateIdentity
     {
         public MaterialSelectionItemDto(){}
 
@@ -13,6 +14,7 @@ namespace ModularKitchenDesigner.Domain.Dto
             Material = materialItem.Material.Title;
             KitchenType = materialItem.KitchenType.Title;
             Guid = materialItem.Id;
+            base.SetId(materialItem.Id);
         }
 
         [Required(ErrorMessage = "ComponentType cannot be null or empty.")]
