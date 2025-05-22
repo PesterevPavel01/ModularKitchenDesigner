@@ -1,30 +1,28 @@
-﻿using ModularKitchenDesigner.Domain.Interfaces.Validators;
-using System.Runtime.CompilerServices;
-using System.Text;
+﻿using System.Runtime.CompilerServices;
+using ModularKitchenDesigner.Application.Exceptions;
+using ModularKitchenDesigner.Domain.Interfaces.Validators;
 
 namespace ModularKitchenDesigner.Application.Validators
 {
     internal class EmptyListValidator : IEmptyListValidator
     {
-        public List<TEntity> Validate<TEntity>(List<TEntity> models, string preffix = "", [CallerMemberName] string methodName = null, params string[] suffix)
+        public List<TEntity> Validate<TEntity, TArgument>(List<TEntity> models, TArgument methodArgument, String callerObject = null, [CallerMemberName] string methodName = null)
             where TEntity : class
         {
             if (!models.Any())
             {
-                StringBuilder stringBuilder = new();
+                ErrorMessage errorMessage = new()
+                {
+                    Title = "Ошибка валидации!",
+                    MethodName = methodName,
+                    Entity = typeof(TEntity).Name,
+                    Message = "Записи не найдены!",
+                    CallerObject = callerObject,
+                    MethodArgument = methodArgument,
+                    Code = 1
+                };
 
-                if (!String.IsNullOrEmpty(preffix))
-                    stringBuilder.AppendLine(preffix);
-
-                stringBuilder.AppendLine($"Entity: {typeof(TEntity).Name}");
-                stringBuilder.AppendLine("ErrorMessage: Нет ни одной записи, удовлетворяющей установленным условиям!");
-                stringBuilder.AppendLine($"MethodName: {methodName}");
-
-                if (suffix.Count() > 0)
-                    foreach (var param in suffix)
-                        stringBuilder.AppendLine(param);
-
-                throw new Exception(stringBuilder.ToString());
+                throw new ValidationException(errorMessage.ToJson());
             }
 
             return models;

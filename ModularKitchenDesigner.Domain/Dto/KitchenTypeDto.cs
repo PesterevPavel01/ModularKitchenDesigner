@@ -1,6 +1,6 @@
 ﻿using ModularKitchenDesigner.Domain.Entityes;
 using ModularKitchenDesigner.Domain.Entityes.Base;
-using ModularKitchenDesigner.Domain.Interfaces;
+using ModularKitchenDesigner.Domain.Interfaces.Base;
 using System.ComponentModel.DataAnnotations;
 
 namespace ModularKitchenDesigner.Domain.Dto

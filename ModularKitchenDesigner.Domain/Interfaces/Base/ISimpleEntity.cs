@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ModularKitchenDesigner.Domain.Interfaces
+namespace ModularKitchenDesigner.Domain.Interfaces.Base
 {
     public interface ISimpleEntity
     {

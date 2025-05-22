@@ -27,30 +27,39 @@ namespace ModularKitchenDesigner.Api.Controllers
 
         [HttpPost("CreateMultiple")]
         public async Task<IActionResult> CreateMultiple([FromBody] List<SectionDto> models)
-            => Ok(
-                await _sectionProcessorFactory
-                .GetCreatorProcessor<CommonMultipleCreatorProcessor<Section, SectionDto, SectionConverter>>()
-                .ProcessAsync(
-                    data: models,
-                    predicate: entity => 
-                        models.Select(model => model.KitchenGuid).Contains(entity.Kitchen.Id)
-                        && models.Select(model => model.ModuleCode).Contains(entity.Module.Code),
-                    findEntityByDto: model => entity => model.GetId() == entity.Id));
+        => Ok(
+            await _sectionProcessorFactory
+            .GetCreatorProcessor<CommonMultipleCreatorProcessor<Section, SectionDto, SectionConverter>>()
+            .ProcessAsync(
+                data: models,
+                predicate: entity => 
+                    models.Select(model => model.KitchenGuid).Contains(entity.Kitchen.Id)
+                    && models.Select(model => model.ModuleCode).Contains(entity.Module.Code),
+                findEntityByDto: model => entity => model.GetId() == entity.Id));
 
 
         [HttpPost("UpdateMultiple")]
         public async Task<IActionResult> Update([FromBody] List<SectionDto> models)
-            => Ok(
-                await _sectionProcessorFactory
-                .GetCreatorProcessor<CommonMultipleUpdaterProcessor<Section, SectionDto, SectionConverter>>()
-                .ProcessAsync(
-                    data: models,
-                    predicate: entity =>
-                        models.Select(model => model.KitchenGuid).Contains(entity.Kitchen.Id)
-                        && models.Select(model => model.ModuleCode).Contains(entity.Module.Code),
-                    findEntityByDto: model => entity => 
-                        entity.KitchenId == model.KitchenGuid
-                        && entity.Module.Code == model.ModuleCode
-                    ));
+        => Ok(
+            await _sectionProcessorFactory
+            .GetCreatorProcessor<CommonMultipleUpdaterProcessor<Section, SectionDto, SectionConverter>>()
+            .ProcessAsync(
+                data: models,
+                predicate: entity =>
+                    models.Select(model => model.KitchenGuid).Contains(entity.Kitchen.Id)
+                    && models.Select(model => model.ModuleCode).Contains(entity.Module.Code),
+                findEntityByDto: model => entity => 
+                    entity.KitchenId == model.KitchenGuid
+                    && entity.Module.Code == model.ModuleCode));
+
+        [HttpPost("RemoveMultiple")]
+        public async Task<IActionResult> Remove([FromBody] List<SectionDto> models)
+        => Ok(
+            await _sectionProcessorFactory
+            .GetLoaderProcessor<CommonMultipleRemoveProcessor<Section, SectionDto>>()
+            .ProcessAsync(
+                predicate: entity =>
+                    models.Select(model => model.KitchenGuid).Contains(entity.Kitchen.Id)
+                    && models.Select(model => model.ModuleCode).Contains(entity.Module.Code)));
     }
 }

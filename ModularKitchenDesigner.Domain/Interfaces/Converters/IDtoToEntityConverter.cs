@@ -1,8 +1,7 @@
-﻿using ModularKitchenDesigner.Domain.Interfaces.Processors;
-using ModularKitchenDesigner.Domain.Interfaces.Validators;
+﻿using ModularKitchenDesigner.Domain.Interfaces.Validators;
 using Repository;
 
-namespace ModularKitchenDesigner.Domain.Interfaces.Convertors
+namespace ModularKitchenDesigner.Domain.Interfaces.Converters
 {
     public interface IDtoToEntityConverter<TEntity, TDto>
     {
@@ -13,7 +12,7 @@ namespace ModularKitchenDesigner.Domain.Interfaces.Convertors
         /// <param name="entities">коллекция сущностей</param>
         /// <param name="validatorSuffix">суффикс для сообщения об ошибке</param>
         /// <returns></returns>
-        Task<List<TEntity>> Convert(List<TDto> models, List<TEntity> entities, Func<TDto, Func<TEntity, bool>> findEntityByDto, string[] validatorSuffix);
+        Task<List<TEntity>> Convert(List<TDto> models, List<TEntity> entities, Func<TDto, Func<TEntity, bool>> findEntityByDto);
         IDtoToEntityConverter<TEntity, TDto> SetValidatorFactory(IValidatorFactory validatorFactory);
         IDtoToEntityConverter<TEntity, TDto> SetRepositoryFactory(IRepositoryFactory repositoryFactory);
     }

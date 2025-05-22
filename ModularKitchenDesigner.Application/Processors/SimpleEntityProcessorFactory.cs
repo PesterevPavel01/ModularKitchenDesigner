@@ -2,8 +2,8 @@
 using ModularKitchenDesigner.Application.Processors.SimpleEntityProcessors;
 using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes.Base;
-using ModularKitchenDesigner.Domain.Interfaces;
-using ModularKitchenDesigner.Domain.Interfaces.Convertors;
+using ModularKitchenDesigner.Domain.Interfaces.Base;
+using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
 using ModularKitchenDesigner.Domain.Interfaces.Processors.SimpleEntity;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;

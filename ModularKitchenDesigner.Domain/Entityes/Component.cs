@@ -35,6 +35,7 @@ namespace ModularKitchenDesigner.Domain.Entityes
                 Material = Material.Title,
                 Model = Model.Title,
             };
+        
         public Component ConvertFromDtoWithRequiredFields(ComponentDto model)
         {
             Code = model.Code;

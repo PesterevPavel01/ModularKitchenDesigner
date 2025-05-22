@@ -1,6 +1,6 @@
 ﻿using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes;
-using ModularKitchenDesigner.Domain.Interfaces.Convertors;
+using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
 using Newtonsoft.Json;
 using Repository;
@@ -24,14 +24,14 @@ namespace ModularKitchenDesigner.Application.Converters
             return this;
         }
         
-        public async Task<List<Module>> Convert(List<ModuleDto> models, List<Module> entities, Func<ModuleDto, Func<Module, bool>> findEntityByDto, string[] validatorSuffix)
+        public async Task<List<Module>> Convert(List<ModuleDto> models, List<Module> entities, Func<ModuleDto, Func<Module, bool>> findEntityByDto)
         {
             var moduleTypeResult = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
                     model: await _repositoryFactory.GetRepository<ModuleType>().GetAllAsync(predicate: x => models.Select(model => model.Type ?? "default").Contains(x.Title)),
-                    preffix: "",
-                    suffix: validatorSuffix);
+                    methodArgument: models,
+                    callerObject: GetType().Name);
 
             foreach (ModuleDto model in models)
             {
@@ -39,9 +39,8 @@ namespace ModularKitchenDesigner.Application.Converters
                 .GetObjectNullValidator()
                 .Validate(
                     model: entities.FirstOrDefault(findEntityByDto(model)),
-                    suffix: validatorSuffix,
-                    preffix: $"Элемент вызвавший ошибку: {JsonConvert.SerializeObject(model, Formatting.Indented)}"
-                );
+                    methodArgument: models,
+                    callerObject: GetType().Name);
 
                 entity.Title = model.Title;
                 entity.Code = model.Code;
@@ -52,8 +51,8 @@ namespace ModularKitchenDesigner.Application.Converters
                     .GetObjectNullValidator()
                     .Validate(
                         model: moduleTypeResult.Find(x => x.Title == model.Type),
-                        suffix: validatorSuffix
-                        )?.Id ?? entity.ModuleTypeId;
+                    methodArgument: models,
+                    callerObject: GetType().Name)?.Id ?? entity.ModuleTypeId;
             }
 
             return entities;

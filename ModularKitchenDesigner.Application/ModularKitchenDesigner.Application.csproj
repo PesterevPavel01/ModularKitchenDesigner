@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ModularKitchenDesigner.Domain\ModularKitchenDesigner.Domain.csproj" />
     <ProjectReference Include="..\Repository\Repository.csproj" />
+    <ProjectReference Include="..\TelegramService\TelegramService.csproj" />
   </ItemGroup>
 
 </Project>

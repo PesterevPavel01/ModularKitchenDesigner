@@ -1,7 +1,6 @@
-﻿using ModularKitchenDesigner.Application.Validators;
-using ModularKitchenDesigner.Domain.Dto;
+﻿using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes;
-using ModularKitchenDesigner.Domain.Interfaces.Convertors;
+using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
 using Newtonsoft.Json;
 using Repository;
@@ -24,28 +23,28 @@ namespace ModularKitchenDesigner.Application.Converters
             _validatorFactory = validatorFactory;
             return this;
         }
-        public async Task<List<MaterialSpecificationItem>> Convert(List<MaterialSpecificationItemDto> models, List<MaterialSpecificationItem> entities, Func<MaterialSpecificationItemDto, Func<MaterialSpecificationItem, bool>> findEntityByDto, string[] validatorSuffix)
+        public async Task<List<MaterialSpecificationItem>> Convert(List<MaterialSpecificationItemDto> models, List<MaterialSpecificationItem> entities, Func<MaterialSpecificationItemDto, Func<MaterialSpecificationItem, bool>> findEntityByDto)
         {
             var modulTypeResult = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
                     model: await _repositoryFactory.GetRepository<ModuleType>().GetAllAsync(predicate: x => models.Select(model => model.ModuleType).Contains(x.Title)),
-                            preffix: "",
-                            suffix: validatorSuffix);
+                    methodArgument: models,
+                    callerObject: GetType().Name);
 
             var materialSelectionItemResult = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
                     model: await _repositoryFactory.GetRepository<MaterialSelectionItem>().GetAllAsync(predicate: x => models.Select(model => model.MaterialSelectionItemGuid).Contains(x.Id)),
-                    preffix: "",
-                    suffix: validatorSuffix);
+                    methodArgument: models,
+                    callerObject: GetType().Name);
 
             var kitchenResult = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
                     model: await _repositoryFactory.GetRepository<Kitchen>().GetAllAsync(predicate: x => models.Select(model => model.KitchenGuid).Contains(x.Id)),
-                    preffix: "",
-                    suffix: validatorSuffix);
+                    methodArgument: models,
+                    callerObject: GetType().Name);
 
             foreach (MaterialSpecificationItemDto model in models)
             {
@@ -53,30 +52,29 @@ namespace ModularKitchenDesigner.Application.Converters
                     .GetObjectNullValidator()
                     .Validate(
                         model: entities.FirstOrDefault(findEntityByDto(model)),
-                        suffix: validatorSuffix,
-                        preffix: $"Элемент вызвавший ошибку: {JsonConvert.SerializeObject(model, Formatting.Indented)}"
-                    );
+                        methodArgument: models,
+                        callerObject: GetType().Name);
 
                 entity.ModuleTypeId = _validatorFactory
                     .GetObjectNullValidator()
                     .Validate(
                         model: modulTypeResult.Find(x => x.Title == model.ModuleType),
-                        suffix: validatorSuffix
-                        )?.Id ?? entity.ModuleTypeId;
+                        methodArgument: models,
+                        callerObject: GetType().Name)?.Id ?? entity.ModuleTypeId;
 
                 entity.MaterialSelectionItemId = _validatorFactory
                     .GetObjectNullValidator()
                     .Validate(
                         model: materialSelectionItemResult.Find(x => x.Id == model.MaterialSelectionItemGuid),
-                        suffix: validatorSuffix
-                        )?.Id ?? entity.MaterialSelectionItemId;
+                        methodArgument: models,
+                        callerObject: GetType().Name)?.Id ?? entity.MaterialSelectionItemId;
 
                 entity.KitchenId = _validatorFactory
                     .GetObjectNullValidator()
                     .Validate(
                         model: kitchenResult.Find(x => x.Id == model.KitchenGuid),
-                        suffix: validatorSuffix
-                        )?.Id ?? entity.KitchenId;
+                        methodArgument: models,
+                        callerObject: GetType().Name)?.Id ?? entity.KitchenId;
             }
 
             return entities;

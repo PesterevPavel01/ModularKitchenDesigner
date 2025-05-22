@@ -1,6 +1,6 @@
 ﻿using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes;
-using ModularKitchenDesigner.Domain.Interfaces.Convertors;
+using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
 using Newtonsoft.Json;
 using Repository;
@@ -24,21 +24,21 @@ namespace ModularKitchenDesigner.Application.Converters
             return this;
         }
 
-        public async Task<List<Section>> Convert(List<SectionDto> models, List<Section> entities, Func<SectionDto, Func<Section, bool>> findEntityByDto, string[] validatorSuffix)
+        public async Task<List<Section>> Convert(List<SectionDto> models, List<Section> entities, Func<SectionDto, Func<Section, bool>> findEntityByDto)
         {
             var kitchenResult = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
                     model: await _repositoryFactory.GetRepository<Kitchen>().GetAllAsync(predicate: x => models.Select(model => model.KitchenGuid).Contains(x.Id)),
-                    preffix: "",
-                    suffix: validatorSuffix);
+                    methodArgument: models,
+                    callerObject: GetType().Name);
 
             var moduleResult = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
                     model: await _repositoryFactory.GetRepository<Module>().GetAllAsync(predicate: x => models.Select(model => model.ModuleCode).Contains(x.Code)),
-                    preffix: "",
-                    suffix: validatorSuffix);
+                    methodArgument: models,
+                    callerObject: GetType().Name);
 
             foreach (SectionDto model in models)
             {
@@ -46,21 +46,22 @@ namespace ModularKitchenDesigner.Application.Converters
                 .GetObjectNullValidator()
                 .Validate(
                     model: entities.FirstOrDefault(findEntityByDto(model)),
-                    suffix: validatorSuffix,
-                    preffix: $"Элемент вызвавший ошибку: {JsonConvert.SerializeObject(model, Formatting.Indented)}"
-                );
+                    methodArgument: models,
+                    callerObject: GetType().Name);
 
                 entity.KitchenId = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
                     model: kitchenResult.Find(kitchen => kitchen.Id == model.KitchenGuid),
-                    suffix: validatorSuffix)?.Id ?? entity.KitchenId;
+                    methodArgument: models,
+                    callerObject: GetType().Name)?.Id ?? entity.KitchenId;
 
                 entity.ModuleId = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
                     model: moduleResult.Find(module => module.Code == model.ModuleCode),
-                    suffix: validatorSuffix)?.Id ?? entity.ModuleId;
+                    methodArgument: models,
+                    callerObject: GetType().Name)?.Id ?? entity.ModuleId;
 
                 entity.Quantity = model.Quantity;
             }

@@ -9,14 +9,12 @@ using Result;
 
 namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
 {
-    public sealed class CommonDefaultLoaderProcessor<TEntity, TDto> : ILoaderProcessor<TEntity, TDto>
+    public class CommonMultipleRemoveProcessor<TEntity, TDto> : ILoaderProcessor<TEntity, TDto>
         where TDto : class
         where TEntity : Identity, IAuditable, IConvertibleToDto<TEntity, TDto>
     {
-
         private IRepositoryFactory _repositoryFactory = null!;
         private IValidatorFactory _validatorFactory = null!;
-
 
         public ILoaderProcessor<TEntity, TDto> SetRepositoryFactory(IRepositoryFactory repositoryFactory)
         {
@@ -31,14 +29,18 @@ namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
         }
         public async Task<CollectionResult<TDto>> ProcessAsync(Expression<Func<TEntity, bool>> predicate = null)
         {
+
             List<TEntity> models = _validatorFactory
-                .GetEmptyListValidator()
-                .Validate(
-                    models: await _repositoryFactory.GetRepository<TEntity>().GetAllAsync(
-                        include: TEntity.IncludeRequaredField(),
-                        predicate: predicate),
-                    methodArgument: predicate.GetType().Name,
-                    callerObject: GetType().Name);
+            .GetEmptyListValidator()
+            .Validate(
+                models: await _repositoryFactory.GetRepository<TEntity>().GetAllAsync(
+                predicate: predicate,
+                trackingType: TrackingType.Tracking,
+                include: TEntity.IncludeRequaredField()),
+                methodArgument: predicate.GetType().Name,
+                callerObject: GetType().Name);
+
+            var result = await _repositoryFactory.GetRepository<TEntity>().RemoveMultipleAsync(models);
 
             return new()
             {
@@ -46,6 +48,5 @@ namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
                 Data = models.Select(x => x.ConvertToDto())
             };
         }
-
     }
 }

@@ -1,7 +1,8 @@
 ﻿using System.Linq.Expressions;
 using ModularKitchenDesigner.Domain.Entityes.Base;
 using ModularKitchenDesigner.Domain.Interfaces;
-using ModularKitchenDesigner.Domain.Interfaces.Convertors;
+using ModularKitchenDesigner.Domain.Interfaces.Base;
+using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
 using Newtonsoft.Json;
@@ -38,11 +39,7 @@ namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
 
         public async Task<CollectionResult<TDto>> ProcessAsync(List<TDto> models, Func<TDto, Func<TEntity, bool>> findEntityByDto, Expression<Func<TEntity, bool>>? predicate = null)
         {
-            string[] suffix = [
-                $"Object: {GetType().Name}",
-                $"Argument: {JsonConvert.SerializeObject(models, Formatting.Indented)}"
-            ];
-
+ 
             List<TEntity> currentEntities = _validatorFactory
                 .GetEmptyListValidator()
                 .Validate(
@@ -53,8 +50,8 @@ namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
                             trackingType: TrackingType.Tracking,
                             include: TEntity.IncludeRequaredField()
                         ),
-                    preffix: "",
-                    suffix: suffix);
+                    methodArgument: models,
+                    callerObject: GetType().Name);
 
             var result = await _repositoryFactory
                 .GetRepository<TEntity>()
@@ -64,7 +61,6 @@ namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
                     .Convert(
                         models: models,
                         entities: currentEntities,
-                        validatorSuffix: suffix,
                         findEntityByDto: findEntityByDto));
             
             var newComponents = await _repositoryFactory

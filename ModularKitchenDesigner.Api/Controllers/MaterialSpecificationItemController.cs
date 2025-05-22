@@ -53,5 +53,16 @@ namespace ModularKitchenDesigner.Api.Controllers
                         model.ModuleType == entity.ModuleType.Title
                         && model.MaterialSelectionItemGuid == entity.MaterialSelectionItem.Id
                         && model.KitchenGuid == entity.Kitchen.Id));
+
+        [HttpPost("RemoveMultiple")]
+        public async Task<IActionResult> Remove([FromBody] List<MaterialSpecificationItemDto> models)
+        => Ok(
+            await _materialSpecificationItemProcessorFactory
+            .GetLoaderProcessor<CommonMultipleRemoveProcessor<MaterialSpecificationItem, MaterialSpecificationItemDto>>()
+            .ProcessAsync(
+                predicate: entity =>
+                    models.Select(model => model.ModuleType).Contains(entity.ModuleType.Title)
+                    && models.Select(model => model.MaterialSelectionItemGuid).Contains(entity.MaterialSelectionItem.Id)
+                    && models.Select(model => model.KitchenGuid).Contains(entity.Kitchen.Id)));
     }
 }

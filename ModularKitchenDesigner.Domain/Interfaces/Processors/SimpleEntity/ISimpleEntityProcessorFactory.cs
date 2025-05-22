@@ -1,6 +1,7 @@
 ﻿using Interceptors;
 using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes.Base;
+using ModularKitchenDesigner.Domain.Interfaces.Base;
 using Result;
 
 namespace ModularKitchenDesigner.Domain.Interfaces.Processors.SimpleEntity

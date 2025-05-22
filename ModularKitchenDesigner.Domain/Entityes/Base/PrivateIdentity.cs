@@ -1,4 +1,6 @@
-﻿namespace ModularKitchenDesigner.Domain.Entityes.Base
+﻿using ModularKitchenDesigner.Domain.Interfaces.Base;
+
+namespace ModularKitchenDesigner.Domain.Entityes.Base
 {
     public class PrivateIdentity : IPrivateIdentity
     {

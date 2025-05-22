@@ -6,6 +6,8 @@ using ModularKitchenDesigner.DAL.Dependencies;
 using Repository.Dependencies;
 using ModularKitchenDesigner.Api;
 using ModularKitchenDesigner.Application.Extensions;
+using Microsoft.AspNetCore.Diagnostics;
+using ModularKitchenDesigner.Api.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +27,7 @@ builder.Services.AddServices();
 
 var app = builder.Build();
 
+app.UseMiddleware<ExcertionHandlingMiddleware>();
 // Configure the HTTP request pipeline.
 
 app.UseSwagger();

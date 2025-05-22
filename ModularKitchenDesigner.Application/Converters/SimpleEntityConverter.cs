@@ -1,7 +1,7 @@
 ﻿using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes.Base;
-using ModularKitchenDesigner.Domain.Interfaces;
-using ModularKitchenDesigner.Domain.Interfaces.Convertors;
+using ModularKitchenDesigner.Domain.Interfaces.Base;
+using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
 using Newtonsoft.Json;
 using Repository;
@@ -25,7 +25,7 @@ namespace ModularKitchenDesigner.Application.Converters
             return this;
         }
 
-        public async Task<List<TEntity>> Convert(List<SimpleDto> models, List<TEntity> entities, Func<SimpleDto, Func<TEntity, bool>> findEntityByDto, string[] validatorSuffix)
+        public async Task<List<TEntity>> Convert(List<SimpleDto> models, List<TEntity> entities, Func<SimpleDto, Func<TEntity, bool>> findEntityByDto)
         {
             foreach (SimpleDto model in models) 
             {
@@ -33,9 +33,8 @@ namespace ModularKitchenDesigner.Application.Converters
                 .GetObjectNullValidator()
                 .Validate(
                     model: entities.FirstOrDefault(findEntityByDto(model)),
-                    suffix: validatorSuffix,
-                    preffix: $"Элемент вызвавший ошибку: {JsonConvert.SerializeObject(model, Formatting.Indented)}"
-                );
+                    methodArgument: models,
+                    callerObject: GetType().Name);
 
                 entity.Title = model?.Title;
             }

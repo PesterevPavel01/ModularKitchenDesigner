@@ -275,6 +275,17 @@ namespace Repository
             return await Task.FromResult(entity);
         }
 
+        public async Task<List<TEntity>> RemoveMultipleAsync(List<TEntity> entities)
+        {
+            if (entities.Count == 0)
+                throw new ArgumentNullException("Entities not found");
+
+            _dbContext.RemoveRange(entities);
+            await _dbContext.SaveChangesAsync();
+
+            return await Task.FromResult(entities);
+        }
+
         public async Task<bool> SaveChangesAsync()
         {
             try

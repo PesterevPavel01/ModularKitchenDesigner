@@ -1,6 +1,4 @@
-﻿using ModularKitchenDesigner.Domain.Interfaces.Processors.SimpleEntity;
-
-namespace ModularKitchenDesigner.Domain.Interfaces.Convertors
+﻿namespace ModularKitchenDesigner.Domain.Interfaces.Converters
 {
     public interface IDtoToEntityConverterFactory
     {

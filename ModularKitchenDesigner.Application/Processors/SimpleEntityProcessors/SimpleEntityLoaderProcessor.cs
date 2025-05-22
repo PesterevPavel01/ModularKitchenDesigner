@@ -2,7 +2,7 @@
 using Interceptors;
 using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes.Base;
-using ModularKitchenDesigner.Domain.Interfaces;
+using ModularKitchenDesigner.Domain.Interfaces.Base;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
 using Repository;
@@ -39,8 +39,8 @@ namespace ModularKitchenDesigner.Application.Processors.SimpleEntityProcessors
                 .GetEmptyListValidator()
                 .Validate(
                     models: await _repositoryFactory.GetRepository<TEntity>().GetAllAsync(predicate: predicate),
-                    preffix: "",
-                    suffix: suffix);
+                    methodArgument: predicate.GetType().Name,
+                    callerObject: GetType().Name);
 
             var resultList = result.Select(x => new SimpleDto() { Code = x.Code, Title = x.Title }).ToList();
 

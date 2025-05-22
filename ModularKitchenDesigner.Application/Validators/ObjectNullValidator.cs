@@ -1,30 +1,28 @@
-﻿using ModularKitchenDesigner.Domain.Interfaces.Validators;
-using System.Runtime.CompilerServices;
-using System.Text;
+﻿using System.Runtime.CompilerServices;
+using ModularKitchenDesigner.Application.Exceptions;
+using ModularKitchenDesigner.Domain.Interfaces.Validators;
 
 namespace ModularKitchenDesigner.Application.Validators
 {
     internal class ObjectNullValidator : IObjectNullValidator
     {
-        public TEntity Validate<TEntity>(TEntity model, string preffix = "", [CallerMemberName] string methodName = null, params string[] suffix)
+        public TEntity Validate<TEntity, TArgument>(TEntity model, TArgument methodArgument, String callerObject = null, [CallerMemberName] string methodName = null)
              where TEntity : class
         {
             if (model is null) 
             {
-                StringBuilder stringBuilder = new ();
-                
-                if (!String.IsNullOrEmpty(preffix))
-                    stringBuilder.AppendLine(preffix);
-                
-                stringBuilder.AppendLine($"Entity: {typeof(TEntity).Name}");
-                stringBuilder.AppendLine("ErrorMessage: Запись не найдена!");
-                stringBuilder.AppendLine($"MethodName: {methodName}");
+                ErrorMessage errorMessage = new()
+                {
+                    Title = "Ошибка валидации",
+                    Entity = typeof(TEntity).Name,
+                    Message = "Оъект не найден!",
+                    CallerObject = callerObject,
+                    MethodName = methodName,
+                    MethodArgument = methodArgument,
+                    Code = 0
+                };
 
-                if (suffix.Count() > 0)
-                    foreach (var param in suffix)
-                        stringBuilder.AppendLine(param);
-
-                throw new Exception(stringBuilder.ToString());
+                throw new ValidationException(errorMessage.ToJson());
             }
 
             return model;

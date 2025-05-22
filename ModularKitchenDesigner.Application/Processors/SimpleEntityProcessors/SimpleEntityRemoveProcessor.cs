@@ -1,8 +1,7 @@
 ﻿using ModularKitchenDesigner.Domain.Dto;
-using ModularKitchenDesigner.Domain.Interfaces;
+using ModularKitchenDesigner.Domain.Interfaces.Base;
 using ModularKitchenDesigner.Domain.Interfaces.Processors.SimpleEntity;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
-using Newtonsoft.Json;
 using Repository;
 
 namespace ModularKitchenDesigner.Application.Processors.SimpleEntityProcessors
@@ -22,17 +21,12 @@ namespace ModularKitchenDesigner.Application.Processors.SimpleEntityProcessors
 
         public async Task<Result.BaseResult<SimpleDto>> RemoveAsync(string code)
         {
-            string[] suffix = [
-                $"Object: {GetType().Name}",
-                $"Argument: {JsonConvert.SerializeObject(code, Formatting.Indented)}"
-            ];
-
             var currentRecord = _validatorFactory
                .GetObjectNullValidator()
                .Validate(
-                   model: (await _repository.GetAllAsync(predicate: x => x.Code == code, trackingType: TrackingType.Tracking)).FirstOrDefault(),
-                   preffix: "",
-                   suffix: suffix);
+                    model: (await _repository.GetAllAsync(predicate: x => x.Code == code, trackingType: TrackingType.Tracking)).FirstOrDefault(),
+                    methodArgument: $"Code: {code}",
+                    callerObject: GetType().Name);
 
             var result = await _repository.RemoveAsync(currentRecord);
 

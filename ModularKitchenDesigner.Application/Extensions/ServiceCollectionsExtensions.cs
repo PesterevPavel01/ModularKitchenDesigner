@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using ModularKitchenDesigner.Application.Converters;
+using ModularKitchenDesigner.Application.Handlers;
 using ModularKitchenDesigner.Application.Processors;
 using ModularKitchenDesigner.Application.Validators;
 using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes;
-using ModularKitchenDesigner.Domain.Interfaces.Convertors;
+using ModularKitchenDesigner.Domain.Interfaces.Converters;
+using ModularKitchenDesigner.Domain.Interfaces.Handlers;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
 using ModularKitchenDesigner.Domain.Interfaces.Processors.SimpleEntity;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
@@ -17,7 +19,7 @@ namespace ModularKitchenDesigner.Application.Extensions
         {
             if (services is null)
             {
-                throw new ArgumentNullException(nameof(services));
+                throw new ApplicationException(nameof(services));
             }
 
             services.AddScoped<IValidatorFactory, ValidatorFactory>();
@@ -42,6 +44,8 @@ namespace ModularKitchenDesigner.Application.Extensions
             services.AddScoped<ISimpleEntityProcessorFactory, SimpleEntityProcessorFactory>();
 
             services.AddScoped<IDtoToEntityConverterFactory, DtoToEntityConverterFactory>();
+
+            services.AddSingleton<IExceptionHandlerService, ExceptionHandlerService>();
 
 
             return services;

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Query;
 using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Interfaces;
+using ModularKitchenDesigner.Domain.Interfaces.Base;
 
 namespace ModularKitchenDesigner.Domain.Entityes.Base
 {

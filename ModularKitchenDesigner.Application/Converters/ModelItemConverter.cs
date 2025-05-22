@@ -1,6 +1,6 @@
 ﻿using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes;
-using ModularKitchenDesigner.Domain.Interfaces.Convertors;
+using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
 using Newtonsoft.Json;
 using Repository;
@@ -23,21 +23,21 @@ namespace ModularKitchenDesigner.Application.Converters
             _validatorFactory = validatorFactory;
             return this;
         }
-        public async Task<List<ModelItem>> Convert(List<ModelItemDto> models, List<ModelItem> entities, Func<ModelItemDto, Func<ModelItem, bool>> findEntityByDto, string[] validatorSuffix)
+        public async Task<List<ModelItem>> Convert(List<ModelItemDto> models, List<ModelItem> entities, Func<ModelItemDto, Func<ModelItem, bool>> findEntityByDto)
         {
             var moduleResult = _validatorFactory
             .GetObjectNullValidator()
             .Validate(
                 model: await _repositoryFactory.GetRepository<Module>().GetAllAsync(predicate: x => models.Select(model => model.ModuleCode).Contains(x.Code)),
-                preffix: "",
-                suffix: validatorSuffix);
+                methodArgument: models,
+                callerObject: GetType().Name);
 
             var modelResult = _validatorFactory
             .GetObjectNullValidator()
             .Validate(
-                    model: await _repositoryFactory.GetRepository<Model>().GetAllAsync(predicate: x => models.Select(model => model.ModelCode).Contains(x.Code)),
-                    preffix: "",
-                    suffix: validatorSuffix);
+                model: await _repositoryFactory.GetRepository<Model>().GetAllAsync(predicate: x => models.Select(model => model.ModelCode).Contains(x.Code)),
+                methodArgument: models,
+                callerObject: GetType().Name);
 
             foreach (ModelItemDto model in models)
             {
@@ -45,21 +45,21 @@ namespace ModularKitchenDesigner.Application.Converters
                 .GetObjectNullValidator()
                 .Validate(
                     model: entities.FirstOrDefault(findEntityByDto(model)),
-                    suffix: validatorSuffix,
-                    preffix: $"Элемент вызвавший ошибку: {JsonConvert.SerializeObject(model, Formatting.Indented)}"
-                );
+                    methodArgument: models,
+                    callerObject: GetType().Name);
 
                 entity.ModuleId = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
                     model: moduleResult.Find(x => x.Code == model.ModuleCode),
-                    suffix: validatorSuffix)?.Id ?? entity.ModuleId;
+                methodArgument: models,
+                callerObject: GetType().Name)?.Id ?? entity.ModuleId;
 
                 entity.ModelId =_validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
                     model: modelResult.Find(x => x.Code == model.ModelCode),
-                    suffix: validatorSuffix)?.Id ?? entity.ModelId;
+                    methodArgument: models, callerObject: GetType().Name)?.Id ?? entity.ModelId;
 
                 entity.Quantity = model.Quantity;
             }

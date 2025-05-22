@@ -1,7 +1,6 @@
 ﻿using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes;
-using ModularKitchenDesigner.Domain.Entityes.Base;
-using ModularKitchenDesigner.Domain.Interfaces.Convertors;
+using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
 using Newtonsoft.Json;
 using Repository;
@@ -25,14 +24,14 @@ namespace ModularKitchenDesigner.Application.Converters
             return this;
         }
 
-        public async Task<List<KitchenType>> Convert(List<KitchenTypeDto> models, List<KitchenType> entities, Func<KitchenTypeDto, Func<KitchenType, bool>> findEntityByDto, string[] validatorSuffix)
+        public async Task<List<KitchenType>> Convert(List<KitchenTypeDto> models, List<KitchenType> entities, Func<KitchenTypeDto, Func<KitchenType, bool>> findEntityByDto)
         {
             var priceSegmentResult = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
                     model: await _repositoryFactory.GetRepository<PriceSegment>().GetAllAsync(predicate: x => models.Select(model => model.PriceSegment).Contains(x.Title)),
-                    preffix: "",
-                    suffix: validatorSuffix);
+                    methodArgument: models,
+                    callerObject: GetType().Name);
 
             foreach (KitchenTypeDto model in models)
             {
@@ -40,9 +39,8 @@ namespace ModularKitchenDesigner.Application.Converters
                 .GetObjectNullValidator()
                 .Validate(
                     model: entities.FirstOrDefault(findEntityByDto(model)),
-                    suffix: validatorSuffix,
-                    preffix: $"Элемент вызвавший ошибку: {JsonConvert.SerializeObject(model, Formatting.Indented)}"
-                );
+                    methodArgument: models,
+                    callerObject: GetType().Name);
 
                 entity.Title = model.Title;
                 entity.Code = model.Code;
@@ -50,7 +48,8 @@ namespace ModularKitchenDesigner.Application.Converters
                 .GetObjectNullValidator()
                 .Validate(
                     model: priceSegmentResult.Find(segment => segment.Title == model.PriceSegment),
-                    suffix: validatorSuffix)?.Id ?? entity.PriceSegmentId;
+                    methodArgument: models,
+                    callerObject: GetType().Name)?.Id ?? entity.PriceSegmentId;
             }
             return entities;
         }

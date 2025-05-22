@@ -35,6 +35,8 @@ namespace Repository
 
         Task<TEntity> RemoveAsync(TEntity entity);
 
+        Task<List<TEntity>> RemoveMultipleAsync(List<TEntity> entities);
+
         Task<bool> RemoveAllAsync();
 
         Task<TEntity> ReloadAsync(TEntity entity);
