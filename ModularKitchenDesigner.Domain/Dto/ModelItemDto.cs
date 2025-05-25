@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ModularKitchenDesigner.Domain.Dto
 {
-    public sealed class ModelItemDto : PrivateIdentity
+    public sealed class ModelItemDto
     {
         public ModelItemDto(){}
 
@@ -13,6 +13,7 @@ namespace ModularKitchenDesigner.Domain.Dto
             ModuleCode = modelItem.Module.Code;
             ModelCode = modelItem.Model.Code;
             Quantity = modelItem.Quantity;
+            Code = modelItem.Code;
         }
 
         [Required(ErrorMessage = "ModuleCode cannot be null or empty.")]
@@ -22,5 +23,7 @@ namespace ModularKitchenDesigner.Domain.Dto
         public string ModelCode { get; set; }
 
         public short Quantity { get; set; }
+        public String Code { get; set; }
+
     }
 }

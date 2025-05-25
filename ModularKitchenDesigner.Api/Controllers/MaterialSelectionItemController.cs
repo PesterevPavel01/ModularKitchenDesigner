@@ -52,39 +52,20 @@ namespace ModularKitchenDesigner.Api.Controllers
             => Ok(
                 await _materialSelectionItemProcessorFactory
                 .GetCreatorProcessor<CommonMultipleCreatorProcessor<MaterialSelectionItem, MaterialSelectionItemDto, MaterialSelectionItemConverter>>()
-                .ProcessAsync(
-                    data: models,
-                    predicate: entity => 
-                        models.Select(model => model.KitchenType).Contains(entity.KitchenType.Title)
-                        && models.Select(model => model.Material).Contains(entity.Material.Title)
-                        && models.Select(model => model.ComponentType).Contains(entity.ComponentType.Title),
-                    findEntityByDto: model => entity => model.GetId() == entity.Id));
+                .ProcessAsync(models));
 
         [HttpPost("UpdateMultiple")]
         public async Task<IActionResult> UpdateMultiple([FromBody] List<MaterialSelectionItemDto> models)
             => Ok(
                 await _materialSelectionItemProcessorFactory
                 .GetCreatorProcessor<CommonMultipleUpdaterProcessor<MaterialSelectionItem, MaterialSelectionItemDto, MaterialSelectionItemConverter>>()
-                .ProcessAsync(
-                    data: models,
-                    predicate: entity =>
-                        models.Select(model => model.KitchenType).Contains(entity.KitchenType.Title)
-                        && models.Select(model => model.Material).Contains(entity.Material.Title)
-                        && models.Select(model => model.ComponentType).Contains(entity.ComponentType.Title),
-                    findEntityByDto: model => entity => 
-                        model.KitchenType == entity.KitchenType.Title
-                        && model.Material == entity.Material.Title
-                        && model.ComponentType == entity.ComponentType.Title));
+                .ProcessAsync(models));
 
         [HttpPost("RemoveMultiple")]
         public async Task<IActionResult> Remove([FromBody] List<MaterialSelectionItemDto> models)
         => Ok(
             await _materialSelectionItemProcessorFactory
-            .GetLoaderProcessor<CommonMultipleRemoveProcessor<MaterialSelectionItem, MaterialSelectionItemDto>>()
-            .ProcessAsync(
-                    predicate: entity =>
-                        models.Select(model => model.KitchenType).Contains(entity.KitchenType.Title)
-                        && models.Select(model => model.Material).Contains(entity.Material.Title)
-                        && models.Select(model => model.ComponentType).Contains(entity.ComponentType.Title)));
+            .GetCreatorProcessor<CommonMultipleRemoveProcessor<MaterialSelectionItem, MaterialSelectionItemDto>>()
+            .ProcessAsync(models));
     }
 }

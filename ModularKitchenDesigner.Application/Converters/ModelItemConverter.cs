@@ -1,4 +1,5 @@
-﻿using ModularKitchenDesigner.Domain.Dto;
+﻿using System.Collections.Generic;
+using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes;
 using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
@@ -23,7 +24,7 @@ namespace ModularKitchenDesigner.Application.Converters
             _validatorFactory = validatorFactory;
             return this;
         }
-        public async Task<List<ModelItem>> Convert(List<ModelItemDto> models, List<ModelItem> entities, Func<ModelItemDto, Func<ModelItem, bool>> findEntityByDto)
+        public async Task<List<ModelItem>> Convert(List<ModelItemDto> models, List<ModelItem> entities)
         {
             var moduleResult = _validatorFactory
             .GetObjectNullValidator()
@@ -39,32 +40,44 @@ namespace ModularKitchenDesigner.Application.Converters
                 methodArgument: models,
                 callerObject: GetType().Name);
 
-            foreach (ModelItemDto model in models)
+            List < ModelItem > modelItems = [];
+
+            foreach (ModelItemDto modelItem in models)
             {
-                ModelItem? entity = _validatorFactory
+                var module = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
-                    model: entities.FirstOrDefault(findEntityByDto(model)),
-                    methodArgument: models,
-                    callerObject: GetType().Name);
-
-                entity.ModuleId = _validatorFactory
-                .GetObjectNullValidator()
-                .Validate(
-                    model: moduleResult.Find(x => x.Code == model.ModuleCode),
+                    model: moduleResult.Find(x => x.Code == modelItem.ModuleCode),
                 methodArgument: models,
-                callerObject: GetType().Name)?.Id ?? entity.ModuleId;
+                callerObject: GetType().Name);
 
-                entity.ModelId =_validatorFactory
+                var model =_validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
-                    model: modelResult.Find(x => x.Code == model.ModelCode),
-                    methodArgument: models, callerObject: GetType().Name)?.Id ?? entity.ModelId;
+                    model: modelResult.Find(x => x.Code == modelItem.ModelCode),
+                    methodArgument: models, callerObject: GetType().Name);
 
-                entity.Quantity = model.Quantity;
+                var quantity = modelItem.Quantity;
+
+                ModelItem? entity = entities.Find(
+                    x => x.Module.Code == modelItem.ModuleCode
+                    && x.Model.Code == modelItem.ModelCode);
+
+                if(entity is null)
+                    modelItems.Add(
+                        ModelItem.Create(
+                            quantity: quantity,
+                            module: module,
+                            model: model));
+                else
+                    modelItems.Add(
+                        entity.Update(
+                            quantity: quantity,
+                            module: module,
+                            model: model));
             }
 
-            return entities;
+            return modelItems;
         }
 
     }

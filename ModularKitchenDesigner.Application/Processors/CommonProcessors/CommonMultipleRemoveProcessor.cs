@@ -1,7 +1,7 @@
-﻿using System.Linq.Expressions;
-using Interceptors;
+﻿using Interceptors;
 using ModularKitchenDesigner.Domain.Entityes.Base;
 using ModularKitchenDesigner.Domain.Interfaces;
+using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
 using Repository;
@@ -9,44 +9,52 @@ using Result;
 
 namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
 {
-    public class CommonMultipleRemoveProcessor<TEntity, TDto> : ILoaderProcessor<TEntity, TDto>
+    public class CommonMultipleRemoveProcessor<TEntity, TDto> : ICreatorProcessor<TDto, TEntity>
         where TDto : class
-        where TEntity : Identity, IAuditable, IConvertibleToDto<TEntity, TDto>
+        where TEntity : Identity, IAuditable, IDtoConvertible<TEntity, TDto>
     {
         private IRepositoryFactory _repositoryFactory = null!;
         private IValidatorFactory _validatorFactory = null!;
+        private IDtoToEntityConverterFactory _converterFactory = null!;
 
-        public ILoaderProcessor<TEntity, TDto> SetRepositoryFactory(IRepositoryFactory repositoryFactory)
+        public ICreatorProcessor<TDto, TEntity> SetRepositoryFactory(IRepositoryFactory repositoryFactory)
         {
             _repositoryFactory = repositoryFactory;
             return this;
         }
 
-        public ILoaderProcessor<TEntity, TDto> SetValidatorFactory(IValidatorFactory validatorFactory)
+        public ICreatorProcessor<TDto, TEntity> SetValidatorFactory(IValidatorFactory validatorFactory)
         {
             _validatorFactory = validatorFactory;
             return this;
         }
-        public async Task<CollectionResult<TDto>> ProcessAsync(Expression<Func<TEntity, bool>> predicate = null)
+        public ICreatorProcessor<TDto, TEntity> SetDtoToEntityConverterFactory(IDtoToEntityConverterFactory converterFactory)
+        {
+            _converterFactory = converterFactory;
+            return this;
+        }
+
+        public async Task<CollectionResult<TDto>> ProcessAsync(List<TDto> models)
         {
 
-            List<TEntity> models = _validatorFactory
+            List<TEntity> entityes = _validatorFactory
             .GetEmptyListValidator()
             .Validate(
                 models: await _repositoryFactory.GetRepository<TEntity>().GetAllAsync(
-                predicate: predicate,
+                predicate: TEntity.ContainsByUniqueKeyPredicate(models),
                 trackingType: TrackingType.Tracking,
                 include: TEntity.IncludeRequaredField()),
-                methodArgument: predicate.GetType().Name,
+                methodArgument: models?.GetType().Name ?? "N/A",
                 callerObject: GetType().Name);
 
-            var result = await _repositoryFactory.GetRepository<TEntity>().RemoveMultipleAsync(models);
+            var result = await _repositoryFactory.GetRepository<TEntity>().RemoveMultipleAsync(entityes);
 
             return new()
             {
-                Count = models.Count,
-                Data = models.Select(x => x.ConvertToDto())
+                Count = entityes.Count,
+                Data = entityes.Select(entity => entity.ConvertToDto())
             };
         }
+
     }
 }

@@ -14,7 +14,6 @@ namespace ModularKitchenDesigner.DAL.Configurations
             builder.HasIndex(x => x.Code).IsUnique();
             builder.Property(x => x.Title).IsRequired().HasMaxLength(255);
             builder.HasIndex(x => x.Title).IsUnique();
-            builder.HasIndex(x => x.Title);
 
             builder.HasOne(x => x.PriceSegment)
                 .WithMany(x => x.Types)

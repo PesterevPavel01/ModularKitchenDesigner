@@ -1,5 +1,6 @@
 ﻿using Interceptors;
 using ModularKitchenDesigner.Domain.Entityes.Base;
+using ModularKitchenDesigner.Domain.Interfaces;
 using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
@@ -8,7 +9,7 @@ using Repository;
 namespace ModularKitchenDesigner.Application.Processors
 {
     public sealed class ProcessorFactory<TEntity, TDto> : IProcessorFactory<TEntity, TDto>
-        where TEntity : Identity, IAuditable
+        where TEntity : Identity, IDtoConvertible<TEntity, TDto>
         where TDto : class
     {
         private Dictionary<Type, object>? _processors = [];

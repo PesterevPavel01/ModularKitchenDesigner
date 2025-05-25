@@ -1,4 +1,5 @@
-﻿using Interceptors;
+﻿using System.Linq.Expressions;
+using Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using ModularKitchenDesigner.Domain.Dto;
@@ -7,17 +8,27 @@ using ModularKitchenDesigner.Domain.Interfaces;
 
 namespace ModularKitchenDesigner.Domain.Entityes
 {
-    public class MaterialSelectionItem : Identity, IAuditable, IConvertibleToDto<MaterialSelectionItem, MaterialSelectionItemDto>
+    public class MaterialSelectionItem : Identity, IAuditable, IDtoConvertible<MaterialSelectionItem, MaterialSelectionItemDto>
     {
+        private MaterialSelectionItem(){}
+
+        private MaterialSelectionItem(ComponentType componentType, Material material, KitchenType kitchenType, string code) 
+        {
+            ComponentTypeId = componentType.Id;
+            KitchenTypeId = kitchenType.Id;
+            MaterialId = material.Id;
+            Code = code ?? Guid.NewGuid().ToString();
+        }
+
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-
-        public ComponentType ComponentType { get; set; }
-        public Guid ComponentTypeId { get; set; }
-        public Material Material { get; set; }
-        public Guid MaterialId { get; set; }
-        public KitchenType KitchenType { get; set; }
-        public Guid KitchenTypeId { get; set; }
+        public string Code { get; set; }
+        public ComponentType ComponentType { get; private set; }
+        public Guid ComponentTypeId { get; private set; }
+        public Material Material { get; private set; }
+        public Guid MaterialId { get; private set; }
+        public KitchenType KitchenType { get; private set; }
+        public Guid KitchenTypeId { get; private set; }
 
         public List<MaterialSpecificationItem> MaterialSpecificationItems { get; set; }
 
@@ -25,14 +36,19 @@ namespace ModularKitchenDesigner.Domain.Entityes
         => query => query
         .Include(x => x.Material)
         .Include(x => x.ComponentType)
-        .Include(x => x.KitchenType);
+        .Include(x => x.KitchenType)
+        .Include(x => x.MaterialSpecificationItems);
 
-        public MaterialSelectionItem ConvertFromDtoWithRequiredFields(MaterialSelectionItemDto model)
-        {
-            model.Guid = Guid.NewGuid();
-            Id =model.Guid;
-            return this;
-        }
+        public bool isUniqueKeyEqual(MaterialSelectionItemDto model)
+            => this.ComponentType.Title == model.ComponentType
+            && this.Material.Title == model.Material
+            && this.KitchenType.Title == model.KitchenType;
+
+        public static Expression<Func<MaterialSelectionItem, bool>> ContainsByUniqueKeyPredicate(List<MaterialSelectionItemDto> models)
+            => entity
+                => models.Select(model => model.ComponentType).Contains(entity.ComponentType.Title)
+                && models.Select(model => model.Material).Contains(entity.Material.Title)
+                && models.Select(model => model.KitchenType).Contains(entity.KitchenType.Title);
 
         public MaterialSelectionItemDto ConvertToDto()
         => new()
@@ -40,7 +56,20 @@ namespace ModularKitchenDesigner.Domain.Entityes
             ComponentType = ComponentType.Title,
             Material = Material.Title,
             KitchenType = KitchenType.Title,
-            Guid = Id
+            Code = Code
         };
+
+        public static MaterialSelectionItem Create(ComponentType componentType, Material material, KitchenType kitchenType, string code = null)
+            => new(componentType, material, kitchenType, code);
+
+        public MaterialSelectionItem Update(ComponentType componentType, Material material, KitchenType kitchenType, string code = null) 
+        {
+            ComponentTypeId = componentType.Id;
+            MaterialId = material.Id;
+            KitchenTypeId = kitchenType.Id;
+            Code = code ?? Code;
+
+            return this;
+        }
     }
 }

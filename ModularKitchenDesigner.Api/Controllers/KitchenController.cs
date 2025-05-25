@@ -47,27 +47,20 @@ namespace ModularKitchenDesigner.Api.Controllers
             => Ok(
                 await _kitchenProcessorFactory
                 .GetCreatorProcessor<CommonMultipleCreatorProcessor<Kitchen,KitchenDto,KitchenConverter>>()
-                .ProcessAsync(
-                    data: models,
-                    predicate: entity => models.Select(model => model.GetId()).Contains(entity.Id),
-                    findEntityByDto: model => entity => model.GetId() == entity.Id));
+                .ProcessAsync(models));
 
         [HttpPost("UpdateMultiple")]
         public async Task<IActionResult> UpdateMultiple([FromBody] List<KitchenDto> models)
             => Ok(
                 await _kitchenProcessorFactory
                 .GetCreatorProcessor<CommonMultipleUpdaterProcessor<Kitchen, KitchenDto, KitchenConverter>>()
-                .ProcessAsync(
-                    data: models,
-                    predicate: entity => models.Select(model => model.Guid).Contains(entity.Id),
-                    findEntityByDto: model => entity => model.Guid == entity.Id));
+                .ProcessAsync(models));
 
         [HttpPost("RemoveMultiple")]
         public async Task<IActionResult> Remove([FromBody] List<KitchenDto> models)
         => Ok(
             await _kitchenProcessorFactory
-            .GetLoaderProcessor<CommonMultipleRemoveProcessor<Kitchen, KitchenDto>>()
-            .ProcessAsync(
-                predicate: entity => models.Select(model => model.Guid).Contains(entity.Id)));
+            .GetCreatorProcessor<CommonMultipleRemoveProcessor<Kitchen, KitchenDto>>()
+            .ProcessAsync(models));
     }
 }

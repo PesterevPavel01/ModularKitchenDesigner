@@ -1,20 +1,16 @@
-﻿using System.Linq.Expressions;
-using ModularKitchenDesigner.Domain.Entityes.Base;
+﻿using ModularKitchenDesigner.Domain.Entityes.Base;
 using ModularKitchenDesigner.Domain.Interfaces;
-using ModularKitchenDesigner.Domain.Interfaces.Base;
 using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
-using Newtonsoft.Json;
 using Repository;
 using Result;
 
 namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
 {
     public sealed class CommonMultipleCreatorProcessor<TEntity, TDto, TConverter> : ICreatorProcessor<TDto, TEntity>
-        where TEntity : Identity, IConvertibleToDto<TEntity, TDto>, new()
+        where TEntity : Identity, IDtoConvertible<TEntity, TDto>
         where TConverter : IDtoToEntityConverter<TEntity, TDto>, new()
-        where TDto : IPrivateIdentity
     {
         private IRepositoryFactory _repositoryFactory = null!;
         private IValidatorFactory _validatorFactory = null!;
@@ -42,29 +38,19 @@ namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
         /// Процессор
         /// </summary>
         /// <param name="models">Модели, которые нужно добавить</param>
-        /// <param name="findEntityByDto">Функция для сопоставления Dto с соответствующей ей Entity</param>
         /// <param name="predicate">Predicat для поиска существующих Entity, соответствующих Dto, через EF Core</param>
         /// <returns></returns>
 
-        public async Task<CollectionResult<TDto>> ProcessAsync(List<TDto> models, Func<TDto, Func<TEntity, bool>> findEntityByDto, Expression<Func<TEntity, bool>>? predicate = null)
+        public async Task<CollectionResult<TDto>> ProcessAsync(List<TDto> models)
         {
-            List<TEntity> currentEntityes = _validatorFactory
+            List <TEntity> currentEntityes = _validatorFactory
                 .GetCreateValidator()
                 .Validate(
                     models: await _repositoryFactory
                         .GetRepository<TEntity>()
-                        .GetAllAsync(
-                            predicate: predicate
-                        ),
+                        .GetAllAsync( predicate: TEntity.ContainsByUniqueKeyPredicate(models)),
                     methodArgument: models,
                     callerObject: GetType().Name);
-
-            List<TEntity> newEntities = models.Select(model => new TEntity() {Id = model.GetId()}).ToList();
-
-            if (findEntityByDto == null)
-            {
-                findEntityByDto = model => entity => entity.Id == model.GetId();
-            }
 
             var result = await _repositoryFactory
                 .GetRepository<TEntity>()
@@ -72,21 +58,19 @@ namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
                     await _converterFactory
                     .GetConverter<TEntity, TDto, TConverter>()
                     .Convert(
-                        models : models, 
-                        entities : newEntities, 
-                        findEntityByDto : findEntityByDto));
+                        models: models,
+                        entities: currentEntityes));
 
-            var newComponents = await _repositoryFactory
+            var newEntities = await _repositoryFactory
                 .GetRepository<TEntity>()
                 .GetAllAsync(
                     include: TEntity.IncludeRequaredField(),
-                    predicate: predicate
-                );
+                    predicate: TEntity.ContainsByUniqueKeyPredicate(models));
 
             return new()
             {
-                Count = newComponents.Count,
-                Data = newComponents.Select(component => component.ConvertToDto())
+                Count = newEntities.Count,
+                Data = newEntities.Select(entity => entity.ConvertToDto())
             };
         }
     }

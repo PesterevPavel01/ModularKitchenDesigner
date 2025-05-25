@@ -4,14 +4,15 @@ using ModularKitchenDesigner.Domain.Entityes.Base;
 namespace ModularKitchenDesigner.Domain.Interfaces.Processors
 {
     public interface IProcessorFactory<TEntity, TDto>
-        where TEntity : Identity, IAuditable
+        where TEntity : Identity, IDtoConvertible<TEntity, TDto>
     {
         /*
         ICreatorProcessor<TEntity, TDto> GetCreatorProcessor<TProcessor>()
             where TProcessor : class, ICreatorProcessor<TEntity,TDto>, new();
-*/        
-        ILoaderProcessor<TEntity,TDto> GetLoaderProcessor<TProcessor>()
+*/
+        ILoaderProcessor<TEntity, TDto> GetLoaderProcessor<TProcessor>()
             where TProcessor : class, ILoaderProcessor<TEntity, TDto>, new();
+
 
         ICreatorProcessor<TDto, TEntity> GetCreatorProcessor<TProcessor>()
             where TProcessor : class, ICreatorProcessor<TDto, TEntity>, new();

@@ -43,36 +43,21 @@ namespace ModularKitchenDesigner.Api.Controllers
         => Ok(
             await _modelItemProcessorFactory
             .GetCreatorProcessor<CommonMultipleCreatorProcessor<ModelItem, ModelItemDto, ModelItemConverter>>()
-        .ProcessAsync(
-            data: models,
-            predicate: entity => 
-                models.Select(model => model.ModuleCode).Contains(entity.Module.Code)
-                && models.Select(model => model.ModelCode).Contains(entity.Model.Code),
-            findEntityByDto: model => entity => model.GetId() == entity.Id));
+            .ProcessAsync(models));
 
         [HttpPost("UpdateMultiple")]
         public async Task<IActionResult> Update([FromBody] List<ModelItemDto> models)
         => Ok(
             await _modelItemProcessorFactory
             .GetCreatorProcessor<CommonMultipleUpdaterProcessor<ModelItem, ModelItemDto, ModelItemConverter>>()
-            .ProcessAsync(
-                data: models,
-                predicate: entity =>
-                    models.Select(model => model.ModuleCode).Contains(entity.Module.Code)
-                    && models.Select(model => model.ModelCode).Contains(entity.Model.Code),
-                findEntityByDto: model => entity => 
-                    model.ModuleCode == entity.Module.Code
-                    && model.ModelCode == entity.Model.Code));
+            .ProcessAsync(models));
 
         [HttpPost("RemoveMultiple")]
         public async Task<IActionResult> Remove([FromBody] List<ModelItemDto> models)
         => Ok(
             await _modelItemProcessorFactory
-            .GetLoaderProcessor<CommonMultipleRemoveProcessor<ModelItem, ModelItemDto>>()
-            .ProcessAsync(
-                predicate: entity =>
-                    models.Select(model => model.ModuleCode).Contains(entity.Module.Code)
-                    && models.Select(model => model.ModelCode).Contains(entity.Model.Code)));
+            .GetCreatorProcessor<CommonMultipleRemoveProcessor<ModelItem, ModelItemDto>>()
+            .ProcessAsync(models));
 
     }
 }

@@ -2,7 +2,6 @@
 using ModularKitchenDesigner.Domain.Entityes;
 using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
-using Newtonsoft.Json;
 using Repository;
 
 namespace ModularKitchenDesigner.Application.Converters
@@ -24,7 +23,7 @@ namespace ModularKitchenDesigner.Application.Converters
             return this;
         }
 
-        public async Task<List<KitchenType>> Convert(List<KitchenTypeDto> models, List<KitchenType> entities, Func<KitchenTypeDto, Func<KitchenType, bool>> findEntityByDto)
+        public async Task<List<KitchenType>> Convert(List<KitchenTypeDto> models, List<KitchenType> entities)
         {
             var priceSegmentResult = _validatorFactory
                 .GetObjectNullValidator()
@@ -33,25 +32,36 @@ namespace ModularKitchenDesigner.Application.Converters
                     methodArgument: models,
                     callerObject: GetType().Name);
 
+            List<KitchenType> kitchens = [];
+
             foreach (KitchenTypeDto model in models)
             {
-                KitchenType? entity = _validatorFactory
-                .GetObjectNullValidator()
-                .Validate(
-                    model: entities.FirstOrDefault(findEntityByDto(model)),
-                    methodArgument: models,
-                    callerObject: GetType().Name);
-
-                entity.Title = model.Title;
-                entity.Code = model.Code;
-                entity.PriceSegmentId = _validatorFactory
+                var title = model.Title;
+                var code = model.Code;
+                var priceSegment = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
                     model: priceSegmentResult.Find(segment => segment.Title == model.PriceSegment),
                     methodArgument: models,
-                    callerObject: GetType().Name)?.Id ?? entity.PriceSegmentId;
+                    callerObject: GetType().Name);
+
+                KitchenType? entity = entities.Find(x => x.isUniqueKeyEqual(model));
+
+                if (entity is null)
+                    kitchens.Add(
+                        KitchenType.Create(
+                            title: title,
+                            code: code,
+                            priceSegment: priceSegment
+                            ));
+                else
+                    kitchens.Add(
+                        entity.Update(
+                            title: title,
+                            code: code,
+                            priceSegment: priceSegment));
             }
-            return entities;
+            return kitchens;
         }
 
     }

@@ -9,7 +9,7 @@ using ModularKitchenDesigner.Domain.Interfaces.Processors;
 namespace ModularKitchenDesigner.Api.Controllers
 {
     [ApiController]
-    [ApiVersion("1.0")]
+    [ApiVersion("3.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
 
     public class KitchenTypeController : ControllerBase
@@ -44,28 +44,20 @@ namespace ModularKitchenDesigner.Api.Controllers
             => Ok(
                 await _kitchenTypeProcessorFactory
                 .GetCreatorProcessor<CommonMultipleCreatorProcessor<KitchenType, KitchenTypeDto, KitchenTypeConverter>>()
-                .ProcessAsync(
-                    data: models,
-                    predicate: entity => models.Select(model => model.Code).Contains(entity.Code),
-                    findEntityByDto: model => entity => model.GetId() == entity.Id));
+                .ProcessAsync(models));
 
         [HttpPost("UpdateMultiple")]
         public async Task<IActionResult> Update([FromBody] List<KitchenTypeDto> models)
             => Ok(
                 await _kitchenTypeProcessorFactory
                 .GetCreatorProcessor<CommonMultipleUpdaterProcessor<KitchenType, KitchenTypeDto, KitchenTypeConverter>>()
-                .ProcessAsync(
-                    data: models,
-                    predicate: entity => models.Select(model => model.Code).Contains(entity.Code),
-                    findEntityByDto: model => entity => entity.Code == model.Code
-                    ));
+                .ProcessAsync(models));
 
         [HttpPost("RemoveMultiple")]
         public async Task<IActionResult> Remove([FromBody] List<KitchenTypeDto> models)
         => Ok(
             await _kitchenTypeProcessorFactory
-            .GetLoaderProcessor<CommonMultipleRemoveProcessor<KitchenType, KitchenTypeDto>>()
-            .ProcessAsync(
-                predicate: entity => models.Select(model => model.Code).Contains(entity.Code)));
+            .GetCreatorProcessor<CommonMultipleRemoveProcessor<KitchenType, KitchenTypeDto>>()
+            .ProcessAsync(models));
     }
 }

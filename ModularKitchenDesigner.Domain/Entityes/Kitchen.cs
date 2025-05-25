@@ -1,4 +1,5 @@
-﻿using Interceptors;
+﻿using System.Linq.Expressions;
+using Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using ModularKitchenDesigner.Domain.Dto;
@@ -7,36 +8,68 @@ using ModularKitchenDesigner.Domain.Interfaces;
 
 namespace ModularKitchenDesigner.Domain.Entityes
 {
-    public sealed class Kitchen : Identity, IAuditable, IConvertibleToDto<Kitchen, KitchenDto>
+    public sealed class Kitchen : Identity, IAuditable, IDtoConvertible<Kitchen, KitchenDto>
     {
-        public DateTime CreatedAt { get ; set ; }
-        public DateTime UpdatedAt { get ; set ; }
-        public string UserLogin { get; set; }
-        public string UserId { get; set; }
-        public KitchenType KitchenType { get; set; }
-        public Guid KitchenTypeId { get; set; }
-        public List<Section> Sections { get; set; } = [];
-        public List<MaterialSpecificationItem> MaterialSpecificationItems { get; set; } = [];
+        public Kitchen(){}
+        private Kitchen(string userLogin, string userId, string title, KitchenType kitchenType, string code)
+        {
+            UserLogin = userLogin;
+            UserId = userId;
+            Title = title;
+            KitchenTypeId = kitchenType.Id;
+            Code = code ?? Guid.NewGuid().ToString();
+        }
+
+        public DateTime CreatedAt { get ; set; }
+        public DateTime UpdatedAt { get ; set; }
+        public string Title { get; private set; }
+        public string UserLogin { get; private set; }
+        public string UserId { get; private set; }
+        public string Code { get; set; }
+
+        public KitchenType KitchenType { get; private set; }
+        public Guid KitchenTypeId { get; private set; }
+        public List<Section> Sections { get; private set; } = [];
+        public List<MaterialSpecificationItem> MaterialSpecificationItems { get; private set; } = [];
 
         public static Func<IQueryable<Kitchen>, IIncludableQueryable<Kitchen, object>> IncludeRequaredField()
-            =>
-                query => query
-                    .Include(x => x.KitchenType);
+            => query => query
+            .Include(x => x.KitchenType)
+            .Include(x => x.Sections)
+            .Include(x => x.MaterialSpecificationItems);
 
-        public Kitchen ConvertFromDtoWithRequiredFields(KitchenDto model)
-        {
-            model.Guid = Guid.NewGuid();
-            Id = model.Guid;
-            return this;
-        }
+        public bool isUniqueKeyEqual(KitchenDto model)
+            => this.Code == model.Code;
+
+        public Func<List<KitchenDto>, bool> containsByUniqueKey()
+            => models 
+                => models.Select(model => model.Code).Contains(this.Code);
 
         public KitchenDto ConvertToDto()
             => new()
             {
-                UserLogin = UserLogin,
-                UserId = UserId,
-                KitchenType = KitchenType.Title,
-                Guid = Id
+                UserLogin = this.UserLogin,
+                UserId = this.UserId,
+                KitchenType = this.KitchenType.Title,
+                Title = this.Title
             };
+
+        public static Kitchen Create(string userLogin, string userId, string title, KitchenType kitchenType, string code = null)
+            => new(userLogin, userId, title, kitchenType, code);
+
+        public Kitchen Update(string userLogin, string userId, string title, KitchenType kitchenType, string code = null)
+        {
+            UserLogin = userLogin;
+            UserId = userId;
+            Title = title;
+            KitchenTypeId = kitchenType.Id;
+            Code = code ?? Code;
+
+            return this;
+        }
+
+        public static Expression<Func<Kitchen, bool>> ContainsByUniqueKeyPredicate(List<KitchenDto> models)
+            => entity 
+                => models.Select(model => model.Code).Contains(entity.Code);
     }
 }

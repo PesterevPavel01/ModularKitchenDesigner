@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ModularKitchenDesigner.Domain.Dto
 {
-    public sealed class SimpleDto : PrivateIdentity, ISimpleEntity
+    public sealed class SimpleDto : ISimpleEntity
     {
         [Required(ErrorMessage = "Title cannot be null or empty.")]
         public string Title { get; set; }

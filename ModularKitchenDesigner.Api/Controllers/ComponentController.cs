@@ -9,7 +9,7 @@ using ModularKitchenDesigner.Domain.Interfaces.Processors;
 namespace ModularKitchenDesigner.Api.Controllers
 {
     [ApiController]
-    [ApiVersion("2.0")]
+    [ApiVersion("3.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
 
     public class ComponentController : ControllerBase
@@ -43,29 +43,20 @@ namespace ModularKitchenDesigner.Api.Controllers
             => Ok(
                 await _componentProcessorFactory
                 .GetCreatorProcessor<CommonMultipleCreatorProcessor<Component, ComponentDto, ComponentConverter>>()
-                .ProcessAsync(
-                    data: models,
-                    predicate: entity => models.Select(model => model.Code).Contains(entity.Code),
-                    findEntityByDto: model => entity => model.GetId() == entity.Id));
+                .ProcessAsync(models));
 
         [HttpPost("UpdateMultiple")]
         public async Task<IActionResult> Update([FromBody] List<ComponentDto> models)
             => Ok(
                 await _componentProcessorFactory
                 .GetCreatorProcessor<CommonMultipleUpdaterProcessor<Component, ComponentDto, ComponentConverter>>()
-                .ProcessAsync(
-                    data:models,
-                    predicate: entity => 
-                        models.Select(model => model.Code).Contains(entity.Code),
-                    findEntityByDto: model => entity => model.Code == entity.Code));
+                .ProcessAsync(models));
 
         [HttpPost("RemoveMultiple")]
         public async Task<IActionResult> Remove([FromBody] List<ComponentDto> models)
         => Ok(
             await _componentProcessorFactory
-            .GetLoaderProcessor<CommonMultipleRemoveProcessor<Component, ComponentDto>>()
-            .ProcessAsync(
-                predicate: entity =>
-                    models.Select(model => model.Code).Contains(entity.Code)));
+            .GetCreatorProcessor<CommonMultipleRemoveProcessor<Component, ComponentDto>>()
+            .ProcessAsync(models));
     }
 }

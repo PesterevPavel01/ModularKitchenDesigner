@@ -1,4 +1,5 @@
-﻿using ModularKitchenDesigner.Domain.Dto;
+﻿using System.Collections.Generic;
+using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes;
 using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
@@ -23,7 +24,7 @@ namespace ModularKitchenDesigner.Application.Converters
             _validatorFactory = validatorFactory;
             return this;
         }
-        public async Task<List<MaterialSpecificationItem>> Convert(List<MaterialSpecificationItemDto> models, List<MaterialSpecificationItem> entities, Func<MaterialSpecificationItemDto, Func<MaterialSpecificationItem, bool>> findEntityByDto)
+        public async Task<List<MaterialSpecificationItem>> Convert(List<MaterialSpecificationItemDto> models, List<MaterialSpecificationItem> entities)
         {
             var modulTypeResult = _validatorFactory
                 .GetObjectNullValidator()
@@ -35,49 +36,61 @@ namespace ModularKitchenDesigner.Application.Converters
             var materialSelectionItemResult = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
-                    model: await _repositoryFactory.GetRepository<MaterialSelectionItem>().GetAllAsync(predicate: x => models.Select(model => model.MaterialSelectionItemGuid).Contains(x.Id)),
+                    model: await _repositoryFactory.GetRepository<MaterialSelectionItem>().GetAllAsync(predicate: x => models.Select(model => model.MaterialSelectionItemCode).Contains(x.Code)),
                     methodArgument: models,
                     callerObject: GetType().Name);
 
             var kitchenResult = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
-                    model: await _repositoryFactory.GetRepository<Kitchen>().GetAllAsync(predicate: x => models.Select(model => model.KitchenGuid).Contains(x.Id)),
+                    model: await _repositoryFactory
+                        .GetRepository<Kitchen>()
+                        .GetAllAsync(predicate: x => models.Select(model => model.KitchenCode).Contains(x.Code)),
                     methodArgument: models,
                     callerObject: GetType().Name);
 
+            List<MaterialSpecificationItem> materialSpecificationItems = [];
+
             foreach (MaterialSpecificationItemDto model in models)
             {
-                MaterialSpecificationItem? entity = _validatorFactory
-                    .GetObjectNullValidator()
-                    .Validate(
-                        model: entities.FirstOrDefault(findEntityByDto(model)),
-                        methodArgument: models,
-                        callerObject: GetType().Name);
-
-                entity.ModuleTypeId = _validatorFactory
+                var moduleType = _validatorFactory
                     .GetObjectNullValidator()
                     .Validate(
                         model: modulTypeResult.Find(x => x.Title == model.ModuleType),
                         methodArgument: models,
-                        callerObject: GetType().Name)?.Id ?? entity.ModuleTypeId;
+                        callerObject: GetType().Name);
 
-                entity.MaterialSelectionItemId = _validatorFactory
+                var materialSelectionItem = _validatorFactory
                     .GetObjectNullValidator()
                     .Validate(
-                        model: materialSelectionItemResult.Find(x => x.Id == model.MaterialSelectionItemGuid),
+                        model: materialSelectionItemResult.Find(x => x.Code == model.MaterialSelectionItemCode),
                         methodArgument: models,
-                        callerObject: GetType().Name)?.Id ?? entity.MaterialSelectionItemId;
+                        callerObject: GetType().Name);
 
-                entity.KitchenId = _validatorFactory
+                var kitchen = _validatorFactory
                     .GetObjectNullValidator()
                     .Validate(
-                        model: kitchenResult.Find(x => x.Id == model.KitchenGuid),
+                        model: kitchenResult.Find(x => x.Code == model.KitchenCode),
                         methodArgument: models,
-                        callerObject: GetType().Name)?.Id ?? entity.KitchenId;
+                        callerObject: GetType().Name);
+
+                MaterialSpecificationItem? entity = entities.Find(x=> x.isUniqueKeyEqual(model));
+
+                if(entity is null)
+                    materialSpecificationItems.Add(
+                        MaterialSpecificationItem.Create(
+                            moduleType: moduleType,
+                            materialSelectionItem: materialSelectionItem,
+                            kitchen: kitchen));
+                else
+                    materialSpecificationItems.Add(
+                        entity.Update(
+                            moduleType: moduleType,
+                            materialSelectionItem: materialSelectionItem,
+                            kitchen: kitchen));
             }
 
-            return entities;
+            return materialSpecificationItems;
         }
     }
 }

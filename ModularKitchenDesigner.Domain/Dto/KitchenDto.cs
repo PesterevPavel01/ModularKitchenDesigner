@@ -1,10 +1,9 @@
-﻿using ModularKitchenDesigner.Domain.Entityes;
-using ModularKitchenDesigner.Domain.Entityes.Base;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using ModularKitchenDesigner.Domain.Entityes;
 
 namespace ModularKitchenDesigner.Domain.Dto
 {
-    public sealed class KitchenDto : PrivateIdentity
+    public sealed class KitchenDto
     {
         public KitchenDto(){}
 
@@ -13,8 +12,7 @@ namespace ModularKitchenDesigner.Domain.Dto
             UserLogin = kitchen.UserLogin;
             UserId = kitchen.UserId;
             KitchenType = kitchen.KitchenType.Title;
-            Guid = kitchen.Id;
-            base.SetId(kitchen.Id);
+            Code = kitchen.Code;
         }
 
         [Required(ErrorMessage = "UserLogin cannot be null or empty.")]
@@ -22,10 +20,12 @@ namespace ModularKitchenDesigner.Domain.Dto
 
         [Required(ErrorMessage = "UserId cannot be null or empty.")]
         public string UserId { get; set; }
+        [Required(ErrorMessage = "UserId cannot be null or empty.")]
+        public string Title { get; set; }
 
         [Required(ErrorMessage = "KitchenType cannot be null or empty.")]
         public string KitchenType { get; set; }
 
-        public Guid Guid { get; set; }
+        public String Code { get; set; } = Guid.NewGuid().ToString();
     }
 }

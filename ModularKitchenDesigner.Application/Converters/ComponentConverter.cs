@@ -2,7 +2,6 @@
 using ModularKitchenDesigner.Domain.Entityes;
 using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
-using Newtonsoft.Json;
 using Repository;
 
 namespace ModularKitchenDesigner.Application.Converters
@@ -23,7 +22,7 @@ namespace ModularKitchenDesigner.Application.Converters
             _validatorFactory = validatorFactory;
             return this;
         }
-        public async Task<List<Component>> Convert(List<ComponentDto> models, List<Component> entities, Func<ComponentDto, Func<Component, bool>> findEntityByDto)
+        public async Task<List<Component>> Convert(List<ComponentDto> models, List<Component> entities)
         {
             var componentTypeResult = _validatorFactory
                 .GetObjectNullValidator()
@@ -53,46 +52,64 @@ namespace ModularKitchenDesigner.Application.Converters
                     methodArgument: models,
                     callerObject: GetType().Name);
 
-            foreach (ComponentDto model in models)
+            List<Component> components = [];
+
+            foreach (ComponentDto componentModel in models)
             {
-                Component? entity = _validatorFactory
-                .GetObjectNullValidator()
-                .Validate(
-                    model: entities.FirstOrDefault(findEntityByDto(model)),
-                    methodArgument: models,
-                    callerObject: GetType().Name);
-
-                entity.Title = model.Title;
-                entity.Code = model.Code;
-                entity.Price = model.Price;
+                var title = componentModel.Title;
+                var code = componentModel.Code;
+                var price = componentModel.Price;
                 
-                entity.ComponentTypeId = _validatorFactory
-                .GetObjectNullValidator()
-                .Validate(
-                    model: componentTypeResult.Find(type => type.Title == model.ComponentType),
-                    methodArgument: models,
-                    callerObject: GetType().Name)?.Id ?? entity.ComponentTypeId;
+                var componentType = _validatorFactory
+                    .GetObjectNullValidator()
+                    .Validate(
+                        model: componentTypeResult.Find(type => type.Title == componentModel.ComponentType),
+                        methodArgument: models,
+                        callerObject: GetType().Name);
 
-                entity.PriceSegmentId = _validatorFactory
-                .GetObjectNullValidator()
-                .Validate(
-                    model: priceSegmentResult.Find(segment => segment.Title == model.PriceSegment),
-                    methodArgument: models, callerObject: GetType().Name)?.Id ?? entity.PriceSegmentId;
+                var priceSegment = _validatorFactory
+                    .GetObjectNullValidator()
+                    .Validate(
+                        model: priceSegmentResult.Find(segment => segment.Title == componentModel.PriceSegment),
+                        methodArgument: models, callerObject: GetType().Name);
 
-                entity.MaterialId = _validatorFactory
-                .GetObjectNullValidator()
-                .Validate(
-                    model: materialResult.Find(material => material.Title == model.Material),
-                    methodArgument: models, callerObject: GetType().Name)?.Id ?? entity.MaterialId;
+                var material = _validatorFactory
+                    .GetObjectNullValidator()
+                    .Validate(
+                        model: materialResult.Find(material => material.Title == componentModel.Material),
+                        methodArgument: models, callerObject: GetType().Name);
 
-                entity.ModelId = _validatorFactory
-                .GetObjectNullValidator()
-                .Validate(
-                    model: modelResult.Find(currentModel => currentModel.Title == model.Model),
-                    methodArgument: models, callerObject: GetType().Name)?.Id ?? entity.ModelId;
+                var model = _validatorFactory
+                    .GetObjectNullValidator()
+                    .Validate(
+                        model: modelResult.Find(currentModel => currentModel.Title == componentModel.Model),
+                        methodArgument: models, callerObject: GetType().Name);
+
+                Component? component = entities.Find(c => c.isUniqueKeyEqual(componentModel));
+
+                if (component is null)
+                    components.Add(
+                        Component.Create(
+                            title: title,
+                            code: code,
+                            price: price,
+                            componentType: componentType,
+                            priceSegment: priceSegment,
+                            material: material,
+                            model: model));
+                else
+                    components.Add(
+                        component.Update(
+                            title: title,
+                            code: code,
+                            price: price,
+                            componentType: componentType,
+                            priceSegment: priceSegment,
+                            material: material,
+                            model: model));
             }
             
-            return entities;
+            return components;
         }
     }
 }

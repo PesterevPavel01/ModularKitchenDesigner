@@ -1,4 +1,5 @@
-﻿using ModularKitchenDesigner.Domain.Dto;
+﻿using System.Collections.Generic;
+using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes;
 using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
@@ -24,7 +25,7 @@ namespace ModularKitchenDesigner.Application.Converters
             return this;
         }
 
-        public async Task<List<MaterialSelectionItem>> Convert(List<MaterialSelectionItemDto> models, List<MaterialSelectionItem> entities, Func<MaterialSelectionItemDto, Func<MaterialSelectionItem, bool>> findEntityByDto)
+        public async Task<List<MaterialSelectionItem>> Convert(List<MaterialSelectionItemDto> models, List<MaterialSelectionItem> entities)
         {
             var materialResult = _validatorFactory
             .GetObjectNullValidator()
@@ -47,38 +48,51 @@ namespace ModularKitchenDesigner.Application.Converters
                 methodArgument: models,
                 callerObject: GetType().Name);
 
+            List<MaterialSelectionItem> materialSelectionItems = [];
+
             foreach (MaterialSelectionItemDto model in models)
             {
-                MaterialSelectionItem? entity = _validatorFactory
-                .GetObjectNullValidator()
-                .Validate(
-                    model: entities.FirstOrDefault(findEntityByDto(model)),
-                    methodArgument: models,
-                    callerObject: GetType().Name);
 
-                entity.MaterialId = _validatorFactory
+                var material = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
                     model: materialResult.Find(material => material.Title == model.Material),
                     methodArgument: models,
-                    callerObject: GetType().Name)?.Id ?? entity.MaterialId;
+                    callerObject: GetType().Name);
 
-                entity.KitchenTypeId = _validatorFactory
+                var kitchenType = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
                     model: kitchenTypeResult.Find(type => type.Title == model.KitchenType),
                     methodArgument: models,
-                    callerObject: GetType().Name)?.Id ?? entity.KitchenTypeId;
+                    callerObject: GetType().Name);
 
-                entity.ComponentTypeId = _validatorFactory
+                var componentType = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
                     model: componentTypeResult.Find(type => type.Title == model.ComponentType),
                     methodArgument: models,
-                    callerObject: GetType().Name)?.Id ?? entity.ComponentTypeId;
+                    callerObject: GetType().Name);
+
+
+
+                MaterialSelectionItem? entity = entities.Find(x => x.isUniqueKeyEqual(model));
+
+                if (entity is null)
+                    materialSelectionItems.Add(
+                        MaterialSelectionItem.Create(
+                            componentType: componentType,
+                            material: material,
+                            kitchenType: kitchenType));
+                else
+                    materialSelectionItems.Add(
+                        entity.Update(
+                            componentType: componentType,
+                            material: material,
+                            kitchenType: kitchenType));
             }
 
-            return entities; 
+            return materialSelectionItems; 
         }
     }
 }

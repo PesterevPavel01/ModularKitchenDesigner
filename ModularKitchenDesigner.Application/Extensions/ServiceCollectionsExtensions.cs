@@ -32,7 +32,6 @@ namespace ModularKitchenDesigner.Application.Extensions
 
 
             services.AddScoped<IProcessorFactory<ModelItem, ModelItemDto>, ProcessorFactory<ModelItem, ModelItemDto>>();
-            services.AddScoped<IProcessorFactory<Section, OrderDto>, ProcessorFactory<Section, OrderDto>>();
             services.AddScoped<IProcessorFactory<Section, SectionDto>, ProcessorFactory<Section, SectionDto>>();
             services.AddScoped<IProcessorFactory<Module, ModuleDto>, ProcessorFactory<Module, ModuleDto>>();
             services.AddScoped<IProcessorFactory<Kitchen, KitchenDto>, ProcessorFactory<Kitchen, KitchenDto>>();

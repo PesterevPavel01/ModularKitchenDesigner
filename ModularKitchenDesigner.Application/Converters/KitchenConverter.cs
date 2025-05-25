@@ -1,5 +1,7 @@
-﻿using ModularKitchenDesigner.Domain.Dto;
+﻿using System.Collections.Generic;
+using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes;
+using ModularKitchenDesigner.Domain.Entityes.Base;
 using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
 using Newtonsoft.Json;
@@ -24,7 +26,7 @@ namespace ModularKitchenDesigner.Application.Converters
             return this;
         }
 
-        public async Task<List<Kitchen>> Convert(List<KitchenDto> models, List<Kitchen> entities, Func<KitchenDto, Func<Kitchen, bool>> findEntityByDto)
+        public async Task<List<Kitchen>> Convert(List<KitchenDto> models, List<Kitchen> entities)
         {
             var kitchenTypeResult = _validatorFactory
             .GetObjectNullValidator()
@@ -33,27 +35,43 @@ namespace ModularKitchenDesigner.Application.Converters
                 methodArgument: models,
                 callerObject: GetType().Name);
 
+            List <Kitchen> kitchens = [];
+
             foreach (KitchenDto model in models)
             { 
-                Kitchen? entity = _validatorFactory
-                .GetObjectNullValidator()
-                .Validate(
-                    model: entities.FirstOrDefault(findEntityByDto(model)),
-                    methodArgument: models,
-                    callerObject: GetType().Name);
+                var userLogin = model.UserLogin;
+                var userId = model.UserId;
+                var title = model.Title;
+                var code = model.Code;
 
-                entity.UserLogin = model.UserLogin;
-                entity.UserId = model.UserId;
-
-                entity.KitchenTypeId = _validatorFactory
+                var kitchenType = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
                     model: kitchenTypeResult.Find(type => type.Title == model.KitchenType),
                     methodArgument: models,
-                    callerObject: GetType().Name)?.Id ?? entity.KitchenTypeId;
+                    callerObject: GetType().Name);
+
+                Kitchen? kitchen = entities.Find(entity => entity.isUniqueKeyEqual(model));
+
+                if (kitchen is null)
+                    kitchens.Add(
+                        Kitchen.Create(
+                            userLogin: userLogin,
+                            userId: userId,
+                            title: title,
+                            kitchenType: kitchenType,
+                            code: code));
+                else
+                    kitchens.Add(
+                        kitchen.Update(
+                            userLogin: userLogin,
+                            userId: userId,
+                            title: title,
+                            kitchenType: kitchenType,
+                            code: code));
             }
 
-            return entities;
+            return kitchens;
         }
     }
 }

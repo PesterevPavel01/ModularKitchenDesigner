@@ -2,7 +2,6 @@
 using ModularKitchenDesigner.Domain.Entityes;
 using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
-using Newtonsoft.Json;
 using Repository;
 
 namespace ModularKitchenDesigner.Application.Converters
@@ -24,12 +23,16 @@ namespace ModularKitchenDesigner.Application.Converters
             return this;
         }
 
-        public async Task<List<Section>> Convert(List<SectionDto> models, List<Section> entities, Func<SectionDto, Func<Section, bool>> findEntityByDto)
+        public async Task<List<Section>> Convert(List<SectionDto> models, List<Section> entities)
         {
             var kitchenResult = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
-                    model: await _repositoryFactory.GetRepository<Kitchen>().GetAllAsync(predicate: x => models.Select(model => model.KitchenGuid).Contains(x.Id)),
+                    model: await _repositoryFactory
+                    .GetRepository<Kitchen>()
+                    .GetAllAsync(
+                        predicate: 
+                            x => models.Select(model => model.KitchenCode).Contains(x.Code)),
                     methodArgument: models,
                     callerObject: GetType().Name);
 
@@ -40,33 +43,46 @@ namespace ModularKitchenDesigner.Application.Converters
                     methodArgument: models,
                     callerObject: GetType().Name);
 
+            List<Section> sections = [];
+
             foreach (SectionDto model in models)
             {
-                Section? entity = _validatorFactory
+                var kitchen = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
-                    model: entities.FirstOrDefault(findEntityByDto(model)),
+                    model: kitchenResult.Find(
+                        kitchen => kitchen.Code == model.KitchenCode),
                     methodArgument: models,
                     callerObject: GetType().Name);
 
-                entity.KitchenId = _validatorFactory
-                .GetObjectNullValidator()
-                .Validate(
-                    model: kitchenResult.Find(kitchen => kitchen.Id == model.KitchenGuid),
-                    methodArgument: models,
-                    callerObject: GetType().Name)?.Id ?? entity.KitchenId;
-
-                entity.ModuleId = _validatorFactory
+                var module = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
                     model: moduleResult.Find(module => module.Code == model.ModuleCode),
                     methodArgument: models,
-                    callerObject: GetType().Name)?.Id ?? entity.ModuleId;
+                    callerObject: GetType().Name);
 
-                entity.Quantity = model.Quantity;
+                var quantity = model.Quantity;
+
+                Section? entity = entities.Find(
+                    x => x.Module.Code == model.ModuleCode 
+                    && x.Kitchen.Code == model.KitchenCode);
+
+                if(entity is null)
+                    sections.Add(
+                        Section.Create(
+                            quantity: quantity,
+                            kitchen: kitchen,
+                            module: module));
+                else
+                    sections.Add(
+                        entity.Update(
+                            quantity: quantity,
+                            kitchen: kitchen,
+                            module: module));
             }
 
-            return entities;
+            return sections;
         }
     }
 }

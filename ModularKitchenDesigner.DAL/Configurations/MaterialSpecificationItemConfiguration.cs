@@ -9,7 +9,9 @@ namespace ModularKitchenDesigner.DAL.Configurations
         public void Configure(EntityTypeBuilder<MaterialSpecificationItem> builder)
         {
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
-            //builder.HasIndex(x => new { x.MaterialSelectionItem, x.MaterialSelectionItem.ComponentType }).IsUnique();
+            builder.HasIndex(x => new { x.ModuleTypeId, x.MaterialSelectionItemId,x.KitchenId }).IsUnique();
+            builder.Property(x => x.Code).IsRequired().HasMaxLength(50);
+            builder.HasIndex(x => x.Code).IsUnique();
 
             builder.HasOne(x => x.ModuleType)
                 .WithMany(x => x.MaterialSpecificationItems)
@@ -25,7 +27,7 @@ namespace ModularKitchenDesigner.DAL.Configurations
 
             builder.HasOne(x => x.Kitchen)
                 .WithMany(x => x.MaterialSpecificationItems)
-                .HasForeignKey(x => x.MaterialSelectionItemId)
+                .HasForeignKey(x => x.KitchenId)
                 .HasPrincipalKey(x => x.Id)
                 .OnDelete(DeleteBehavior.Restrict);
 

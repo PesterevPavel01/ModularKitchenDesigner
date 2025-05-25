@@ -2,7 +2,6 @@
 using ModularKitchenDesigner.Domain.Entityes;
 using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
-using Newtonsoft.Json;
 using Repository;
 
 namespace ModularKitchenDesigner.Application.Converters
@@ -24,7 +23,7 @@ namespace ModularKitchenDesigner.Application.Converters
             return this;
         }
         
-        public async Task<List<Module>> Convert(List<ModuleDto> models, List<Module> entities, Func<ModuleDto, Func<Module, bool>> findEntityByDto)
+        public async Task<List<Module>> Convert(List<ModuleDto> models, List<Module> entities)
         {
             var moduleTypeResult = _validatorFactory
                 .GetObjectNullValidator()
@@ -33,29 +32,43 @@ namespace ModularKitchenDesigner.Application.Converters
                     methodArgument: models,
                     callerObject: GetType().Name);
 
+            List<Module> modules = [];
+
             foreach (ModuleDto model in models)
             {
-                Module? entity = _validatorFactory
-                .GetObjectNullValidator()
-                .Validate(
-                    model: entities.FirstOrDefault(findEntityByDto(model)),
-                    methodArgument: models,
-                    callerObject: GetType().Name);
+                var title = model.Title;
+                var code = model.Code;
+                var width = model.Width;
+                var previewImageSrc = model.PreviewImageSrc;
 
-                entity.Title = model.Title;
-                entity.Code = model.Code;
-                entity.Width = model.Width;
-                entity.PreviewImageSrc = model.PreviewImageSrc;
-
-                entity.ModuleTypeId = _validatorFactory
+                var moduleType = _validatorFactory
                     .GetObjectNullValidator()
                     .Validate(
                         model: moduleTypeResult.Find(x => x.Title == model.Type),
                     methodArgument: models,
-                    callerObject: GetType().Name)?.Id ?? entity.ModuleTypeId;
+                    callerObject: GetType().Name);
+
+                Module? module = entities.Find(x => x.Code == model.Code);
+
+                if (module is null)
+                    modules.Add(
+                        Module.Create(
+                            title: title,
+                            code: code,
+                            previewImageSrc: previewImageSrc,
+                            width: width,
+                            moduleType: moduleType));
+                else
+                    modules.Add(
+                        module.Update(
+                            title: title,
+                            code: code,
+                            previewImageSrc: previewImageSrc,
+                            width: width,
+                            moduleType: moduleType));
             }
 
-            return entities;
+            return modules;
         }
     }
 }

@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using ModularKitchenDesigner.Domain.Entityes;
-using ModularKitchenDesigner.Domain.Entityes.Base;
 
 namespace ModularKitchenDesigner.Domain.Dto
 {
-    public sealed class ComponentDto : PrivateIdentity
+    public sealed class ComponentDto
     {
         public ComponentDto(Component newComponent)
         {

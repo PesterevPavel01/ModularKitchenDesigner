@@ -19,7 +19,7 @@ namespace ModularKitchenDesigner.Application.Converters
         }
 
         public IDtoToEntityConverter<TEntity, TDto> GetConverter<TEntity, TDto, TConverter>() 
-            where TEntity : class, IConvertibleToDto<TEntity, TDto>, new()
+            where TEntity : class, IDtoConvertible<TEntity, TDto>
             where TConverter : IDtoToEntityConverter<TEntity, TDto>, new()
         {
             var type = typeof(TEntity);

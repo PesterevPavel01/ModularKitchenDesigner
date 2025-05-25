@@ -12,7 +12,7 @@ namespace ModularKitchenDesigner.Domain.Interfaces.Converters
         /// <param name="entities">коллекция сущностей</param>
         /// <param name="validatorSuffix">суффикс для сообщения об ошибке</param>
         /// <returns></returns>
-        Task<List<TEntity>> Convert(List<TDto> models, List<TEntity> entities, Func<TDto, Func<TEntity, bool>> findEntityByDto);
+        Task<List<TEntity>> Convert(List<TDto> models, List<TEntity> entities);
         IDtoToEntityConverter<TEntity, TDto> SetValidatorFactory(IValidatorFactory validatorFactory);
         IDtoToEntityConverter<TEntity, TDto> SetRepositoryFactory(IRepositoryFactory repositoryFactory);
     }

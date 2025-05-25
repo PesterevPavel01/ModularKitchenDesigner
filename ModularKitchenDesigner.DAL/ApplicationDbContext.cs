@@ -21,15 +21,15 @@ namespace ModularKitchenDesigner.DAL
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
+            /*
             modelBuilder.Entity<PriceSegment>().HasData(
             new PriceSegment
             {
-                Id = Guid.NewGuid(),
                 Title = "default",
                 Code = "00000000DEF",
                 CreatedAt = DateTime.Now,
                 UpdatedAt = default,
-            });           
+            }); */
         }
     }
 }

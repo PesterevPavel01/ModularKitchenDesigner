@@ -17,7 +17,7 @@ namespace ModularKitchenDesigner.DAL.Configurations
             builder.Property(x => x.PreviewImageSrc).HasDefaultValue("N/A");
             builder.HasIndex(x => x.PreviewImageSrc);
 
-            builder.HasOne(x => x.Type)
+            builder.HasOne(x => x.ModuleType)
                 .WithMany(x => x.Modules)
                 .HasForeignKey(x => x.ModuleTypeId)
                 .HasPrincipalKey(x => x.Id)

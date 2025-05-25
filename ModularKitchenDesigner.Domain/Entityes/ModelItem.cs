@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+﻿using System.Linq.Expressions;
 using Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -8,35 +8,65 @@ using ModularKitchenDesigner.Domain.Interfaces;
 
 namespace ModularKitchenDesigner.Domain.Entityes
 {
-    public sealed class ModelItem : Identity, IAuditable, IConvertibleToDto<ModelItem, ModelItemDto>
+    public sealed class ModelItem : Identity, IAuditable, IDtoConvertible<ModelItem, ModelItemDto>
     {
+        private ModelItem(){}
+
+        private ModelItem(short quantity, Module module, Model model, string code) 
+        {
+            Quantity = quantity;
+            ModuleId = module.Id;
+            ModelId = model.Id;
+            Code = code ?? Guid.NewGuid().ToString();
+        }
+
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public short Quantity { get; set; }
+        public short Quantity { get; private set; }
+        public string Code { get; set; }
 
-        public Module Module { get; set; }
-        public Guid ModuleId { get; set; }
-        public Model Model { get; set; }
-        public Guid ModelId { get; set; }
+        public Module Module { get; private set; }
+        public Guid ModuleId { get; private set; }
+        public Model Model { get; private set; }
+        public Guid ModelId { get; private set; }
 
         public static Func<IQueryable<ModelItem>, IIncludableQueryable<ModelItem, object>> IncludeRequaredField()
         => query => query
-        .Include(x => x.Module)
-        .Include(x => x.Model);
+            .Include(x => x.Module)
+            .Include(x => x.Model);
 
-        public ModelItem ConvertFromDtoWithRequiredFields(ModelItemDto model)
-        {
-            Module = new() { Code = model.ModuleCode };
-            Model = new() { Code = model.ModelCode };
-            return this;
-        }
+        public bool isUniqueKeyEqual(ModelItemDto model)
+            => this.Model.Code == model.ModelCode
+            && this.Module.Code == model.ModuleCode;
+        public bool containsByUniqueKey(List<ModelItemDto> models)
+            => models.Select(model => model.ModelCode).Contains(this.Model.Code)
+            && models.Select(model => model.ModuleCode).Contains(this.Module.Code);
+
+        public static Expression<Func<ModelItem, bool>> ContainsByUniqueKeyPredicate(List<ModelItemDto> models)
+            => entity
+                => models.Select(model => model.ModelCode).Contains(entity.Model.Code)
+                && models.Select(model => model.ModuleCode).Contains(entity.Module.Code);
 
         public ModelItemDto ConvertToDto()
         => new()
         {
             ModuleCode = Module.Code,
             ModelCode = Model.Code,
-            Quantity = Quantity
+            Quantity = Quantity,
+            Code = Code
         };
+
+        public static ModelItem Create(short quantity, Module module, Model model, string code = null)
+            => new(quantity, module, model, code);
+
+        public ModelItem Update(short quantity, Module module, Model model, string code = null)
+        {
+            Quantity = quantity;
+            ModuleId = module.Id;
+            ModelId = model.Id;
+            Code = code ?? Code;
+
+            return this;
+        }
     }
 }

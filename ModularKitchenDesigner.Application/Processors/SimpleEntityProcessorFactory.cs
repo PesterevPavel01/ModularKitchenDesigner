@@ -2,6 +2,7 @@
 using ModularKitchenDesigner.Application.Processors.SimpleEntityProcessors;
 using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes.Base;
+using ModularKitchenDesigner.Domain.Interfaces;
 using ModularKitchenDesigner.Domain.Interfaces.Base;
 using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
@@ -37,7 +38,7 @@ namespace ModularKitchenDesigner.Application.Processors
         #endregion
 
         public ILoaderProcessor<TEntity, SimpleDto> GetLoaderProcessor<TProcessor, TEntity>()
-            where TEntity : Identity, ISimpleEntity, IAuditable
+            where TEntity : Identity, ISimpleEntity, IDtoConvertible<TEntity, SimpleDto>
             where TProcessor : class, ILoaderProcessor<TEntity, SimpleDto>, new()
         {
             var type = typeof(TEntity);
@@ -51,7 +52,7 @@ namespace ModularKitchenDesigner.Application.Processors
         }
 
         public ISimpleEntityRemoveProcessor GetRemoveProcessor<TEntity>()
-            where TEntity : class, ISimpleEntity, new()
+            where TEntity : class, ISimpleEntity, IDtoConvertible<TEntity, SimpleDto>, new ()
         {
             var type = typeof(TEntity);
 

@@ -1,13 +1,12 @@
-using Serilog;
-using TelegramService.DependencyInjection;
 using HttpConnector.DependencyInjection;
+using ModularKitchenDesigner.Api;
+using ModularKitchenDesigner.Api.Middlewares;
+using ModularKitchenDesigner.Application.Extensions;
 using ModularKitchenDesigner.DAL;
 using ModularKitchenDesigner.DAL.Dependencies;
 using Repository.Dependencies;
-using ModularKitchenDesigner.Api;
-using ModularKitchenDesigner.Application.Extensions;
-using Microsoft.AspNetCore.Diagnostics;
-using ModularKitchenDesigner.Api.Middlewares;
+using Serilog;
+using TelegramService.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +36,7 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Api v1.0");
     c.SwaggerEndpoint("/swagger/v2/swagger.json", "Api v2.0");
     c.SwaggerEndpoint("/swagger/v3/swagger.json", "Api v3.0");
+    c.SwaggerEndpoint("/swagger/v4/swagger.json", "Api v4.0");
 });
 
 app.UseHttpsRedirection();

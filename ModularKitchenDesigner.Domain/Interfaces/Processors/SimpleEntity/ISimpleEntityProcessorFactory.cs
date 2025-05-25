@@ -9,10 +9,10 @@ namespace ModularKitchenDesigner.Domain.Interfaces.Processors.SimpleEntity
     public interface ISimpleEntityProcessorFactory
     {
         ILoaderProcessor<TEntity, SimpleDto> GetLoaderProcessor<TProcessor,TEntity>()
-            where TEntity : Identity, ISimpleEntity, IAuditable
+            where TEntity : Identity, ISimpleEntity, IDtoConvertible<TEntity, SimpleDto>
             where TProcessor : class, ILoaderProcessor<TEntity, SimpleDto>, new();
 
         ISimpleEntityRemoveProcessor GetRemoveProcessor<TEntity>()
-            where TEntity : class, ISimpleEntity, new();
+            where TEntity : class, ISimpleEntity, IDtoConvertible<TEntity, SimpleDto>, new();
     }
 }

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ModularKitchenDesigner.Domain.Dto
 {
-    public sealed class ModuleDto : PrivateIdentity
+    public sealed class ModuleDto
     {
         public ModuleDto(){}
         public ModuleDto(Module module)
@@ -13,7 +13,7 @@ namespace ModularKitchenDesigner.Domain.Dto
             Code = module.Code;
             PreviewImageSrc = module.PreviewImageSrc;
             Width = module.Width;
-            Type = module.Type.Title;
+            Type = module.ModuleType.Title;
         }
 
         [Required(ErrorMessage = "Title cannot be null or empty.")]

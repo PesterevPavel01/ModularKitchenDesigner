@@ -11,7 +11,7 @@ namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
 {
     public sealed class CommonDefaultLoaderProcessor<TEntity, TDto> : ILoaderProcessor<TEntity, TDto>
         where TDto : class
-        where TEntity : Identity, IAuditable, IConvertibleToDto<TEntity, TDto>
+        where TEntity : Identity, IAuditable, IDtoConvertible<TEntity, TDto>
     {
 
         private IRepositoryFactory _repositoryFactory = null!;
@@ -37,7 +37,7 @@ namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
                     models: await _repositoryFactory.GetRepository<TEntity>().GetAllAsync(
                         include: TEntity.IncludeRequaredField(),
                         predicate: predicate),
-                    methodArgument: predicate.GetType().Name,
+                    methodArgument: predicate?.GetType().Name ?? "N/A",
                     callerObject: GetType().Name);
 
             return new()

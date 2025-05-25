@@ -12,16 +12,18 @@ namespace ModularKitchenDesigner.Api.Controllers
 
     public class OrderController : ControllerBase
     {
+        /*
         public OrderController(IProcessorFactory<Section, OrderDto> orderProcessorFactory)
         {
             _orderProcessorFactory = orderProcessorFactory;
         }
 
         private readonly IProcessorFactory<Section, OrderDto> _orderProcessorFactory;
-
+        */
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet("test")]
         public async Task<IActionResult> Test()
             => Ok($"URL: {Request.Path}");
+
     }
 }

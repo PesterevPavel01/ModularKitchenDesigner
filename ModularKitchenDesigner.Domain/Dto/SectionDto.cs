@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using ModularKitchenDesigner.Domain.Entityes;
-using ModularKitchenDesigner.Domain.Entityes.Base;
 
 namespace ModularKitchenDesigner.Domain.Dto
 {
-    public sealed class SectionDto : PrivateIdentity
+    public sealed class SectionDto
     {
         public SectionDto() { }
 
@@ -12,7 +11,7 @@ namespace ModularKitchenDesigner.Domain.Dto
         {
             Quantity = section.Quantity;
             ModuleCode = section.Module.Code;
-            KitchenGuid = section.Kitchen.Id;
+            KitchenCode = section.Kitchen.Code;
         }
 
         [Required(ErrorMessage = "Quantity cannot be null or empty.")]
@@ -21,7 +20,9 @@ namespace ModularKitchenDesigner.Domain.Dto
         [Required(ErrorMessage = "ModuleCode cannot be null or empty.")]
         public string ModuleCode { get; set; }
 
-        [Required(ErrorMessage = "KitchenGuid cannot be null or empty.")]
-        public Guid KitchenGuid { get; set; }
+        [Required(ErrorMessage = "KitchenCode cannot be null or empty.")]
+        public string KitchenCode { get; set; }
+
+        public string Code { get; set; } 
     }
 }

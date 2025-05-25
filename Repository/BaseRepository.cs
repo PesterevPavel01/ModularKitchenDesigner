@@ -70,6 +70,7 @@ namespace Repository
                 throw new ArgumentNullException("Entities not found");
 
             _dbContext.AddRange(entities);
+
             await _dbContext.SaveChangesAsync();
 
             return entities;
