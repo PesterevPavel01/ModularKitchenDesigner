@@ -1,13 +1,10 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
-using ModularKitchenDesigner.Domain.Dto;
-using ModularKitchenDesigner.Domain.Entityes;
-using ModularKitchenDesigner.Domain.Interfaces.Processors;
 
 namespace ModularKitchenDesigner.Api.Controllers
 {
     [ApiController]
-    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
 
     public class OrderController : ControllerBase

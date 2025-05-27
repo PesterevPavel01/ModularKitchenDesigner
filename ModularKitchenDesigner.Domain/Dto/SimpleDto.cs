@@ -1,15 +1,20 @@
-﻿using ModularKitchenDesigner.Domain.Entityes.Base;
-using ModularKitchenDesigner.Domain.Interfaces.Base;
-using System.ComponentModel.DataAnnotations;
+﻿using ModularKitchenDesigner.Domain.Dto.Base;
+using ModularKitchenDesigner.Domain.Dto.Exchange;
+using ModularKitchenDesigner.Domain.Interfaces.Exchange;
 
 namespace ModularKitchenDesigner.Domain.Dto
 {
-    public sealed class SimpleDto : ISimpleEntity
+    public sealed class SimpleDto : BaseDto, IExcangeDtoConvertable<SimpleDto,NomanclatureDto>
     {
-        [Required(ErrorMessage = "Title cannot be null or empty.")]
-        public string Title { get; set; }
+        public SimpleDto() { }
+        public SimpleDto(string title, string code)
+            : base(title: title, code: code) { }
+        public SimpleDto Convert(NomanclatureDto dto)
+        {
+            Code = dto.Code;
+            Title = dto.Title;
 
-        [Required(ErrorMessage = "Code cannot be null or empty.")]
-        public string Code { get; set; }
+            return this;
+        }
     }
 }

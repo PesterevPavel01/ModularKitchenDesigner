@@ -1,12 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
-using ModularKitchenDesigner.Domain.Entityes;
-using ModularKitchenDesigner.Domain.Interfaces.Base;
+﻿using ModularKitchenDesigner.Domain.Entityes;
+using ModularKitchenDesigner.Domain.Entityes.Base;
 
 namespace ModularKitchenDesigner.Domain.Dto
 {
-    public class KitchenTypeDto : ISimpleEntity
+    public class KitchenTypeDto : BaseEntity
     {
         public KitchenTypeDto(){}
+
+        public KitchenTypeDto(string title, string code,string priceSegment)
+        { 
+            Title = title;
+            Code = code;
+            PriceSegment = priceSegment;       
+        }
 
         public KitchenTypeDto( KitchenType kitchenType)
         {
@@ -15,12 +21,7 @@ namespace ModularKitchenDesigner.Domain.Dto
             PriceSegment = kitchenType.PriceSegment.Title;
         }
 
-        [Required(ErrorMessage = "Title cannot be null or empty.")]
-        public string Title { get; set; }
-        
-        [Required(ErrorMessage = "Code cannot be null or empty.")]
-        public string Code { get; set; }
-
         public string PriceSegment { get; set; }
+
     }
 }

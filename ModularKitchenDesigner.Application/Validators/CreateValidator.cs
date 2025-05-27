@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using ModularKitchenDesigner.Application.Errors;
 using ModularKitchenDesigner.Application.Exceptions;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
 

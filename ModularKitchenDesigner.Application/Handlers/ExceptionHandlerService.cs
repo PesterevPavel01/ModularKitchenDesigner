@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Http;
+using ModularKitchenDesigner.Application.Errors;
 using ModularKitchenDesigner.Application.Exceptions;
-using ModularKitchenDesigner.Application.Validators;
 using ModularKitchenDesigner.Domain.Interfaces.Handlers;
 using Newtonsoft.Json;
 using Result;

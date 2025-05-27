@@ -1,13 +1,14 @@
-﻿using System.Linq.Expressions;
+﻿using ModularKitchenDesigner.Domain.Entityes.Base;
 using ModularKitchenDesigner.Domain.Interfaces;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
 using Repository;
 using Result;
+using System.Linq.Expressions;
 
 namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
 {
-    public sealed class CommonDefaultLoaderProcessor<TEntity, TDto> : ILoaderProcessor<TEntity, TDto>
+    internal class CommonLoaderWithoutValidationProcessor<TEntity, TDto> : ILoaderProcessor<TEntity, TDto>
         where TDto : class
         where TEntity : class, IDtoConvertible<TEntity, TDto>
     {
@@ -29,14 +30,9 @@ namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
         }
         public async Task<CollectionResult<TDto>> ProcessAsync(Expression<Func<TEntity, bool>>? predicate = null)
         {
-            List<TEntity> models = _validatorFactory
-                .GetEmptyListValidator()
-                .Validate(
-                    models: await _repositoryFactory.GetRepository<TEntity>().GetAllAsync(
-                        include: TEntity.IncludeRequaredField(),
-                        predicate: predicate),
-                    methodArgument: predicate?.GetType().Name ?? "N/A",
-                    callerObject: GetType().Name);
+            List<TEntity> models = await _repositoryFactory.GetRepository<TEntity>().GetAllAsync(
+                include: TEntity.IncludeRequaredField(),
+                predicate: predicate);
 
             return new()
             {

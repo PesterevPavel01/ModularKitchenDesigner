@@ -5,22 +5,22 @@ using ModularKitchenDesigner.Application.Processors.CommonProcessors;
 using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
-using ModularKitchenDesigner.Domain.Interfaces.Processors.SimpleEntity;
+using ModularKitchenDesigner.Domain.Interfaces.Processors.SimpleEntityProcessors;
 
 namespace ModularKitchenDesigner.Api.Controllers.SimpleEntity
 {
     [ApiController]
-    [ApiVersion("4.0")]
+    [ApiVersion("5.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     public class MaterialController : ControllerBase
     {
-        public MaterialController(ISimpleEntityProcessorFactory simpleEntityService, IProcessorFactory<Material, SimpleDto> materialProcessorFactory)
+        public MaterialController(ISimpleEntityProcessorFactory simpleEntityService, IProcessorFactory materialProcessorFactory)
         {
             _materialProcessorFactory = materialProcessorFactory; 
             _removeProcessor = simpleEntityService.GetRemoveProcessor<Material>();
         }
 
-        private readonly IProcessorFactory<Material, SimpleDto> _materialProcessorFactory;
+        private readonly IProcessorFactory _materialProcessorFactory;
 
         private readonly ISimpleEntityRemoveProcessor _removeProcessor;
 
@@ -31,15 +31,15 @@ namespace ModularKitchenDesigner.Api.Controllers.SimpleEntity
 
         [HttpGet()]
         public async Task<IActionResult> GetAll()
-            => Ok(await _materialProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Material, SimpleDto>>().ProcessAsync());
+            => Ok(await _materialProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Material, SimpleDto>, Material, SimpleDto>().ProcessAsync());
 
         [HttpGet("GetByCode/{code}")]
         public async Task<IActionResult> GetByCode(string code)
-            => Ok(await _materialProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Material, SimpleDto>>().ProcessAsync(predicate: x => x.Code == code));
+            => Ok(await _materialProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Material, SimpleDto>, Material, SimpleDto>().ProcessAsync(predicate: x => x.Code == code));
 
         [HttpGet("GetByTitle/{name}")]
         public async Task<IActionResult> GetByTitle(string name)
-            => Ok(await _materialProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Material, SimpleDto>>().ProcessAsync(predicate: x => x.Title == name));
+            => Ok(await _materialProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Material, SimpleDto>, Material, SimpleDto>().ProcessAsync(predicate: x => x.Title == name));
 
         [HttpDelete("{code}")]
         public async Task<IActionResult> Remove(string code)
@@ -49,12 +49,12 @@ namespace ModularKitchenDesigner.Api.Controllers.SimpleEntity
         public async Task<IActionResult> CreateMultiple([FromBody] List<SimpleDto> models)
             => Ok(
                 await _materialProcessorFactory
-                .GetCreatorProcessor<CommonMultipleCreatorProcessor<Material, SimpleDto, SimpleEntityConverter<Material>>>()
+                .GetCreatorProcessor<CommonMultipleCreatorProcessor<Material, SimpleDto, SimpleEntityConverter<Material>>, Material, SimpleDto>()
                 .ProcessAsync(models));
 
         [HttpPost("UpdateMultiple")]
         public async Task<IActionResult> UpdateMultiple([FromBody] List<SimpleDto> models)
-            => Ok(await _materialProcessorFactory.GetCreatorProcessor<CommonMultipleUpdaterProcessor<Material, SimpleDto, SimpleEntityConverter<Material>>>()
+            => Ok(await _materialProcessorFactory.GetCreatorProcessor<CommonMultipleUpdaterProcessor<Material, SimpleDto, SimpleEntityConverter<Material>>, Material, SimpleDto>()
                 .ProcessAsync(models));
 
     }

@@ -9,7 +9,7 @@ using Result;
 namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
 {
     public class CommonMultipleUpdaterProcessor<TEntity,TDto,TConverter> : ICreatorProcessor<TDto, TEntity>
-        where TEntity : Identity, IDtoConvertible<TEntity, TDto>
+        where TEntity : class, IDtoConvertible<TEntity, TDto>
         where TConverter : IDtoToEntityConverter<TEntity, TDto>, new()
     {
         private IRepositoryFactory _repositoryFactory = null!;

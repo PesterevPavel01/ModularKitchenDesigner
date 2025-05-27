@@ -49,7 +49,8 @@ namespace ModularKitchenDesigner.Domain.Entityes
         {
             Quantity = this.Quantity,
             ModuleCode = this.Module.Code,
-            KitchenCode = this.Kitchen.Code
+            KitchenCode = this.Kitchen.Code,
+            Code = this.Code
         };
 
         public static Section Create(short quantity, Kitchen kitchen, Module module, string code = null)

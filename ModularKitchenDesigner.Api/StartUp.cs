@@ -25,7 +25,7 @@ namespace ModularKitchenDesigner.Api
                 options.SwaggerDoc("v1", new OpenApiInfo()
                 {
                     Version = "v1",
-                    Title = "Сервис ModularKitchenDesigner.Api",
+                    Title = "Сервис ModularKitchenDesigner.Api. Методы для обмена.",
                     Description = "Версия 1.0",
                 });
 
@@ -48,6 +48,13 @@ namespace ModularKitchenDesigner.Api
                     Version = "v4",
                     Title = "Сервис ModularKitchenDesigner.Api",
                     Description = "Версия 4.0",
+                });
+
+                options.SwaggerDoc("v5", new OpenApiInfo()
+                {
+                    Version = "v5",
+                    Title = "Сервис ModularKitchenDesigner.Api",
+                    Description = "Версия 5.0",
                 });
             });
         }

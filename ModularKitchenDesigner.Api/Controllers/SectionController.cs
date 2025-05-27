@@ -9,27 +9,27 @@ using ModularKitchenDesigner.Domain.Interfaces.Processors;
 namespace ModularKitchenDesigner.Api.Controllers
 {
     [ApiController]
-    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
 
     public class SectionController : ControllerBase
     {
-        public SectionController(IProcessorFactory<Section, SectionDto> sectionProcessorFactory)
+        public SectionController(IProcessorFactory sectionProcessorFactory)
         {
             _sectionProcessorFactory = sectionProcessorFactory;
         }
 
-        private readonly IProcessorFactory<Section, SectionDto> _sectionProcessorFactory;
+        private readonly IProcessorFactory _sectionProcessorFactory;
 
         [HttpGet()]
         public async Task<IActionResult> GetAll()
-        => Ok(await _sectionProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Section, SectionDto>>().ProcessAsync());
+        => Ok(await _sectionProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Section, SectionDto>, Section, SectionDto>().ProcessAsync());
 
         [HttpPost("CreateMultiple")]
         public async Task<IActionResult> CreateMultiple([FromBody] List<SectionDto> models)
         => Ok(
             await _sectionProcessorFactory
-            .GetCreatorProcessor<CommonMultipleCreatorProcessor<Section, SectionDto, SectionConverter>>()
+            .GetCreatorProcessor<CommonMultipleCreatorProcessor<Section, SectionDto, SectionConverter>, Section, SectionDto>()
             .ProcessAsync(models));
 
 
@@ -37,14 +37,14 @@ namespace ModularKitchenDesigner.Api.Controllers
         public async Task<IActionResult> Update([FromBody] List<SectionDto> models)
         => Ok(
             await _sectionProcessorFactory
-            .GetCreatorProcessor<CommonMultipleUpdaterProcessor<Section, SectionDto, SectionConverter>>()
+            .GetCreatorProcessor<CommonMultipleUpdaterProcessor<Section, SectionDto, SectionConverter>, Section, SectionDto>()
             .ProcessAsync(models));
 
         [HttpPost("RemoveMultiple")]
         public async Task<IActionResult> Remove([FromBody] List<SectionDto> models)
         => Ok(
             await _sectionProcessorFactory
-            .GetCreatorProcessor<CommonMultipleRemoveProcessor<Section, SectionDto>>()
+            .GetCreatorProcessor<CommonMultipleRemoveProcessor<Section, SectionDto>, Section, SectionDto>()
             .ProcessAsync(models));
     }
 }

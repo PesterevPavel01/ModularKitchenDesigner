@@ -9,7 +9,7 @@ using Repository;
 namespace ModularKitchenDesigner.Application.Converters
 {
     public sealed class SimpleEntityConverter<TEntity> : IDtoToEntityConverter<TEntity, SimpleDto>
-        where TEntity : Identity, ISimpleEntity, IDtoConvertible<TEntity, SimpleDto>, new()
+        where TEntity : SimpleEntity, ISimpleEntity, IDtoConvertible<TEntity, SimpleDto>, new()
     {
         private IRepositoryFactory _repositoryFactory = null!;
         private IValidatorFactory _validatorFactory = null!;
@@ -35,13 +35,9 @@ namespace ModularKitchenDesigner.Application.Converters
                 TEntity? entity  = entities.Find(entity => entity.isUniqueKeyEqual(model));
 
                 if (entity is null) 
-                {
-                    entity = new TEntity();
-                    entity.Title = model?.Title;
-                    entity.Code = model?.Code;
-                }
+                    entity = (TEntity?)TEntity.Create<TEntity>(model.Title, model.Code);
                 else 
-                    entity.Title = model?.Title;
+                    entity.Update(model.Title, model.Code);
 
                 simpleEntities.Add(entity);
             }

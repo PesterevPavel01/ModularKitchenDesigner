@@ -7,7 +7,7 @@ using Result;
 namespace ModularKitchenDesigner.Domain.Interfaces.Processors
 {
     public interface ILoaderProcessor<TEntity,TDto>
-        where TEntity : Identity, IDtoConvertible<TEntity, TDto>
+        where TEntity : IDtoConvertible<TEntity, TDto>
     {
         ILoaderProcessor<TEntity, TDto> SetValidatorFactory(IValidatorFactory validatorFactory);
         ILoaderProcessor<TEntity, TDto> SetRepositoryFactory(IRepositoryFactory repositoryFactory);

@@ -1,6 +1,4 @@
-﻿using Interceptors;
-using ModularKitchenDesigner.Domain.Entityes.Base;
-using ModularKitchenDesigner.Domain.Interfaces;
+﻿using ModularKitchenDesigner.Domain.Interfaces;
 using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
@@ -8,9 +6,7 @@ using Repository;
 
 namespace ModularKitchenDesigner.Application.Processors
 {
-    public sealed class ProcessorFactory<TEntity, TDto> : IProcessorFactory<TEntity, TDto>
-        where TEntity : Identity, IDtoConvertible<TEntity, TDto>
-        where TDto : class
+    public sealed class ProcessorFactory : IProcessorFactory
     {
         private Dictionary<Type, object>? _processors = [];
         private readonly IRepositoryFactory _repositoryFactory = null!;
@@ -24,7 +20,9 @@ namespace ModularKitchenDesigner.Application.Processors
             _converterFactory = converterFactory;
         }
         
-        public ILoaderProcessor<TEntity, TDto> GetLoaderProcessor<TProcessor>()
+        public ILoaderProcessor<TEntity, TDto> GetLoaderProcessor<TProcessor, TEntity, TDto>()
+            where TEntity : class, IDtoConvertible<TEntity, TDto>
+            where TDto : class
             where TProcessor : class, ILoaderProcessor<TEntity, TDto>, new()
         {
             var type = typeof(TProcessor);
@@ -39,7 +37,9 @@ namespace ModularKitchenDesigner.Application.Processors
             return (ILoaderProcessor<TEntity, TDto>)_processors[type];
         }
         
-        public ICreatorProcessor<TDto, TEntity> GetCreatorProcessor<TProcessor>()
+        public ICreatorProcessor<TDto, TEntity> GetCreatorProcessor<TProcessor, TEntity, TDto>()
+            where TEntity : class, IDtoConvertible<TEntity, TDto>
+            where TDto : class
             where TProcessor : class, ICreatorProcessor<TDto, TEntity>, new()
         {
             var type = typeof(TProcessor);

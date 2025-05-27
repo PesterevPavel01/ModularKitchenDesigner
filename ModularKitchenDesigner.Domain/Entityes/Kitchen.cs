@@ -45,13 +45,18 @@ namespace ModularKitchenDesigner.Domain.Entityes
             => models 
                 => models.Select(model => model.Code).Contains(this.Code);
 
+        public static Expression<Func<Kitchen, bool>> ContainsByUniqueKeyPredicate(List<KitchenDto> models)
+            => entity 
+                => models.Select(model => model.Code).Contains(entity.Code);
+
         public KitchenDto ConvertToDto()
             => new()
             {
                 UserLogin = this.UserLogin,
                 UserId = this.UserId,
                 KitchenType = this.KitchenType.Title,
-                Title = this.Title
+                Title = this.Title,
+                Code = this.Code
             };
 
         public static Kitchen Create(string userLogin, string userId, string title, KitchenType kitchenType, string code = null)
@@ -67,9 +72,5 @@ namespace ModularKitchenDesigner.Domain.Entityes
 
             return this;
         }
-
-        public static Expression<Func<Kitchen, bool>> ContainsByUniqueKeyPredicate(List<KitchenDto> models)
-            => entity 
-                => models.Select(model => model.Code).Contains(entity.Code);
     }
 }

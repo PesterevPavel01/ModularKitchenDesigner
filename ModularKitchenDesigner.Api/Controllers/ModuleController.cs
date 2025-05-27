@@ -9,17 +9,17 @@ using ModularKitchenDesigner.Domain.Interfaces.Processors;
 namespace ModularKitchenDesigner.Api.Controllers
 {
     [ApiController]
-    [ApiVersion("3.0")]
+    [ApiVersion("4.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
 
     public class ModuleController : ControllerBase
     {
-        public ModuleController(IProcessorFactory<Module, ModuleDto> moduleProcessorFactory)
+        public ModuleController(IProcessorFactory moduleProcessorFactory)
         {
             _moduleProcessorFactory = moduleProcessorFactory;
         }
 
-        private readonly IProcessorFactory<Module, ModuleDto> _moduleProcessorFactory;
+        private readonly IProcessorFactory _moduleProcessorFactory;
 
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet("test")]
@@ -28,31 +28,31 @@ namespace ModularKitchenDesigner.Api.Controllers
 
         [HttpGet()]
         public async Task<IActionResult> GetAll()
-        => Ok(await _moduleProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Module, ModuleDto>>().ProcessAsync());
+        => Ok(await _moduleProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Module, ModuleDto>, Module, ModuleDto>().ProcessAsync());
 
         [HttpGet("GetByType/{ModuleType}")]
         public async Task<IActionResult> GetByModuleType(String ModuleType)
-        => Ok(await _moduleProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Module, ModuleDto>>().ProcessAsync(predicate: x => x.ModuleType.Title == ModuleType));
+        => Ok(await _moduleProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Module, ModuleDto>, Module, ModuleDto>().ProcessAsync(predicate: x => x.ModuleType.Title == ModuleType));
 
         [HttpPost("CreateMultiple")]
         public async Task<IActionResult> CreateMultiple([FromBody] List<ModuleDto> models)
         => Ok(
             await _moduleProcessorFactory
-            .GetCreatorProcessor<CommonMultipleCreatorProcessor<Module, ModuleDto, ModuleConverter>>()
+            .GetCreatorProcessor<CommonMultipleCreatorProcessor<Module, ModuleDto, ModuleConverter>, Module, ModuleDto>()
             .ProcessAsync(models));
 
         [HttpPost("UpdateMultiple")]
         public async Task<IActionResult> Update([FromBody] List<ModuleDto> models)
         => Ok(
             await _moduleProcessorFactory
-            .GetCreatorProcessor<CommonMultipleUpdaterProcessor<Module, ModuleDto, ModuleConverter>>()
+            .GetCreatorProcessor<CommonMultipleUpdaterProcessor<Module, ModuleDto, ModuleConverter>, Module, ModuleDto>()
             .ProcessAsync(models));
 
         [HttpPost("RemoveMultiple")]
         public async Task<IActionResult> Remove([FromBody] List<ModuleDto> models)
         => Ok(
             await _moduleProcessorFactory
-            .GetCreatorProcessor<CommonMultipleRemoveProcessor<Module, ModuleDto>>()
+            .GetCreatorProcessor<CommonMultipleRemoveProcessor<Module, ModuleDto>, Module, ModuleDto>()
             .ProcessAsync(models));
     }
 }

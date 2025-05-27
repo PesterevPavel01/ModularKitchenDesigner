@@ -37,6 +37,7 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v2/swagger.json", "Api v2.0");
     c.SwaggerEndpoint("/swagger/v3/swagger.json", "Api v3.0");
     c.SwaggerEndpoint("/swagger/v4/swagger.json", "Api v4.0");
+    c.SwaggerEndpoint("/swagger/v5/swagger.json", "Api v5.0");
 });
 
 app.UseHttpsRedirection();

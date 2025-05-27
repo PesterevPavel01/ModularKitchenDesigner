@@ -1,12 +1,11 @@
-﻿using Interceptors;
-using ModularKitchenDesigner.Application.Processors.SimpleEntityProcessors;
+﻿using ModularKitchenDesigner.Application.Processors.SimpleEntityProcessors;
 using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes.Base;
 using ModularKitchenDesigner.Domain.Interfaces;
 using ModularKitchenDesigner.Domain.Interfaces.Base;
 using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
-using ModularKitchenDesigner.Domain.Interfaces.Processors.SimpleEntity;
+using ModularKitchenDesigner.Domain.Interfaces.Processors.SimpleEntityProcessors;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
 using Repository;
 
@@ -38,7 +37,7 @@ namespace ModularKitchenDesigner.Application.Processors
         #endregion
 
         public ILoaderProcessor<TEntity, SimpleDto> GetLoaderProcessor<TProcessor, TEntity>()
-            where TEntity : Identity, ISimpleEntity, IDtoConvertible<TEntity, SimpleDto>
+            where TEntity : SimpleEntity, ISimpleEntity, IDtoConvertible<TEntity, SimpleDto>,new()
             where TProcessor : class, ILoaderProcessor<TEntity, SimpleDto>, new()
         {
             var type = typeof(TEntity);
@@ -52,7 +51,7 @@ namespace ModularKitchenDesigner.Application.Processors
         }
 
         public ISimpleEntityRemoveProcessor GetRemoveProcessor<TEntity>()
-            where TEntity : class, ISimpleEntity, IDtoConvertible<TEntity, SimpleDto>, new ()
+            where TEntity : SimpleEntity, ISimpleEntity, IDtoConvertible<TEntity, SimpleDto>, new ()
         {
             var type = typeof(TEntity);
 

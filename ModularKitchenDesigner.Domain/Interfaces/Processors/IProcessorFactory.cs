@@ -1,20 +1,18 @@
-﻿using Interceptors;
-using ModularKitchenDesigner.Domain.Entityes.Base;
+﻿using ModularKitchenDesigner.Domain.Entityes.Base;
 
 namespace ModularKitchenDesigner.Domain.Interfaces.Processors
 {
-    public interface IProcessorFactory<TEntity, TDto>
-        where TEntity : Identity, IDtoConvertible<TEntity, TDto>
+    public interface IProcessorFactory
     {
-        /*
-        ICreatorProcessor<TEntity, TDto> GetCreatorProcessor<TProcessor>()
-            where TProcessor : class, ICreatorProcessor<TEntity,TDto>, new();
-*/
-        ILoaderProcessor<TEntity, TDto> GetLoaderProcessor<TProcessor>()
+        ILoaderProcessor<TEntity, TDto> GetLoaderProcessor<TProcessor, TEntity, TDto>()
+            where TEntity : class, IDtoConvertible<TEntity, TDto>
+            where TDto : class
             where TProcessor : class, ILoaderProcessor<TEntity, TDto>, new();
 
 
-        ICreatorProcessor<TDto, TEntity> GetCreatorProcessor<TProcessor>()
+        ICreatorProcessor<TDto, TEntity> GetCreatorProcessor<TProcessor, TEntity, TDto>()
+            where TEntity : class, IDtoConvertible<TEntity, TDto>
+            where TDto : class
             where TProcessor : class, ICreatorProcessor<TDto, TEntity>, new();
     }
 }

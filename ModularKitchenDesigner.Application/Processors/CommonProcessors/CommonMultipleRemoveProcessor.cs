@@ -11,7 +11,7 @@ namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
 {
     public class CommonMultipleRemoveProcessor<TEntity, TDto> : ICreatorProcessor<TDto, TEntity>
         where TDto : class
-        where TEntity : Identity, IAuditable, IDtoConvertible<TEntity, TDto>
+        where TEntity : class, IDtoConvertible<TEntity, TDto>
     {
         private IRepositoryFactory _repositoryFactory = null!;
         private IValidatorFactory _validatorFactory = null!;

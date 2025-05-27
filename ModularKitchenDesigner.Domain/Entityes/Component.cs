@@ -8,10 +8,10 @@ using ModularKitchenDesigner.Domain.Interfaces;
 
 namespace ModularKitchenDesigner.Domain.Entityes
 {
-    public sealed class Component : Identity, IAuditable, IDtoConvertible<Component, ComponentDto>
+    public sealed class Component : BaseEntity, IAuditable, IDtoConvertible<Component, ComponentDto>
     {
         private Component() { }
-        private Component(string title, string code, double price, ComponentType componentType, PriceSegment priceSegment, Material material, Model model)
+        private Component(string title, string code, double price, ComponentType componentType, PriceSegment priceSegment, Material material, Model model, bool enabled = true)
         {
             Title = title;
             Code = code;
@@ -20,13 +20,12 @@ namespace ModularKitchenDesigner.Domain.Entityes
             PriceSegmentId = priceSegment.Id;
             MaterialId = material.Id;
             ModelId = model.Id;
-
+            Enabled = enabled;
         }
 
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public string Title { get; private set; }
-        public string Code { get; private set; }
+
         public double Price { get; private set; }
 
         public ComponentType ComponentType { get; private set; }
@@ -50,10 +49,10 @@ namespace ModularKitchenDesigner.Domain.Entityes
                 Model = Model.Title,
             };
 
-        public static Component Create(string title, string code, double price, ComponentType componentType, PriceSegment priceSegment, Material material, Model model)
-        => new Component(title, code, price, componentType, priceSegment, material, model);
+        public static Component Create(string title, string code, double price, ComponentType componentType, PriceSegment priceSegment, Material material, Model model, bool enabled = true)
+            => new Component(title, code, price, componentType, priceSegment, material, model, enabled);
 
-        public Component Update(string title, string code, double price, ComponentType componentType, PriceSegment priceSegment, Material material, Model model)
+        public Component Update(string title, string code, double price, ComponentType componentType, PriceSegment priceSegment, Material material, Model model, bool enabled = true)
         {
             Title = title;
             Code = code;
@@ -62,6 +61,7 @@ namespace ModularKitchenDesigner.Domain.Entityes
             PriceSegmentId = priceSegment.Id;
             MaterialId = material.Id;
             ModelId = model.Id;
+            Enabled = enabled;
 
             return this;
         }

@@ -42,8 +42,8 @@ namespace ModularKitchenDesigner.Domain.Entityes
             ModuleTypeId = moduleType.Id;
             MaterialSelectionItemId = materialSelectionItem.Id;
             KitchenId = kitchen.Id;
-
             Code = code ?? Code;
+
             return this;
         }
 

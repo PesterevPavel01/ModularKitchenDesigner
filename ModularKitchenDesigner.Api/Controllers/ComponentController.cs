@@ -9,17 +9,17 @@ using ModularKitchenDesigner.Domain.Interfaces.Processors;
 namespace ModularKitchenDesigner.Api.Controllers
 {
     [ApiController]
-    [ApiVersion("3.0")]
+    [ApiVersion("4.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
 
     public class ComponentController : ControllerBase
     {
-        public ComponentController(IProcessorFactory<Component, ComponentDto> componentProcessorFactory)
+        public ComponentController(IProcessorFactory componentProcessorFactory)
         {
             _componentProcessorFactory = componentProcessorFactory;
         }
 
-        private readonly IProcessorFactory<Component, ComponentDto> _componentProcessorFactory;
+        private readonly IProcessorFactory _componentProcessorFactory;
 
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet("test")]
@@ -28,35 +28,35 @@ namespace ModularKitchenDesigner.Api.Controllers
 
         [HttpGet()]
         public async Task<IActionResult> GetAll()
-            => Ok(await _componentProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Component, ComponentDto>>().ProcessAsync());
+            => Ok(await _componentProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Component, ComponentDto>, Component, ComponentDto>().ProcessAsync());
 
         [HttpGet("GetByPriceSegmentCode/{priceSegmentCode}")]
         public async Task<IActionResult> GetByPriceSegmentCode(String priceSegmentCode)
-            => Ok(await _componentProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Component, ComponentDto>>().ProcessAsync(predicate: x => x.PriceSegment.Code == priceSegmentCode));
+            => Ok(await _componentProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Component, ComponentDto>, Component, ComponentDto>().ProcessAsync(predicate: x => x.PriceSegment.Code == priceSegmentCode));
 
         [HttpGet("GetByPriceSegment/{priceSegmentTitle}")]
         public async Task<IActionResult> GetByPriceSegmentTitle(String priceSegmentTitle)
-            => Ok(await _componentProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Component, ComponentDto>>().ProcessAsync(predicate: x => x.PriceSegment.Title == priceSegmentTitle));
+            => Ok(await _componentProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Component, ComponentDto>, Component, ComponentDto>().ProcessAsync(predicate: x => x.PriceSegment.Title == priceSegmentTitle));
 
         [HttpPost("CreateMultiple")]
         public async Task<IActionResult> CreateMultiple([FromBody] List<ComponentDto> models)
             => Ok(
                 await _componentProcessorFactory
-                .GetCreatorProcessor<CommonMultipleCreatorProcessor<Component, ComponentDto, ComponentConverter>>()
+                .GetCreatorProcessor<CommonMultipleCreatorProcessor<Component, ComponentDto, ComponentConverter>, Component, ComponentDto>()
                 .ProcessAsync(models));
 
         [HttpPost("UpdateMultiple")]
         public async Task<IActionResult> Update([FromBody] List<ComponentDto> models)
             => Ok(
                 await _componentProcessorFactory
-                .GetCreatorProcessor<CommonMultipleUpdaterProcessor<Component, ComponentDto, ComponentConverter>>()
+                .GetCreatorProcessor<CommonMultipleUpdaterProcessor<Component, ComponentDto, ComponentConverter>, Component, ComponentDto>()
                 .ProcessAsync(models));
 
         [HttpPost("RemoveMultiple")]
         public async Task<IActionResult> Remove([FromBody] List<ComponentDto> models)
         => Ok(
             await _componentProcessorFactory
-            .GetCreatorProcessor<CommonMultipleRemoveProcessor<Component, ComponentDto>>()
+            .GetCreatorProcessor<CommonMultipleRemoveProcessor<Component, ComponentDto>, Component, ComponentDto>()
             .ProcessAsync(models));
     }
 }

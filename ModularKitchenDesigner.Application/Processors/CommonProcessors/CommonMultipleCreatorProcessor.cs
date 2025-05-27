@@ -1,5 +1,4 @@
-﻿using ModularKitchenDesigner.Domain.Entityes.Base;
-using ModularKitchenDesigner.Domain.Interfaces;
+﻿using ModularKitchenDesigner.Domain.Interfaces;
 using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
@@ -9,7 +8,7 @@ using Result;
 namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
 {
     public sealed class CommonMultipleCreatorProcessor<TEntity, TDto, TConverter> : ICreatorProcessor<TDto, TEntity>
-        where TEntity : Identity, IDtoConvertible<TEntity, TDto>
+        where TEntity : class, IDtoConvertible<TEntity, TDto>
         where TConverter : IDtoToEntityConverter<TEntity, TDto>, new()
     {
         private IRepositoryFactory _repositoryFactory = null!;
@@ -33,13 +32,6 @@ namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
             _converterFactory = converterFactory;
             return this;
         }
-
-        /// <summary>
-        /// Процессор
-        /// </summary>
-        /// <param name="models">Модели, которые нужно добавить</param>
-        /// <param name="predicate">Predicat для поиска существующих Entity, соответствующих Dto, через EF Core</param>
-        /// <returns></returns>
 
         public async Task<CollectionResult<TDto>> ProcessAsync(List<TDto> models)
         {

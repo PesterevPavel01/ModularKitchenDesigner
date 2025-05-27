@@ -1,7 +1,7 @@
 ﻿using ModularKitchenDesigner.Domain.Dto;
 using Result;
 
-namespace ModularKitchenDesigner.Domain.Interfaces.Processors.SimpleEntity
+namespace ModularKitchenDesigner.Domain.Interfaces.Processors.SimpleEntityProcessors
 {
     public interface ISimpleEntityRemoveProcessor
     {

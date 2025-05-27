@@ -8,21 +8,19 @@ using ModularKitchenDesigner.Domain.Interfaces;
 
 namespace ModularKitchenDesigner.Domain.Entityes
 {
-    public class KitchenType : Identity, IAuditable, IDtoConvertible<KitchenType, KitchenTypeDto>
+    public class KitchenType : BaseEntity, IAuditable, IDtoConvertible<KitchenType, KitchenTypeDto>
     {
         private KitchenType(){}
 
-        private KitchenType(String title, string code, PriceSegment priceSegment) 
+        private KitchenType(string title, string code, PriceSegment priceSegment, bool enabled = true) 
         {
             Title = title;
             Code = code;
             PriceSegmentId = priceSegment.Id;
+            Enabled = enabled;
         }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public string Title { get; private set; }
-        public string Code { get; private set; }
-
         public PriceSegment PriceSegment { get; private set; }
         public Guid PriceSegmentId { get; private set; }
         public List<MaterialSelectionItem> MaterialSelectionItems { get; set; } = [];
@@ -42,21 +40,17 @@ namespace ModularKitchenDesigner.Domain.Entityes
             => entity => models.Select(model => model.Code).Contains(entity.Code);
 
         public KitchenTypeDto ConvertToDto()
-            => new()
-            {
-                Title = Title,
-                Code = Code,
-                PriceSegment = PriceSegment.Title
-            };
+            => new(title: Title,code: Code, priceSegment: PriceSegment.Title);
 
-        public static KitchenType Create(String title, string code, PriceSegment priceSegment)
-            => new(title, code, priceSegment);
+        public static KitchenType Create(String title, string code, PriceSegment priceSegment, bool enabled = true)
+            => new(title, code, priceSegment, enabled);
 
-        public KitchenType Update(String title, string code, PriceSegment priceSegment)
+        public KitchenType Update(String title, string code, PriceSegment priceSegment, bool enabled = true)
         {
             Title = title;
             Code = code;
             PriceSegmentId = priceSegment.Id;
+            Enabled = enabled;
 
             return this;
         }

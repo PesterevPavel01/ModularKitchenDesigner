@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace ModularKitchenDesigner.Application.Validators
+namespace ModularKitchenDesigner.Application.Errors
 {
     public class ErrorMessage
     {
@@ -13,7 +13,7 @@ namespace ModularKitchenDesigner.Application.Validators
 
         public int Code { get; set; }
 
-        public String ToJson()
+        public string ToJson()
             => JsonConvert.SerializeObject(this, Formatting.Indented);
     }
 }

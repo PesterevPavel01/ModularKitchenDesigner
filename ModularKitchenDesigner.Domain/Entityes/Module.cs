@@ -70,7 +70,6 @@ namespace ModularKitchenDesigner.Domain.Entityes
             ModuleTypeId = moduleType.Id;
 
             return this;
-            ;
         }
     }
 }

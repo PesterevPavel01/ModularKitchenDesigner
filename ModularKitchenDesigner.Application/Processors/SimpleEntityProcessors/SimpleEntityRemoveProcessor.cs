@@ -1,13 +1,15 @@
 ﻿using ModularKitchenDesigner.Domain.Dto;
+using ModularKitchenDesigner.Domain.Entityes.Base;
 using ModularKitchenDesigner.Domain.Interfaces.Base;
-using ModularKitchenDesigner.Domain.Interfaces.Processors.SimpleEntity;
+using ModularKitchenDesigner.Domain.Interfaces.Processors.SimpleEntityProcessors;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
 using Repository;
+using Result;
 
 namespace ModularKitchenDesigner.Application.Processors.SimpleEntityProcessors
 {
     public class SimpleEntityRemoveProcessor<TEntity> : ISimpleEntityRemoveProcessor
-        where TEntity : class, ISimpleEntity, new()
+        where TEntity : SimpleEntity, ISimpleEntity, new()
     {
 
         public SimpleEntityRemoveProcessor(IRepositoryFactory repositoryFactory, IValidatorFactory validatorFactory)
@@ -19,7 +21,7 @@ namespace ModularKitchenDesigner.Application.Processors.SimpleEntityProcessors
         private IValidatorFactory _validatorFactory = null!;
         private readonly IBaseRepository<TEntity> _repository;
 
-        public async Task<Result.BaseResult<SimpleDto>> RemoveAsync(string code)
+        public async Task<BaseResult<SimpleDto>> RemoveAsync(string code)
         {
             var currentRecord = _validatorFactory
                .GetObjectNullValidator()
@@ -32,7 +34,7 @@ namespace ModularKitchenDesigner.Application.Processors.SimpleEntityProcessors
 
             return new()
             {
-                Data = new SimpleDto() { Code = currentRecord.Code, Title = currentRecord.Title },
+                Data = new SimpleDto(currentRecord.Code, currentRecord.Title),
                 ConnectionTime = DateTime.Now
             };
         }
