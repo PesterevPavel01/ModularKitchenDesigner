@@ -1,10 +1,11 @@
-﻿using ModularKitchenDesigner.Domain.Entityes;
-using ModularKitchenDesigner.Domain.Entityes.Base;
-using System.ComponentModel.DataAnnotations;
+﻿using ModularKitchenDesigner.Domain.Dto.Base;
+using ModularKitchenDesigner.Domain.Dto.Exchange;
+using ModularKitchenDesigner.Domain.Entityes;
+using ModularKitchenDesigner.Domain.Interfaces.Exchange;
 
 namespace ModularKitchenDesigner.Domain.Dto
 {
-    public sealed class ModuleDto
+    public sealed class ModuleDto : BaseDto, IExcangeDtoConvertable<ModuleDto, NomanclatureDto>
     {
         public ModuleDto(){}
         public ModuleDto(Module module)
@@ -16,12 +17,6 @@ namespace ModularKitchenDesigner.Domain.Dto
             Type = module.ModuleType.Title;
         }
 
-        [Required(ErrorMessage = "Title cannot be null or empty.")]
-        public string Title { get; set; }
-
-        [Required(ErrorMessage = "Code cannot be null or empty.")]
-        public string Code { get; set; }
-
         private string _previewImageSrc;
         public string PreviewImageSrc 
         { 
@@ -30,5 +25,15 @@ namespace ModularKitchenDesigner.Domain.Dto
         }
         public double Width { get; set; }
         public string Type { get; set; }
+
+        public ModuleDto Convert(NomanclatureDto dto)
+        {
+            Title = dto.Title;
+            Code = dto.Code;
+            Width = dto.Widht;
+            Type = dto.Parents[0].Title;
+
+            return this;
+        }
     }
 }

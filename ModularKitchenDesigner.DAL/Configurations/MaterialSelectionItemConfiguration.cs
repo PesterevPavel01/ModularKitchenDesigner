@@ -12,6 +12,8 @@ namespace ModularKitchenDesigner.DAL.Configurations
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
             builder.HasIndex(x => new { x.MaterialId, x.ComponentTypeId, x.KitchenTypeId }).IsUnique();
             builder.Property(x => x.Code).IsRequired().HasMaxLength(50);
+            builder.Property(x => x.Title).HasMaxLength(255);
+            builder.Property(x => x.Title).HasDefaultValue("N/A");
             builder.HasIndex(x => x.Code).IsUnique();
 
             builder.HasOne(x => x.ComponentType)

@@ -28,7 +28,11 @@ namespace ModularKitchenDesigner.Api.Controllers
 
         [HttpGet()]
         public async Task<IActionResult> GetAll()
-        => Ok(await _moduleProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Module, ModuleDto>, Module, ModuleDto>().ProcessAsync());
+        => Ok(await _moduleProcessorFactory
+            .GetLoaderProcessor<CommonDefaultLoaderProcessor<Module, ModuleDto>, Module, ModuleDto>()
+            .ProcessAsync(
+                predicate: x => x.Enabled == true
+            ));
 
         [HttpGet("GetByType/{ModuleType}")]
         public async Task<IActionResult> GetByModuleType(String ModuleType)

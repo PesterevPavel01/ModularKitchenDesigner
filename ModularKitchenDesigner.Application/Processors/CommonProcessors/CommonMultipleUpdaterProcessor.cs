@@ -55,7 +55,7 @@ namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
                     _validatorFactory
                        .GetObjectNullValidator()
                        .Validate(
-                           model: currentEntities.Find(entity => entity.isUniqueKeyEqual(model)),
+                           model: currentEntities.Find(entity => entity.IsUniqueKeyEqual(model)),
                            methodArgument: model,
                            callerObject: GetType().Name);
                 }
@@ -74,6 +74,7 @@ namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
                 .GetRepository<TEntity>()
                 .GetAllAsync(
                     include: TEntity.IncludeRequaredField(),
+                    trackingType: TrackingType.Tracking,
                     predicate: TEntity.ContainsByUniqueKeyPredicate(models)
                 );
             

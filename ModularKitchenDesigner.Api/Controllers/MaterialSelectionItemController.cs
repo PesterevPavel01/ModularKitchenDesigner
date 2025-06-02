@@ -29,7 +29,7 @@ namespace ModularKitchenDesigner.Api.Controllers
 
         [HttpGet()]
         public async Task<IActionResult> GetAll()
-            => Ok(await _materialSelectionItemProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<MaterialSelectionItem, MaterialSelectionItemDto>, MaterialSelectionItem, MaterialSelectionItemDto>().ProcessAsync());
+            => Ok(await _materialSelectionItemProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<MaterialSelectionItem, MaterialSelectionItemDto>, MaterialSelectionItem, MaterialSelectionItemDto>().ProcessAsync(predicate: x => x.Enabled == true));
 
         [HttpGet("GetByKitchenType/{KitchenTypeTitle}")]
         public async Task<IActionResult> GetByKitchenType(String KitchenTypeTitle)

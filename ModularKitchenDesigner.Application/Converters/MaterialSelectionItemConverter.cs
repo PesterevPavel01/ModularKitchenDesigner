@@ -76,7 +76,7 @@ namespace ModularKitchenDesigner.Application.Converters
 
 
 
-                MaterialSelectionItem? entity = entities.Find(x => x.isUniqueKeyEqual(model));
+                MaterialSelectionItem? entity = entities.Find(x => x.IsUniqueKeyEqual(model));
 
                 if (entity is null)
                     materialSelectionItems.Add(

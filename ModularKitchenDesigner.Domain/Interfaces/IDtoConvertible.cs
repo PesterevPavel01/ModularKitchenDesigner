@@ -7,7 +7,7 @@ namespace ModularKitchenDesigner.Domain.Interfaces
     {
         TDto ConvertToDto();
         static abstract Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> IncludeRequaredField();
-        bool isUniqueKeyEqual(TDto model);
+        bool IsUniqueKeyEqual(TDto model);
         static abstract Expression<Func<TEntity,bool>> ContainsByUniqueKeyPredicate(List<TDto> models);
     }
 }

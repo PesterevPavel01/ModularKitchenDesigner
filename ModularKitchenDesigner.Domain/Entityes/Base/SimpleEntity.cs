@@ -18,7 +18,7 @@ namespace ModularKitchenDesigner.Domain.Entityes.Base
             Enabled = enabled;
         }
 
-        public bool isUniqueKeyEqual(SimpleDto model)
+        public bool IsUniqueKeyEqual(SimpleDto model)
             => this.Code == model.Code;
 
         public SimpleDto ConvertToDto()

@@ -31,15 +31,24 @@ namespace ModularKitchenDesigner.Api.Controllers.SimpleEntity
 
         [HttpGet()]
         public async Task<IActionResult> GetAll()
-            => Ok(await _componentTypeProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<ComponentType, SimpleDto>, ComponentType, SimpleDto>().ProcessAsync());
+            => Ok(
+                await _componentTypeProcessorFactory
+                .GetLoaderProcessor<CommonDefaultLoaderProcessor<ComponentType, SimpleDto>, ComponentType, SimpleDto>()
+                .ProcessAsync(predicate: x => x.Title != "default" && x.Enabled == true));
 
         [HttpGet("GetByCode/{code}")]
         public async Task<IActionResult> GetByCode(string code)
-            => Ok(await _componentTypeProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<ComponentType, SimpleDto>, ComponentType, SimpleDto>().ProcessAsync(predicate: x => x.Code == code));
+            => Ok(
+                await _componentTypeProcessorFactory
+                .GetLoaderProcessor<CommonDefaultLoaderProcessor<ComponentType, SimpleDto>, ComponentType, SimpleDto>()
+                .ProcessAsync(predicate: x => x.Code == code && x.Enabled == true));
 
         [HttpGet("GetByTitle/{name}")]
         public async Task<IActionResult> GetByTitle(string name)
-            => Ok(await _componentTypeProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<ComponentType, SimpleDto>, ComponentType, SimpleDto>().ProcessAsync(predicate: x => x.Title == name));
+            => Ok(
+                await _componentTypeProcessorFactory
+                .GetLoaderProcessor<CommonDefaultLoaderProcessor<ComponentType, SimpleDto>, ComponentType, SimpleDto>()
+                .ProcessAsync(predicate: x => x.Title == name && x.Enabled == true));
         
         [HttpDelete("{code}")]
         public async Task<IActionResult> Remove(string code)

@@ -1,10 +1,9 @@
-﻿using ModularKitchenDesigner.Domain.Entityes.Base;
+﻿using System.Linq.Expressions;
 using ModularKitchenDesigner.Domain.Interfaces;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
 using Repository;
 using Result;
-using System.Linq.Expressions;
 
 namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
 {
@@ -32,7 +31,8 @@ namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
         {
             List<TEntity> models = await _repositoryFactory.GetRepository<TEntity>().GetAllAsync(
                 include: TEntity.IncludeRequaredField(),
-                predicate: predicate);
+                predicate: predicate,
+                trackingType: TrackingType.Tracking);
 
             return new()
             {

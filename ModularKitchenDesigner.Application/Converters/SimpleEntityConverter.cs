@@ -32,7 +32,7 @@ namespace ModularKitchenDesigner.Application.Converters
             foreach (SimpleDto model in models) 
             {
 
-                TEntity? entity  = entities.Find(entity => entity.isUniqueKeyEqual(model));
+                TEntity? entity  = entities.Find(entity => entity.IsUniqueKeyEqual(model));
 
                 if (entity is null) 
                     entity = (TEntity?)TEntity.Create<TEntity>(model.Title, model.Code);

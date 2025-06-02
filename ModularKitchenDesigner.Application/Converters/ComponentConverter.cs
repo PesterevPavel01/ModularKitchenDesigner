@@ -85,7 +85,7 @@ namespace ModularKitchenDesigner.Application.Converters
                         model: modelResult.Find(currentModel => currentModel.Title == componentModel.Model),
                         methodArgument: models, callerObject: GetType().Name);
 
-                Component? component = entities.Find(c => c.isUniqueKeyEqual(componentModel));
+                Component? component = entities.Find(c => c.IsUniqueKeyEqual(componentModel));
 
                 if (component is null)
                     components.Add(
@@ -98,6 +98,7 @@ namespace ModularKitchenDesigner.Application.Converters
                             material: material,
                             model: model));
                 else
+                    //флаг Enabled не передается, т.к. при обновлении сущности она автоматически становится Enabled = true
                     components.Add(
                         component.Update(
                             title: title,

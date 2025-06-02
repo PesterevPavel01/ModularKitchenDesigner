@@ -51,7 +51,7 @@ namespace ModularKitchenDesigner.Application.Converters
                     methodArgument: models,
                     callerObject: GetType().Name);
 
-                Kitchen? kitchen = entities.Find(entity => entity.isUniqueKeyEqual(model));
+                Kitchen? kitchen = entities.Find(entity => entity.IsUniqueKeyEqual(model));
 
                 if (kitchen is null)
                     kitchens.Add(

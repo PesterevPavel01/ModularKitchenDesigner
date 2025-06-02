@@ -8,22 +8,23 @@ using ModularKitchenDesigner.Domain.Interfaces;
 
 namespace ModularKitchenDesigner.Domain.Entityes
 {
-    public sealed class ModelItem : Identity, IAuditable, IDtoConvertible<ModelItem, ModelItemDto>
+    public sealed class ModelItem : BaseEntity, IAuditable, IDtoConvertible<ModelItem, ModelItemDto>
     {
         private ModelItem(){}
 
-        private ModelItem(short quantity, Module module, Model model, string code) 
+        private ModelItem(short quantity, Module module, Model model, string code, string title = null, bool enabled = true) 
         {
             Quantity = quantity;
             ModuleId = module.Id;
             ModelId = model.Id;
             Code = code ?? Guid.NewGuid().ToString();
+            Title = title is null ? "N/A" : title;
+            Enabled = enabled;
         }
 
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public short Quantity { get; private set; }
-        public string Code { get; set; }
 
         public Module Module { get; private set; }
         public Guid ModuleId { get; private set; }
@@ -35,10 +36,11 @@ namespace ModularKitchenDesigner.Domain.Entityes
             .Include(x => x.Module)
             .Include(x => x.Model);
 
-        public bool isUniqueKeyEqual(ModelItemDto model)
+        public bool IsUniqueKeyEqual(ModelItemDto model)
             => this.Model.Code == model.ModelCode
             && this.Module.Code == model.ModuleCode;
-        public bool containsByUniqueKey(List<ModelItemDto> models)
+
+        public bool ContainsByUniqueKey(List<ModelItemDto> models)
             => models.Select(model => model.ModelCode).Contains(this.Model.Code)
             && models.Select(model => model.ModuleCode).Contains(this.Module.Code);
 
@@ -53,18 +55,21 @@ namespace ModularKitchenDesigner.Domain.Entityes
             ModuleCode = Module.Code,
             ModelCode = Model.Code,
             Quantity = Quantity,
-            Code = Code
+            Code = Code,
+            Title = Title
         };
 
-        public static ModelItem Create(short quantity, Module module, Model model, string code = null)
-            => new(quantity, module, model, code);
+        public static ModelItem Create(short quantity, Module module, Model model, string code = null, string title = null, bool enabled = true)
+            => new(quantity, module, model, code, title, enabled);
 
-        public ModelItem Update(short quantity, Module module, Model model, string code = null)
+        public ModelItem Update(short quantity, Module module, Model model, string code = null, string title = null, bool enabled = true)
         {
             Quantity = quantity;
             ModuleId = module.Id;
             ModelId = model.Id;
             Code = code ?? Code;
+            Enabled = enabled;
+            Title = title is null ? "N/A" : title;
 
             return this;
         }

@@ -10,7 +10,7 @@ namespace ModularKitchenDesigner.Domain.Entityes
 {
     public class KitchenType : BaseEntity, IAuditable, IDtoConvertible<KitchenType, KitchenTypeDto>
     {
-        private KitchenType(){}
+        protected KitchenType(){}
 
         private KitchenType(string title, string code, PriceSegment priceSegment, bool enabled = true) 
         {
@@ -19,6 +19,7 @@ namespace ModularKitchenDesigner.Domain.Entityes
             PriceSegmentId = priceSegment.Id;
             Enabled = enabled;
         }
+
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public PriceSegment PriceSegment { get; private set; }
@@ -32,7 +33,7 @@ namespace ModularKitchenDesigner.Domain.Entityes
                           .Include(x => x.Kitchens)
                           .Include(x => x.MaterialSelectionItems);
 
-        public bool isUniqueKeyEqual(KitchenTypeDto model)
+        public bool IsUniqueKeyEqual(KitchenTypeDto model)
             => this.Code == model.Code;
 
 

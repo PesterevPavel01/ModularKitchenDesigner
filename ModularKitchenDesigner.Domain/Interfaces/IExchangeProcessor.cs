@@ -8,6 +8,6 @@ namespace ModularKitchenDesigner.Domain.Interfaces
         where TDto : class
     {
         IExchangeProcessor<TDto> SetProcessorFactory(IProcessorFactory processorFactory);
-        Task<CollectionResult<TDto>> ProcessAsync(List<TDto> models, Func<NomanclatureDto, bool> isUniqueKeyEqual);
+        Task<CollectionResult<NomanclatureDto>> ProcessAsync(List<NomanclatureDto> models, Func<NomanclatureDto, bool> isUniqueKeyEqual, Func<TDto, bool>? isElementInList = null);
     }
 }

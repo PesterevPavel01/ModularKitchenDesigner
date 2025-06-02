@@ -13,8 +13,8 @@ namespace ModularKitchenDesigner.Domain.Dto.Exchange
 
         [Required(ErrorMessage = "Parents cannot be null or empty.")]
         public List<SimpleDto> Parents { get; set; }
-        public SimpleDto Model { get; set; }
+        public List<TemplateDto> Models { get; set; }
         public double Widht { get; set; }
-        public List<SimpleDto> Templates { get; set; }
+        public SimpleDto Template { get; set; }
     }
 }

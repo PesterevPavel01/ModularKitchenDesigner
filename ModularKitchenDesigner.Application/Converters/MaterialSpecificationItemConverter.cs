@@ -74,7 +74,7 @@ namespace ModularKitchenDesigner.Application.Converters
                         methodArgument: models,
                         callerObject: GetType().Name);
 
-                MaterialSpecificationItem? entity = entities.Find(x=> x.isUniqueKeyEqual(model));
+                MaterialSpecificationItem? entity = entities.Find(x=> x.IsUniqueKeyEqual(model));
 
                 if(entity is null)
                     materialSpecificationItems.Add(

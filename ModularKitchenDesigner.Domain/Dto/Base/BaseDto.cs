@@ -2,7 +2,7 @@
 
 namespace ModularKitchenDesigner.Domain.Dto.Base
 {
-    public class BaseDto
+    public abstract class BaseDto
     {
         public BaseDto(){}
 
@@ -18,4 +18,5 @@ namespace ModularKitchenDesigner.Domain.Dto.Base
         [Required(ErrorMessage = "Code cannot be null or empty.")]
         public string Code { get; set; }
     }
+
 }

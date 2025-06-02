@@ -1,4 +1,5 @@
-﻿using Asp.Versioning;
+﻿using System;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using ModularKitchenDesigner.Application.Converters;
 using ModularKitchenDesigner.Application.Processors.CommonProcessors;
@@ -28,15 +29,17 @@ namespace ModularKitchenDesigner.Api.Controllers
 
         [HttpGet()]
         public async Task<IActionResult> GetAll()
-            => Ok(await _modelItemProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<ModelItem, ModelItemDto>, ModelItem, ModelItemDto>().ProcessAsync());
+            => Ok(await _modelItemProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<ModelItem, ModelItemDto>, ModelItem, ModelItemDto>().ProcessAsync(predicate: x => x.Enabled == true));
 
         [HttpGet("GetByModule/{ModuleTitle}")]
         public async Task<IActionResult> GetByModule(String ModuleTitle)
-            => Ok(await _modelItemProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<ModelItem, ModelItemDto>, ModelItem, ModelItemDto>().ProcessAsync(predicate: x => x.Module.Title == ModuleTitle));
+            => Ok(await _modelItemProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<ModelItem, ModelItemDto>, ModelItem, ModelItemDto>().ProcessAsync(predicate: x => x.Module.Title == ModuleTitle && x.Enabled == true));
 
         [HttpGet("GetByModuleCode/{ModuleCode}")]
         public async Task<IActionResult> GetByModuleModuleCode(String ModuleCode)
-            => Ok(await _modelItemProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<ModelItem, ModelItemDto>, ModelItem, ModelItemDto>().ProcessAsync(predicate: x => x.Module.Code == ModuleCode));
+            => Ok(await _modelItemProcessorFactory
+                .GetLoaderProcessor<CommonDefaultLoaderProcessor<ModelItem, ModelItemDto>, ModelItem, ModelItemDto>()
+                .ProcessAsync(predicate: x => x.Module.Code == ModuleCode && x.Enabled == true));
 
         [HttpPost("CreateMultiple")]
         public async Task<IActionResult> CreateMultiple([FromBody] List<ModelItemDto> models)

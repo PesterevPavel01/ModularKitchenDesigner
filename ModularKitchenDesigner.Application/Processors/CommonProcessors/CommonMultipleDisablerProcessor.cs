@@ -8,7 +8,7 @@ using Result;
 
 namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
 {
-    public class CommonMultipleChangeEnableProcessor<TEntity, TDto> : ICreatorProcessor<TDto, TEntity>
+    public class CommonMultipleDisablerProcessor<TEntity, TDto> : ICreatorProcessor<TDto, TEntity>
         where TEntity : BaseEntity, IDtoConvertible<TEntity, TDto>
     {
         private IRepositoryFactory _repositoryFactory = null!;
@@ -47,7 +47,7 @@ namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
                     callerObject: GetType().Name);
 
             foreach (TEntity entity in currentEntityes) 
-                entity.Enabled = !entity.Enabled;
+                entity.Enabled = false;
 
             var result = await _repositoryFactory
                             .GetRepository<TEntity>()

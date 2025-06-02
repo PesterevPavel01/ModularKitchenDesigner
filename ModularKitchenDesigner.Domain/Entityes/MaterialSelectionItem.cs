@@ -8,21 +8,22 @@ using ModularKitchenDesigner.Domain.Interfaces;
 
 namespace ModularKitchenDesigner.Domain.Entityes
 {
-    public class MaterialSelectionItem : Identity, IAuditable, IDtoConvertible<MaterialSelectionItem, MaterialSelectionItemDto>
+    public class MaterialSelectionItem : BaseEntity, IAuditable, IDtoConvertible<MaterialSelectionItem, MaterialSelectionItemDto>
     {
         private MaterialSelectionItem(){}
 
-        private MaterialSelectionItem(ComponentType componentType, Material material, KitchenType kitchenType, string code) 
+        private MaterialSelectionItem(ComponentType componentType, Material material, KitchenType kitchenType, string code, string title = null, bool enabled = true) 
         {
             ComponentTypeId = componentType.Id;
             KitchenTypeId = kitchenType.Id;
             MaterialId = material.Id;
             Code = code ?? Guid.NewGuid().ToString();
+            Enabled = enabled;
+            Title = title is null ? "N/A" : title;
         }
 
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public string Code { get; set; }
         public ComponentType ComponentType { get; private set; }
         public Guid ComponentTypeId { get; private set; }
         public Material Material { get; private set; }
@@ -39,7 +40,7 @@ namespace ModularKitchenDesigner.Domain.Entityes
         .Include(x => x.KitchenType)
         .Include(x => x.MaterialSpecificationItems);
 
-        public bool isUniqueKeyEqual(MaterialSelectionItemDto model)
+        public bool IsUniqueKeyEqual(MaterialSelectionItemDto model)
             => this.ComponentType.Title == model.ComponentType
             && this.Material.Title == model.Material
             && this.KitchenType.Title == model.KitchenType;
@@ -56,18 +57,21 @@ namespace ModularKitchenDesigner.Domain.Entityes
             ComponentType = ComponentType.Title,
             Material = Material.Title,
             KitchenType = KitchenType.Title,
-            Code = Code
+            Code = Code,
+            Title = Title
         };
 
-        public static MaterialSelectionItem Create(ComponentType componentType, Material material, KitchenType kitchenType, string code = null)
-            => new(componentType, material, kitchenType, code);
+        public static MaterialSelectionItem Create(ComponentType componentType, Material material, KitchenType kitchenType, string code = null, string title = null, bool enabled = true)
+            => new(componentType, material, kitchenType, code, title, enabled);
 
-        public MaterialSelectionItem Update(ComponentType componentType, Material material, KitchenType kitchenType, string code = null) 
+        public MaterialSelectionItem Update(ComponentType componentType, Material material, KitchenType kitchenType, string code = null, string title = null, bool enabled = true) 
         {
             ComponentTypeId = componentType.Id;
             MaterialId = material.Id;
             KitchenTypeId = kitchenType.Id;
             Code = code ?? Code;
+            Enabled = enabled;
+            Title = title is null ? "N/A" : title;
 
             return this;
         }

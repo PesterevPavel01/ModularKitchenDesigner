@@ -40,7 +40,7 @@ namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
                 .Validate(
                     models: await _repositoryFactory
                         .GetRepository<TEntity>()
-                        .GetAllAsync( predicate: TEntity.ContainsByUniqueKeyPredicate(models)),
+                        .GetAllAsync( predicate: TEntity.ContainsByUniqueKeyPredicate(models), trackingType: TrackingType.Tracking),
                     methodArgument: models,
                     callerObject: GetType().Name);
 

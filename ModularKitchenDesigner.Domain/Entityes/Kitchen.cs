@@ -38,7 +38,7 @@ namespace ModularKitchenDesigner.Domain.Entityes
             .Include(x => x.Sections)
             .Include(x => x.MaterialSpecificationItems);
 
-        public bool isUniqueKeyEqual(KitchenDto model)
+        public bool IsUniqueKeyEqual(KitchenDto model)
             => this.Code == model.Code;
 
         public Func<List<KitchenDto>, bool> containsByUniqueKey()
