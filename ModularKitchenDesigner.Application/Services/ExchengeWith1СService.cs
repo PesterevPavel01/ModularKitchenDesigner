@@ -88,9 +88,7 @@ namespace ModularKitchenDesigner.Application.Services
                 .SetProcessorFactory(_processorFactory)
                 .ProcessAsync(
                     models: modelItemsExchangeModels, 
-                    isUniqueKeyEqual: x => x.Parents.FindIndex(x => x.Code == "00080202189") == 1, 
-                    isElementInList: (x,models) => models.Select(model => model.ModuleCode).Contains(x.ModuleCode)
-                        && models.Select(model => model.ModelCode).Contains(x.ModelCode));
+                    isUniqueKeyEqual: x => x.Parents.FindIndex(x => x.Code == "00080202189") == 1);
 
             return new() 
             {

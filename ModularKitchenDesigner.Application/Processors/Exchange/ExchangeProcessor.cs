@@ -1,8 +1,10 @@
 ﻿using ModularKitchenDesigner.Application.Processors.CommonProcessors;
+using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Dto.Base;
 using ModularKitchenDesigner.Domain.Dto.Exchange;
 using ModularKitchenDesigner.Domain.Entityes.Base;
 using ModularKitchenDesigner.Domain.Interfaces;
+using ModularKitchenDesigner.Domain.Interfaces.Base;
 using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Exchange;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
@@ -11,7 +13,7 @@ using Result;
 namespace ModularKitchenDesigner.Application.Processors.Exchange
 {
     public class ExchangeProcessor<TEntity, TDto, TConverter> : IExchangeProcessor<TDto>
-        where TDto : BaseDto, IExcangeDtoConvertable<TDto, NomanclatureDto>, new()
+        where TDto : BaseDto, IExcangeDtoConvertable<TDto, NomanclatureDto>, IUniqueKeyQueryable<TDto>, new()
         where TEntity : BaseEntity, IDtoConvertible<TEntity, TDto>
         where TConverter: IDtoToEntityConverter<TEntity, TDto>, new()
     {
@@ -31,19 +33,16 @@ namespace ModularKitchenDesigner.Application.Processors.Exchange
         /// <returns></returns>
 
 
-        public async Task<CollectionResult<NomanclatureDto>> ProcessAsync(List<NomanclatureDto> models, Func<NomanclatureDto, bool> isUniqueKeyEqual, Func<TDto,List<TDto>, bool> ? isElementInInputModels = null)
+        public async Task<CollectionResult<NomanclatureDto>> ProcessAsync(List<NomanclatureDto> models, Func<NomanclatureDto, bool> isUniqueKeyEqual)
         {
             List<TDto> modelsForCreation = [];
             
             // Получаю все элементы, которые на момент обновления являются элементами TEntity и должны быть обновлены,
             // среди них будут в том числе те, которые перенесены в другую номенклатурную группу
-            
+
             CollectionResult<TDto> modelsForUpdate = await _processorFactory
                     .GetLoaderProcessor<CommonLoaderWithoutValidationProcessor<TEntity, TDto>, TEntity, TDto>()
-                    .ProcessAsync(
-                        predicate : isElementInInputModels is null ? 
-                            entity => models.Select(x => x.Code).Contains(entity.Code) 
-                            : TEntity.ContainsByUniqueKeyPredicate(models.Select(x => new TDto().Convert(x)).ToList()));
+                    .ProcessAsync( predicate : TEntity.ContainsByUniqueKeyPredicate(models.Select(x => new TDto().Convert(x)).ToList()));
 
             // Выбираем пришедшие номенклатурные позиции, только те, которые должны быть элементами TEntity ПОСЛЕ обновления
 
@@ -57,9 +56,7 @@ namespace ModularKitchenDesigner.Application.Processors.Exchange
                 // Выделяем те сущности, которые должны быть изменены, в том числе с Title = "removed"
 
                 var changedModels = newAndUpdatedModelsAfterExchange
-                    .Where( x => isElementInInputModels is null ?
-                        modelsForUpdate.Data.Select(model => model.Code).Contains(x.Code)
-                        : isElementInInputModels(x,modelsForUpdate.Data.ToList()))
+                    .Where( x => x.HasMatchingUniqueKey(modelsForUpdate.Data))
                     .ToList();
 
                 //изменяем только те записи, у которых Title != "removed"
@@ -80,11 +77,7 @@ namespace ModularKitchenDesigner.Application.Processors.Exchange
                 // Выделяем те сущности, которые должны быть удалены (отключены) из активных элементов TEntity
 
                 var changeEnableModels = modelsForUpdate.Data
-                    .Where(
-                        isElementInInputModels is null ?
-                            model => !newAndUpdatedModelsAfterExchange.Select(x => x.Code).Contains(model.Code)
-                            && !disabledModels.Data.Select(x => x.Code).Contains(model.Code)
-                        : model => !isElementInInputModels(model, newAndUpdatedModelsAfterExchange)
+                    .Where( model => !model.HasMatchingUniqueKey(newAndUpdatedModelsAfterExchange)
                             && !disabledModels.Data.Select(x => x.Code).Contains(model.Code))
                     .ToList();
 
@@ -102,10 +95,7 @@ namespace ModularKitchenDesigner.Application.Processors.Exchange
 
                 // Выделяем те сущности, которые должны быть созданы
                 modelsForCreation = newAndUpdatedModelsAfterExchange
-                    .Where(
-                        isElementInInputModels is null ?
-                        x => !modelsForUpdate.Data.Select(model => model.Code).Contains(x.Code)
-                        : x => !isElementInInputModels(x, modelsForUpdate.Data.ToList()))
+                    .Where( x => !x.HasMatchingUniqueKey(modelsForUpdate.Data))
                     .ToList();
 
                 if (modelsForCreation.Any())

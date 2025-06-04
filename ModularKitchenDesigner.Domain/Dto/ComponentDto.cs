@@ -3,11 +3,12 @@ using Microsoft.VisualBasic;
 using ModularKitchenDesigner.Domain.Dto.Base;
 using ModularKitchenDesigner.Domain.Dto.Exchange;
 using ModularKitchenDesigner.Domain.Entityes;
+using ModularKitchenDesigner.Domain.Interfaces.Base;
 using ModularKitchenDesigner.Domain.Interfaces.Exchange;
 
 namespace ModularKitchenDesigner.Domain.Dto
 {
-    public sealed class ComponentDto : BaseDto, IExcangeDtoConvertable<ComponentDto, NomanclatureDto>
+    public sealed class ComponentDto : BaseDto, IExcangeDtoConvertable<ComponentDto, NomanclatureDto>, IUniqueKeyQueryable<ComponentDto>
     {
         public ComponentDto(Component newComponent)
         {
@@ -41,7 +42,7 @@ namespace ModularKitchenDesigner.Domain.Dto
             Title = dto.Title;
             Code = dto.Code;
             Price = dto.Price;
-            Model = dto.Template.Title ?? "default";
+            Model = dto.Template?.Title ?? "default";
 
             ComponentType = dto.Parents.Last().Title;
 
@@ -71,5 +72,9 @@ namespace ModularKitchenDesigner.Domain.Dto
             }
             return this;
         }
+
+        public bool HasMatchingUniqueKey(IEnumerable<ComponentDto> models)
+            =>
+                models.Select(model => model.Code).Contains(this.Code);
     }
 }

@@ -2,11 +2,12 @@
 using ModularKitchenDesigner.Domain.Dto.Base;
 using ModularKitchenDesigner.Domain.Dto.Exchange;
 using ModularKitchenDesigner.Domain.Entityes;
+using ModularKitchenDesigner.Domain.Interfaces.Base;
 using ModularKitchenDesigner.Domain.Interfaces.Exchange;
 
 namespace ModularKitchenDesigner.Domain.Dto
 {
-    public class MaterialSelectionItemDto : BaseDto, IExcangeDtoConvertable<MaterialSelectionItemDto, NomanclatureDto>
+    public class MaterialSelectionItemDto : BaseDto, IExcangeDtoConvertable<MaterialSelectionItemDto, NomanclatureDto>, IUniqueKeyQueryable<MaterialSelectionItemDto>
     {
         public MaterialSelectionItemDto(){}
 
@@ -27,12 +28,18 @@ namespace ModularKitchenDesigner.Domain.Dto
         [Required(ErrorMessage = "Material cannot be null or empty.")]
         public string KitchenType { get; set; }
 
+        public bool HasMatchingUniqueKey(IEnumerable<MaterialSelectionItemDto> models)
+            => models.Select(model => model.ComponentType).Contains(ComponentType)
+                && models.Select(model => model.Material).Contains(Material)
+                && models.Select(model => model.KitchenType).Contains(KitchenType);
+
         MaterialSelectionItemDto IExcangeDtoConvertable<MaterialSelectionItemDto, NomanclatureDto>.Convert(NomanclatureDto dto)
         {
             Code = dto.Code;
-            ComponentType = dto.Parents[2].Title;
+            
+            ComponentType = dto.Parents?.Count() > 2 ? dto.Parents[2].Title : null;
             Material = dto.Title;
-            KitchenType = dto.Parents[0].Title;
+            KitchenType = dto.Parents?.Count() > 0 ? dto.Parents[0].Title : null;
 
             return this;
         }
