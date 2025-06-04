@@ -7,11 +7,10 @@ namespace ModularKitchenDesigner.Domain.Entityes.Base
     public class SimpleEntity : BaseEntity, ISimpleEntity, IAuditable
     {
         protected SimpleEntity(){ }
-
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
-        private SimpleEntity(string title, string code, bool enabled = true) 
+        private SimpleEntity(string title, string code, bool enabled = true, Guid id = default)
         {
             Title = title;
             Code = code;
@@ -24,14 +23,21 @@ namespace ModularKitchenDesigner.Domain.Entityes.Base
         public SimpleDto ConvertToDto()
             => new(title:Title, code:Code);
 
-        public static TEntity Create<TEntity>(string title, string code, bool enabled = true)
-            where TEntity : BaseEntity, new()
-            => new TEntity()
-            {
-                Code = code, 
-                Title = title, 
-                Enabled = enabled
-            };
+        public static TEntity Create<TEntity>(string title, string code, bool enabled = true, Guid id = default)
+            where TEntity : SimpleEntity, new()
+        {
+            var entity = 
+                new TEntity()
+                {
+                    Code = code,
+                    Title = title,
+                    Enabled = enabled,
+                };
+
+            entity.Initialize(id);
+
+            return entity;
+        }
 
         public ISimpleEntity Update(string title, string code, bool enabled = true)
         {

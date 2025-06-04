@@ -72,13 +72,13 @@ namespace ModularKitchenDesigner.Application.Services
 
             var modelItemsExchangeModels = models
                 .Where(x => x.Parents
-                    .FindIndex(x => x.Code == "00080202189") == 1)
+                    .FindIndex(x => x.Code == "00080202189") == 1 && x.Models is not null)
                     .SelectMany(x => x.Models
-                        .Select(model => 
-                            new NomanclatureDto() 
+                        .Select(model =>
+                            new NomanclatureDto()
                             {
-                                Code = x.Code, 
-                                Models = [model], 
+                                Code = x.Code,
+                                Models = [model],
                                 Parents = x.Parents,
                                 Title = model.Title != "removed" ? x.Title : "removed"
                             }))
@@ -89,8 +89,8 @@ namespace ModularKitchenDesigner.Application.Services
                 .ProcessAsync(
                     models: modelItemsExchangeModels, 
                     isUniqueKeyEqual: x => x.Parents.FindIndex(x => x.Code == "00080202189") == 1, 
-                    isElementInList: x => modelItemsExchangeModels.Select(model => model.Code).Contains(x.ModuleCode)
-                        && modelItemsExchangeModels.Select(model => model.Models.First().Code).Contains(x.ModelCode));
+                    isElementInList: (x,models) => models.Select(model => model.ModuleCode).Contains(x.ModuleCode)
+                        && models.Select(model => model.ModelCode).Contains(x.ModelCode));
 
             return new() 
             {

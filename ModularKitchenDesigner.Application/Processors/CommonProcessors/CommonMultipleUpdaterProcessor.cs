@@ -1,5 +1,4 @@
-﻿using ModularKitchenDesigner.Domain.Entityes.Base;
-using ModularKitchenDesigner.Domain.Interfaces;
+﻿using ModularKitchenDesigner.Domain.Interfaces;
 using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;

@@ -1,5 +1,4 @@
-﻿using ModularKitchenDesigner.Domain.Dto.Exchange;
-using Result;
+﻿using Result;
 
 namespace ModularKitchenDesigner.Domain.Interfaces.Exchange
 {

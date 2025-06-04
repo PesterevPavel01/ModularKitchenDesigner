@@ -31,84 +31,93 @@ namespace ModularKitchenDesigner.Application.Processors.Exchange
         /// <returns></returns>
 
 
-        public async Task<CollectionResult<NomanclatureDto>> ProcessAsync(List<NomanclatureDto> models, Func<NomanclatureDto, bool> isUniqueKeyEqual, Func<TDto, bool> ? isElementInList = null)
+        public async Task<CollectionResult<NomanclatureDto>> ProcessAsync(List<NomanclatureDto> models, Func<NomanclatureDto, bool> isUniqueKeyEqual, Func<TDto,List<TDto>, bool> ? isElementInInputModels = null)
         {
-            // Получаю все элементы, которые на момент обновления являются элементами TEntity и должны быть обновлены
-            CollectionResult<TDto> modelsBeforeUpdate = await _processorFactory
+            List<TDto> modelsForCreation = [];
+            
+            // Получаю все элементы, которые на момент обновления являются элементами TEntity и должны быть обновлены,
+            // среди них будут в том числе те, которые перенесены в другую номенклатурную группу
+            
+            CollectionResult<TDto> modelsForUpdate = await _processorFactory
                     .GetLoaderProcessor<CommonLoaderWithoutValidationProcessor<TEntity, TDto>, TEntity, TDto>()
                     .ProcessAsync(
-                        predicate : isElementInList is null ? 
+                        predicate : isElementInInputModels is null ? 
                             entity => models.Select(x => x.Code).Contains(entity.Code) 
                             : TEntity.ContainsByUniqueKeyPredicate(models.Select(x => new TDto().Convert(x)).ToList()));
 
-            // Выбираем пришедшие номенклатурные позиции, которые должны быть элементами TEntity после обновления
-            var changedAndCreatedModels = models
+            // Выбираем пришедшие номенклатурные позиции, только те, которые должны быть элементами TEntity ПОСЛЕ обновления
+
+            var newAndUpdatedModelsAfterExchange = models
                 .Where(isUniqueKeyEqual)
                 .Select(model => new TDto().Convert(model))
                 .ToList();
 
-            // Выделяем те сущности, которые должны быть изменены, в том числе с Title = "removed"
-            var changedModels = changedAndCreatedModels
-                .Where( isElementInList is null ?
-                    x => modelsBeforeUpdate.Data.Select(model => model.Code).Contains(x.Code)
-                    : isElementInList)
-                .ToList();
+            if (modelsForUpdate.Count != 0)
+            {
+                // Выделяем те сущности, которые должны быть изменены, в том числе с Title = "removed"
 
-            //изменяем только те записи, у которых Title != "removed"
-            if (changedModels.Where(x => x.Title != "removed").Any())
-                await _processorFactory
-                    .GetCreatorProcessor<CommonMultipleUpdaterProcessor<TEntity, TDto, TConverter>, TEntity, TDto>()
-                    .ProcessAsync(changedModels.Where(x => x.Title != "removed").ToList());
+                var changedModels = newAndUpdatedModelsAfterExchange
+                    .Where( x => isElementInInputModels is null ?
+                        modelsForUpdate.Data.Select(model => model.Code).Contains(x.Code)
+                        : isElementInInputModels(x,modelsForUpdate.Data.ToList()))
+                    .ToList();
 
-            // Получаем сущности, которые деактивированы на момент обновления, у modelsBeforeUpdate точно есть код, т.к. они загружены из EF
-            var disabledModels = await _processorFactory
-                .GetLoaderProcessor<CommonLoaderWithoutValidationProcessor<TEntity, TDto>, TEntity, TDto>()
-                .ProcessAsync(
-                    predicate: entity => modelsBeforeUpdate.Data.Select(x => x.Code).Contains(entity.Code)
-                               && entity.Enabled == false);
+                //изменяем только те записи, у которых Title != "removed"
 
-            // Выделяем те сущности, которые должны быть удалены (отключены) из активных элементов TEntity
-            var changeEnableModels = modelsBeforeUpdate.Data
-                .Where(
-                    isElementInList is null ?
-                    model => !changedAndCreatedModels.Select(x => x.Code).Contains(model.Code)
-                    && !disabledModels.Data.Select(x => x.Code).Contains(model.Code)
-                    : model => !isElementInList(model)
-                    && !disabledModels.Data.Select(x => x.Code).Contains(model.Code))
-                .ToList();
+                if (changedModels.Where(x => x.Title != "removed").Any())
+                    await _processorFactory
+                        .GetCreatorProcessor<CommonMultipleUpdaterProcessor<TEntity, TDto, TConverter>, TEntity, TDto>()
+                        .ProcessAsync(changedModels.Where(x => x.Title != "removed").ToList());
 
-            //Добавляем к ним модели, которые пришли с Title = "removed"
-            changeEnableModels.AddRange(changedModels.Where(x => x.Title == "removed").ToList());
+                // Получаем сущности, которые деактивированы на момент обновления, у modelsBeforeUpdate точно есть код, т.к. они загружены из EF
 
-            /*
-             * Активация не требуется, т.к. при обновлении сущности через метод Update() она автоматически становится Enable = true
-             
-            changeEnableModels.AddRange(
-                changedModels
-                    .Where(x => disabledModels.Data.Select(model => model.Code).Contains(x.Code))
-                    .ToList());
-            */
+                var disabledModels = await _processorFactory
+                    .GetLoaderProcessor<CommonLoaderWithoutValidationProcessor<TEntity, TDto>, TEntity, TDto>()
+                    .ProcessAsync(
+                        predicate: entity => modelsForUpdate.Data.Select(x => x.Code).Contains(entity.Code)
+                                   && entity.Enabled == false);
 
-            // отключаем сущности
+                // Выделяем те сущности, которые должны быть удалены (отключены) из активных элементов TEntity
 
-            if (changeEnableModels.Any())
-                await _processorFactory
-                    .GetCreatorProcessor<CommonMultipleDisablerProcessor<TEntity, TDto>, TEntity, TDto>()
-                    .ProcessAsync(changeEnableModels);
+                var changeEnableModels = modelsForUpdate.Data
+                    .Where(
+                        isElementInInputModels is null ?
+                            model => !newAndUpdatedModelsAfterExchange.Select(x => x.Code).Contains(model.Code)
+                            && !disabledModels.Data.Select(x => x.Code).Contains(model.Code)
+                        : model => !isElementInInputModels(model, newAndUpdatedModelsAfterExchange)
+                            && !disabledModels.Data.Select(x => x.Code).Contains(model.Code))
+                    .ToList();
 
-            // Выделяем те сущности, которые должны быть созданы
-            var modelsToCreate = changedAndCreatedModels
-                .Where(
-                    isElementInList is null ? 
-                    x => !modelsBeforeUpdate.Data.Select(model => model.Code).Contains(x.Code)
-                    : x=> !isElementInList(x))
-                .ToList();
+                //Добавляем к ним модели, которые пришли с Title = "removed"
+                changeEnableModels.AddRange(changedModels.Where(x => x.Title == "removed").ToList());
 
-            if (modelsToCreate.Any())
-                await _processorFactory
-                    .GetCreatorProcessor<CommonMultipleCreatorProcessor<TEntity, TDto, TConverter>, TEntity, TDto>()
-                    .ProcessAsync(modelsToCreate);
-            
+                /* Активация не требуется, т.к. при обновлении сущности через метод Update() она автоматически становится Enable = true*/
+
+                // отключаем сущности
+
+                if (changeEnableModels.Any())
+                    await _processorFactory
+                        .GetCreatorProcessor<CommonMultipleDisablerProcessor<TEntity, TDto>, TEntity, TDto>()
+                        .ProcessAsync(changeEnableModels);
+
+                // Выделяем те сущности, которые должны быть созданы
+                modelsForCreation = newAndUpdatedModelsAfterExchange
+                    .Where(
+                        isElementInInputModels is null ?
+                        x => !modelsForUpdate.Data.Select(model => model.Code).Contains(x.Code)
+                        : x => !isElementInInputModels(x, modelsForUpdate.Data.ToList()))
+                    .ToList();
+
+                if (modelsForCreation.Any())
+                    await _processorFactory
+                        .GetCreatorProcessor<CommonMultipleCreatorProcessor<TEntity, TDto, TConverter>, TEntity, TDto>()
+                        .ProcessAsync(modelsForCreation);
+            }
+            else
+                if(newAndUpdatedModelsAfterExchange.Any())
+                    await _processorFactory
+                        .GetCreatorProcessor<CommonMultipleCreatorProcessor<TEntity, TDto, TConverter>, TEntity, TDto>()
+                        .ProcessAsync(newAndUpdatedModelsAfterExchange); 
             /*
              * вместо удаления необходимо пользоваться методом отключения сущности
          

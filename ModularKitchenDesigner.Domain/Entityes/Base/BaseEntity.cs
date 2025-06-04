@@ -5,11 +5,17 @@ namespace ModularKitchenDesigner.Domain.Entityes.Base
     public class BaseEntity : Identity
     {
         protected BaseEntity(){}
+
         public BaseEntity(string title, string code, bool enabled = true)
         {
             Title = title;
             Code = code;
             Enabled = enabled;
+        }
+
+        protected void Initialize(Guid id)
+        {
+            Id = id;
         }
 
         [Required(ErrorMessage = "Title cannot be null or empty.")]

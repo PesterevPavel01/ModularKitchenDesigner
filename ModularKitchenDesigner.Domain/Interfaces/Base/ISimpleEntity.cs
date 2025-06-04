@@ -7,8 +7,8 @@ namespace ModularKitchenDesigner.Domain.Interfaces.Base
         //string Title { get; }
         //string Code { get; }
 
-        static abstract TEntity Create<TEntity>(string title, string code, bool enabled = true)
-            where TEntity : BaseEntity, new();
+        static abstract TEntity Create<TEntity>(string title, string code, bool enabled = true, Guid id = default)
+            where TEntity : SimpleEntity, new();
         ISimpleEntity Update(string title, string code, bool enabled = true);
     }
 }
