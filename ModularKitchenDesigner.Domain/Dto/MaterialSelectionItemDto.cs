@@ -37,9 +37,14 @@ namespace ModularKitchenDesigner.Domain.Dto
         {
             Code = dto.Code;
             
-            ComponentType = dto.Parents?.Count() > 2 ? dto.Parents[2].Title : null;
+            if(dto.Parents?.Count > 2)
+            {
+                ComponentType = dto.Parents[2].Title;
+                KitchenType = dto.Parents[0].Title;
+
+            }
+
             Material = dto.Title;
-            KitchenType = dto.Parents?.Count() > 0 ? dto.Parents[0].Title : null;
 
             return this;
         }

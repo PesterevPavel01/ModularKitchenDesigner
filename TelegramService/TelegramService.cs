@@ -9,7 +9,7 @@ namespace TelegramService
     public class TelegramService : ITelegramService
     {
         private static string _token { get; set; } = "7562655253:AAEKJQnd1YXSXpEXtQJ0NvJSo3C1B-GEN8E";
-        private static TelegramBotClient TelegramBotClient;
+        private static TelegramBotClient TelegramBotClient = null!;
         private static readonly string channelId = "-1002463757906";
 
         public TelegramService()

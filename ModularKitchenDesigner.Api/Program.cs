@@ -27,6 +27,7 @@ builder.Services.AddServices();
 var app = builder.Build();
 
 app.UseMiddleware<ExcertionHandlingMiddleware>();
+app.UseMiddleware<AuditMiddleware>();
 // Configure the HTTP request pipeline.
 
 app.UseSwagger();

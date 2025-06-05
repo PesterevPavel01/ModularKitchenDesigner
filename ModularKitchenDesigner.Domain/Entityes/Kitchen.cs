@@ -32,6 +32,20 @@ namespace ModularKitchenDesigner.Domain.Entityes
         public List<Section> Sections { get; private set; } = [];
         public List<MaterialSpecificationItem> MaterialSpecificationItems { get; private set; } = [];
 
+        public static Kitchen Create(string userLogin, string userId, string title, KitchenType kitchenType, string code = null)
+            => new(userLogin, userId, title, kitchenType, code);
+
+        public Kitchen Update(string userLogin, string userId, string title, KitchenType kitchenType, string code = null)
+        {
+            UserLogin = userLogin;
+            UserId = userId;
+            Title = title;
+            KitchenTypeId = kitchenType.Id;
+            Code = code ?? Code;
+
+            return this;
+        }
+
         public static Func<IQueryable<Kitchen>, IIncludableQueryable<Kitchen, object>> IncludeRequaredField()
             => query => query
             .Include(x => x.KitchenType)
@@ -58,19 +72,5 @@ namespace ModularKitchenDesigner.Domain.Entityes
                 Title = this.Title,
                 Code = this.Code
             };
-
-        public static Kitchen Create(string userLogin, string userId, string title, KitchenType kitchenType, string code = null)
-            => new(userLogin, userId, title, kitchenType, code);
-
-        public Kitchen Update(string userLogin, string userId, string title, KitchenType kitchenType, string code = null)
-        {
-            UserLogin = userLogin;
-            UserId = userId;
-            Title = title;
-            KitchenTypeId = kitchenType.Id;
-            Code = code ?? Code;
-
-            return this;
-        }
     }
 }

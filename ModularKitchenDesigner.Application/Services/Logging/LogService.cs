@@ -13,22 +13,19 @@ namespace ModularKitchenDesigner.Application.Services.Logging
         {
             _logger = logger;
         }
-        public async Task<BaseResult> LogAsync(HttpContext httpContext)
+        public async Task<BaseResult> LogAsync(HttpContext httpContext, String body)
         {
-            httpContext.Request.EnableBuffering(); // Позволяет читать тело запроса несколько раз
-            var requestBody = await new StreamReader(httpContext.Request.Body).ReadToEndAsync();
-            httpContext.Request.Body.Position = 0;
-
             StringBuilder stringBuilder = new();
+
+            stringBuilder.Append("Объект: ");
             
+            stringBuilder.AppendLine(httpContext.Response.HasStarted ? "RESPONSE": "REQUEST" );
+
             stringBuilder.Append("Тип запроса: ");
             stringBuilder.AppendLine(httpContext.Request.Method);
 
             stringBuilder.Append("Тело запроса: ");
-            stringBuilder.AppendLine(requestBody);
-            
-            stringBuilder.Append("Путь запроса: ");
-            stringBuilder.AppendLine(httpContext.Request.Path);
+            stringBuilder.AppendLine(body);
 
             try
             {
@@ -39,6 +36,32 @@ namespace ModularKitchenDesigner.Application.Services.Logging
                 return new()
                 {
                     ErrorMessage = $"Ошибка в LogService: {exception.Message}",
+                };
+            }
+
+            return new();
+        }
+
+        public async Task<BaseResult> LogErrorAsync(HttpContext httpContext, Exception exception)
+        {
+            httpContext.Request.EnableBuffering(); // Позволяет читать тело запроса несколько раз
+            var requestBody = await new StreamReader(httpContext.Request.Body).ReadToEndAsync();
+            httpContext.Request.Body.Position = 0;
+
+            StringBuilder stringBuilder = new();
+
+            stringBuilder.Append("ERROR: ");
+            stringBuilder.AppendLine(exception.Message);
+
+            try
+            {
+                _logger.Error(stringBuilder.ToString());
+            }
+            catch (Exception ex)
+            {
+                return new()
+                {
+                    ErrorMessage = $"Ошибка в LogService: {ex.Message}",
                 };
             }
 

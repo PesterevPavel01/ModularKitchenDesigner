@@ -30,7 +30,8 @@ namespace ModularKitchenDesigner.Domain.Dto
         {
             Code = dto.Code;
             Title = dto.Title;
-            PriceSegment = dto.Parents[0].Title;
+            if (dto.Parents?.Count > 0)
+                PriceSegment = dto.Parents[0].Title;
 
             return this;
         }

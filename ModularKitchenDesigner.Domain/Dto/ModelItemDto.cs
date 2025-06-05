@@ -30,10 +30,15 @@ namespace ModularKitchenDesigner.Domain.Dto
 
         public ModelItemDto Convert(NomanclatureDto dto)
         {
-            Quantity = dto.Models.First().Quantity;
-            ModelCode = dto.Models.First().Code;
             ModuleCode = dto.Code;
-            Title = dto.Title == "removed" ? "removed" : dto.Models.First().Title;
+
+            if (dto.Models.Count > 0)
+            {
+                Quantity = dto.Models.First().Quantity;
+                ModelCode = dto.Models.First()?.Code;
+            }
+
+            Title = dto.Title == "removed" ? "removed" : dto.Models?.First().Title;
 
             return this;
         }

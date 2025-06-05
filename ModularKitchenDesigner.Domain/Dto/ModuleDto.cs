@@ -32,7 +32,9 @@ namespace ModularKitchenDesigner.Domain.Dto
             Title = dto.Title;
             Code = dto.Code;
             Width = dto.Widht;
-            Type = dto.Parents[0].Title;
+
+            if(dto.Parents.Any())
+                Type = dto.Parents[0].Title;
 
             return this;
         }
