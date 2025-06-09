@@ -2,12 +2,12 @@
 
 namespace ModularKitchenDesigner.Api.Middlewares
 {
-    public class ExcertionHandlingMiddleware
+    public class ExceptionHandlingMiddleware
     {
         private readonly RequestDelegate _next = null!;
         private readonly IExceptionHandlerService _exceptionHandlerService = null!;
 
-        public ExcertionHandlingMiddleware(RequestDelegate next, IExceptionHandlerService exceptionHandlerService)
+        public ExceptionHandlingMiddleware(RequestDelegate next, IExceptionHandlerService exceptionHandlerService)
         {
             _next = next;
             _exceptionHandlerService = exceptionHandlerService;
@@ -21,7 +21,10 @@ namespace ModularKitchenDesigner.Api.Middlewares
             }
             catch (Exception exception) 
             {
-                await _exceptionHandlerService.ExceptionHandle(httpContext, exception);
+                if (!httpContext.Response.HasStarted)
+                {
+                    await _exceptionHandlerService.ExceptionHandle(httpContext, exception);
+                }
             }
         }
     }
