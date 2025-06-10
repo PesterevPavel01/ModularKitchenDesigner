@@ -1,4 +1,5 @@
-﻿using Asp.Versioning;
+﻿using System;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using ModularKitchenDesigner.Application.Converters;
 using ModularKitchenDesigner.Application.Processors.CommonProcessors;
@@ -23,7 +24,14 @@ namespace ModularKitchenDesigner.Api.Controllers
 
         [HttpGet()]
         public async Task<IActionResult> GetAll()
-        => Ok(await _sectionProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Section, SectionDto>, Section, SectionDto>().ProcessAsync());
+            => Ok(await _sectionProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Section, SectionDto>, Section, SectionDto>().ProcessAsync());
+
+        [HttpGet("GetByKitchenCode/{KitchenCode}")]
+        public async Task<IActionResult> GetByKitchenCode(string KitchenCode)
+            => Ok(
+                await _sectionProcessorFactory
+                .GetLoaderProcessor<CommonDefaultLoaderProcessor<Section, SectionDto>, Section, SectionDto>()
+                .ProcessAsync(predicate: x => x.Kitchen.Code == KitchenCode));
 
         [HttpPost("CreateMultiple")]
         public async Task<IActionResult> CreateMultiple([FromBody] List<SectionDto> models)

@@ -2,6 +2,7 @@
 using ModularKitchenDesigner.Application.Converters;
 using ModularKitchenDesigner.Application.Handlers;
 using ModularKitchenDesigner.Application.Processors;
+using ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor;
 using ModularKitchenDesigner.Application.Services;
 using ModularKitchenDesigner.Application.Services.Logging;
 using ModularKitchenDesigner.Application.Validators;
@@ -38,6 +39,8 @@ namespace ModularKitchenDesigner.Application.Extensions
             services.AddSingleton<ILogService, LogService>();
 
             services.AddSingleton<IExceptionHandlerService, ExceptionHandlerService>();
+
+            services.AddScoped<CustomKitchenInformationProcessor>();
 
 
             return services;

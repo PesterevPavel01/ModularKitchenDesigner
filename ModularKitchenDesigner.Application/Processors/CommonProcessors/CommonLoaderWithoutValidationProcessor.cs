@@ -13,7 +13,6 @@ namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
     {
 
         private IRepositoryFactory _repositoryFactory = null!;
-        private IValidatorFactory _validatorFactory = null!;
 
 
         public ILoaderProcessor<TEntity, TDto> SetRepositoryFactory(IRepositoryFactory repositoryFactory)
@@ -24,7 +23,6 @@ namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
 
         public ILoaderProcessor<TEntity, TDto> SetValidatorFactory(IValidatorFactory validatorFactory)
         {
-            _validatorFactory = validatorFactory;
             return this;
         }
         public async Task<CollectionResult<TDto>> ProcessAsync(Expression<Func<TEntity, bool>>? predicate = null)
