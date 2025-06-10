@@ -100,7 +100,7 @@ namespace Repository
 
             if (include is not null)
             {
-                query = include(query);
+                query = include(query).AsSplitQuery();
             }
 
             if (predicate is not null)
@@ -147,7 +147,7 @@ namespace Repository
             }
             if (include is not null)
             {
-                query = include(query);
+                query = include(query).AsSplitQuery();
             }
             return await query.Select(selector).ToListAsync();
         }
@@ -186,7 +186,7 @@ namespace Repository
             }
             if (include is not null)
             {
-                query = include(query);
+                query = include(query).AsSplitQuery();
             }
 
             var groupping = group(query).AsQueryable();
@@ -214,7 +214,7 @@ namespace Repository
 
             if (include is not null)
             {
-                query = include(query);
+                query = include(query).AsSplitQuery();
             }
 
             if (predicate is not null)

@@ -83,7 +83,6 @@ namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
                     modelItems.ModuleCode
                 }).ToList();
 
-
             var currentModels =
                 (from modules in currentSectionModuleStructure
                 join models in modelsStruct
@@ -94,7 +93,7 @@ namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
                      modules.ModuleType,
                      Quantity = modules.Quantity * models.Quantity,
                      models.Title,
-                     Code = models.Code
+                     models.Code
                  }).ToList();
 
             // Строю реальную структуру кухни
