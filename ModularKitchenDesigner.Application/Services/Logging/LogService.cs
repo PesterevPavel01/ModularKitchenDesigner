@@ -1,8 +1,6 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.Http;
 using ModularKitchenDesigner.Domain.Interfaces.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Result;
 using Serilog;
 
@@ -22,26 +20,21 @@ namespace ModularKitchenDesigner.Application.Services.Logging
 
             var formattedRequestBody = string.IsNullOrEmpty(body)
             ? "N/A"
-            : JToken.Parse(body).ToString(Formatting.Indented);
+            : body;
 
             StringBuilder stringBuilder = new();
 
             stringBuilder.Append(" Объект: ");
             stringBuilder.Append(httpContext.Response.HasStarted ? "RESPONSE;": "REQUEST;" );
-
             stringBuilder.Append(" Тип запроса: ");
             stringBuilder.Append(httpContext.Request.Method);
             stringBuilder.Append(';');
-
-            if (!string.IsNullOrEmpty(body))
-            {
-                stringBuilder.AppendLine($" Тело запроса: ");
-                stringBuilder.Append($"{formattedRequestBody};");
-            }
+            stringBuilder.AppendLine($" Тело запроса: ");
+            stringBuilder.Append($"{formattedRequestBody};");
 
             try
             {
-                _logger.Information(stringBuilder.ToString());
+                _logger.Error(stringBuilder.ToString());
             }
             catch (Exception exception)
             {
@@ -62,7 +55,7 @@ namespace ModularKitchenDesigner.Application.Services.Logging
             stringBuilder.AppendLine(
                 string.IsNullOrEmpty(exception.Message)
                 ? ""
-                : JToken.Parse(exception.Message).ToString(Formatting.Indented));
+                : exception.Message);
 
             try
             {

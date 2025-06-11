@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Text;
 using ModularKitchenDesigner.Domain.Interfaces.Logging;
-using TelegramService;
 using TelegramService.Interfaces;
 
 namespace ModularKitchenDesigner.Api.Middlewares
@@ -20,6 +20,7 @@ namespace ModularKitchenDesigner.Api.Middlewares
 
         public async Task InvokeAsync(HttpContext httpContext)
         {
+
             httpContext.Request.EnableBuffering(); // Позволяет читать тело запроса несколько раз
 
             using StreamReader streamReader = new(httpContext.Request.Body);

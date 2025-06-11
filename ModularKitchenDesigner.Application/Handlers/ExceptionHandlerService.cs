@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using ModularKitchenDesigner.Application.Errors;
 using ModularKitchenDesigner.Application.Exceptions;
 using ModularKitchenDesigner.Domain.Interfaces.Handlers;
@@ -34,7 +33,7 @@ namespace ModularKitchenDesigner.Application.Handlers
             var result =
                 new BaseResult
                 { 
-                    ErrorMessage = JToken.Parse(exception.Message).ToString(Formatting.Indented),
+                    ErrorMessage = exception.Message,
                     ErrorCode = code,
                     ConnectionTime = DateTime.UtcNow,
                 };

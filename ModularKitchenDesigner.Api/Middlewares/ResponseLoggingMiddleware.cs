@@ -39,7 +39,6 @@ namespace ModularKitchenDesigner.Api.Middlewares
                 await memoryStream.CopyToAsync(originalBodyStream);
 
                 var logResult = await _logService.LogAsync(httpContext, responseBodyText);
-
             }
             catch (Exception exception)
             {
