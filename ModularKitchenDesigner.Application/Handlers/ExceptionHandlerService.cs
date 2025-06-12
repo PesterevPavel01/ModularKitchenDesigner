@@ -5,7 +5,6 @@ using ModularKitchenDesigner.Application.Exceptions;
 using ModularKitchenDesigner.Domain.Interfaces.Handlers;
 using ModularKitchenDesigner.Domain.Interfaces.Logging;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Result;
 using TelegramService.Interfaces;
 
@@ -53,13 +52,6 @@ namespace ModularKitchenDesigner.Application.Handlers
                 httpContext.Response.StatusCode = (int)result.ErrorCode;
                 await httpContext.Response.WriteAsync(JsonConvert.SerializeObject(result, Formatting.Indented));
             }
-            /*
-            string response = JsonConvert.SerializeObject(result, Formatting.Indented);
-
-            httpContext.Response.ContentType = "application/json";
-            httpContext.Response.StatusCode = (int)result.ErrorCode;
-            await httpContext.Response.WriteAsync(JToken.Parse(response).ToString(Formatting.Indented));
-            */
         }
     }
 }

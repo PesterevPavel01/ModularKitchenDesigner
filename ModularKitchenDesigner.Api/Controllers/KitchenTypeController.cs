@@ -1,4 +1,5 @@
-﻿using Asp.Versioning;
+﻿using System;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using ModularKitchenDesigner.Application.Converters;
 using ModularKitchenDesigner.Application.Processors.CommonProcessors;
@@ -38,6 +39,10 @@ namespace ModularKitchenDesigner.Api.Controllers
         [HttpGet()]
         public async Task<IActionResult> GetAll()
             => Ok(await _kitchenTypeProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<KitchenType, KitchenTypeDto>, KitchenType, KitchenTypeDto>().ProcessAsync(predicate: x => x.Enabled == true));
+
+        [HttpGet("GetByCode/{code}")]
+        public async Task<IActionResult> GetByCode(string code)
+            => Ok(await _kitchenTypeProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<KitchenType, KitchenTypeDto>, KitchenType, KitchenTypeDto>().ProcessAsync(predicate: x => x.Enabled == true && x.Code == code));
 
         [HttpPost("CreateMultiple")]
         public async Task<IActionResult> CreateMultiple([FromBody] List<KitchenTypeDto> models)
