@@ -15,7 +15,7 @@ namespace ModularKitchenDesigner.Domain.Entityes
         {
             UserLogin = userLogin;
             UserId = userId;
-            Title = title;
+            Title = title ?? "N/A";
             KitchenTypeId = kitchenType.Id;
             Code = code ?? Guid.NewGuid().ToString();
         }
@@ -32,14 +32,14 @@ namespace ModularKitchenDesigner.Domain.Entityes
         public List<Section> Sections { get; private set; } = [];
         public List<MaterialSpecificationItem> MaterialSpecificationItems { get; private set; } = [];
 
-        public static Kitchen Create(string userLogin, string userId, string title, KitchenType kitchenType, string code = null)
+        public static Kitchen Create(string userLogin, string userId, KitchenType kitchenType, string title = null, string code = null)
             => new(userLogin, userId, title, kitchenType, code);
 
-        public Kitchen Update(string userLogin, string userId, string title, KitchenType kitchenType, string code = null)
+        public Kitchen Update(string userLogin, string userId, KitchenType kitchenType, string title = null, string code = null)
         {
             UserLogin = userLogin;
             UserId = userId;
-            Title = title;
+            Title = title ?? Title;
             KitchenTypeId = kitchenType.Id;
             Code = code ?? Code;
 

@@ -13,6 +13,7 @@ namespace ModularKitchenDesigner.Domain.Dto
             UserId = kitchen.UserId;
             KitchenType = kitchen.KitchenType.Title;
             Code = kitchen.Code;
+            Title = kitchen.Title;
         }
 
         [Required(ErrorMessage = "UserLogin cannot be null or empty.")]
@@ -20,7 +21,7 @@ namespace ModularKitchenDesigner.Domain.Dto
 
         [Required(ErrorMessage = "UserId cannot be null or empty.")]
         public string UserId { get; set; }
-        [Required(ErrorMessage = "UserId cannot be null or empty.")]
+
         public string Title { get; set; }
 
         [Required(ErrorMessage = "KitchenType cannot be null or empty.")]

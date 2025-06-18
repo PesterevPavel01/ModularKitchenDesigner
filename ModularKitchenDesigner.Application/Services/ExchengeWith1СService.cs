@@ -33,10 +33,12 @@ namespace ModularKitchenDesigner.Application.Services
             // в модели попадают непосредственно специальные шаблоны из одноименной номенклатурной группы, и позиции у которых не предусмотрено специального шаблона (она сама у себя шаблон)
             var modelExchangeProcessor = await new ExchangeProcessor<Model, SimpleDto, SimpleEntityConverter<Model>>()
                 .SetProcessorFactory(_processorFactory)
-                .ProcessAsync(models, x => 
-                    x.Parents.FindIndex(x => x.Code == "00080203832") == 1
-                    || x.Parents.FindIndex(x => x.Code == "00080200116") == 1
-                    || x.Parents.FindIndex(x => x.Code == "00080200112") == 1);
+                .ProcessAsync(models, x =>
+                     (x.Parents is not null && x.Parents.Count == 2 && x.Parents.FindIndex(x => x.Code == "00080203832") == 1)
+                    || (x.Parents is not null && x.Parents.Count == 3 && x.Parents?.FindIndex(x => x.Code == "00080203832") == 2)
+                    //|| x.Parents.FindIndex(x => x.Code == "00080200116") == 1
+                    //|| x.Parents.FindIndex(x => x.Code == "00080200112") == 1
+                    );
 
             var moduleTypeExchangeProcessor = await new ExchangeProcessor<ModuleType, SimpleDto, SimpleEntityConverter<ModuleType>>()
                 .SetProcessorFactory(_processorFactory)

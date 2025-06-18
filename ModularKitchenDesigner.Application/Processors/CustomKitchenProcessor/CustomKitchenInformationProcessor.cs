@@ -1,9 +1,12 @@
-﻿using ModularKitchenDesigner.Application.Processors.CommonProcessors;
+﻿using System;
+using System.Collections.Generic;
+using ModularKitchenDesigner.Application.Processors.CommonProcessors;
 using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Dto.Kustom;
 using ModularKitchenDesigner.Domain.Entityes;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
 using Result;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
 {
@@ -18,7 +21,6 @@ namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
 
         public async Task<BaseResult<KustomKitchenDto>> ProcessAsync(KustomKitchenDto model)
         {
-
             var kitchenResult = await _processorFactory
                 .GetLoaderProcessor<CommonDefaultLoaderProcessor<Kitchen, KitchenDto>, Kitchen, KitchenDto>()
                 .ProcessAsync(predicate:
@@ -32,13 +34,13 @@ namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
             //загружаю секции, из которых состоит кухня
             var sectionsResult = await _processorFactory
                 .GetLoaderProcessor<CommonDefaultLoaderProcessor<Section, SectionDto>, Section, SectionDto>()
-                .ProcessAsync(predicate: 
+                .ProcessAsync(predicate:
                         x => x.Kitchen.Code == model.KitchenCode);
 
             //загружаю модули, из которых состоят секции
             var modulesResult = await _processorFactory
             .GetLoaderProcessor<CommonDefaultLoaderProcessor<Module, ModuleDto>, Module, ModuleDto>()
-                .ProcessAsync(predicate: 
+                .ProcessAsync(predicate:
                         x => x.Enabled == true && sectionsResult.Data.Select(section => section.ModuleCode).Contains(x.Code));
 
             var currentSectionModuleStructure =
@@ -73,20 +75,20 @@ namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
 
             var modelsStruct =
                 (from modelItems in modelItemsResult.Data
-                join models in modelsResult.Data
-                    on modelItems.ModelCode equals models.Code
-                select new 
-                {
-                    models.Title,
-                    models.Code,
-                    modelItems.Quantity,
-                    modelItems.ModuleCode
-                }).ToList();
+                 join models in modelsResult.Data
+                     on modelItems.ModelCode equals models.Code
+                 select new
+                 {
+                     models.Title,
+                     models.Code,
+                     modelItems.Quantity,
+                     modelItems.ModuleCode
+                 }).ToList();
 
             var currentModels =
                 (from modules in currentSectionModuleStructure
-                join models in modelsStruct
-                    on modules.Code equals models.ModuleCode
+                 join models in modelsStruct
+                     on modules.Code equals models.ModuleCode
                  select new
                  {
                      ModuleCode = modules.Code,
@@ -96,44 +98,59 @@ namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
                      models.Code
                  }).ToList();
 
-            // Строю реальную структуру кухни
+            //Строю реальную структуру кухни
             //Получаю Материалы, из которых строится кухня.
             //ModulType -> ComponentType -> Material -> PriceSegment(справочно)
 
             var kitchenMaterialSpecificationItems = await _processorFactory
                 .GetLoaderProcessor<CommonDefaultLoaderProcessor<MaterialSpecificationItem, MaterialSpecificationItemDto>, MaterialSpecificationItem, MaterialSpecificationItemDto>()
-                .ProcessAsync(predicate: 
+                .ProcessAsync(predicate:
                     x => x.Kitchen.Code == model.KitchenCode);
 
-            var kitchenMaterialSelectionItems = await _processorFactory
+            var MaterialSelectionItems = await _processorFactory
                 .GetLoaderProcessor<CommonDefaultLoaderProcessor<MaterialSelectionItem, MaterialSelectionItemDto>, MaterialSelectionItem, MaterialSelectionItemDto>()
-                .ProcessAsync( predicate: 
+                .ProcessAsync(predicate:
                     x => kitchenMaterialSpecificationItems.Data.Select(item => item.MaterialSelectionItemCode).Contains(x.Code));
 
-            var componentResult = await _processorFactory
-                .GetLoaderProcessor<CommonDefaultLoaderProcessor<Component, ComponentDto>, Component, ComponentDto>()
-                .ProcessAsync(predicate:
-                    x => x.Enabled == true
-                    && x.Material.Title == "default" ? true : kitchenMaterialSelectionItems.Data.Select(item => item.Material).Contains(x.Material.Code)
-                    && x.PriceSegment.Title == "default" ? true : kitchenTypeResult.Data.First().PriceSegment == x.PriceSegment.Title
-                    && currentModels.Select(model => model.Code).Contains(x.Model.Code));
-
-            //переношу реальные компоненты на абстрактную структуру
-            var resultListComponents = (
-                from models in currentModels
-                join components in componentResult.Data
-                    on models.Title equals components.Model
-                select new
+            var kitchenMaterialSelectionItems = kitchenMaterialSpecificationItems.Data
+                .Select(item => new
                 {
-                    components.Code,
-                    models.Quantity,
-                    components.Price,
-                    TotalPrice = models.Quantity * components.Price,
-                    ModelTitle = components.Model,
-                    components.PriceSegment,
-                    components.Material
-                }
-                ).ToList();
+                    item.ModuleType,
+                    MaterialSelectionItem = MaterialSelectionItems.Data.First(x => x.Code == item.MaterialSelectionItemCode)
+                }).ToList();
+
+            var ModuleTypes = kitchenMaterialSelectionItems.GroupBy(x => x.ModuleType).Select(x => x.First().ModuleType).ToList();
+            
+            List<ComponentDto> resultListComponents = [];
+            
+            foreach (var item in ModuleTypes)
+            {
+                //отдельно верх, отдельно низ
+                var currentMaterialSelectionItem = kitchenMaterialSelectionItems.Where(selItem => selItem.ModuleType == item).ToList();
+                var componentResult = await _processorFactory
+                    .GetLoaderProcessor<CommonDefaultLoaderProcessor<Component, ComponentDto>, Component, ComponentDto>()
+                    .ProcessAsync(predicate: x =>
+                        x.Enabled == true &&
+                        (x.Material.Title == "default" || currentMaterialSelectionItem.Select(item => item.MaterialSelectionItem.Material).Contains(x.Material.Title)) &&
+                        (x.PriceSegment.Title == "default" || kitchenTypeResult.Data.First().PriceSegment == x.PriceSegment.Title) &&
+                        currentModels.Select(model => model.Code).Contains(x.Model.Code));
+
+                //переношу реальные компоненты на абстрактную структуру
+                resultListComponents.AddRange(
+                    from models in currentModels.FindAll(x => x.ModuleType == item).ToList()
+                    join components in componentResult.Data
+                        on models.Title equals components.Model
+                    select new ComponentDto
+                        {
+                            Code = components.Code,
+                            Title = components.Title,
+                            PriceSegment = components.PriceSegment,
+                            Model = components.Model,
+                            ComponentType = components.ComponentType,
+                            Material = components.Material,
+                            Price = models.Quantity * components.Price,
+                        });
+            }
 
             return new()
             {
@@ -141,7 +158,7 @@ namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
                 {
                     KitchenTitle = kitchenResult.Data.First().Title,
                     KitchenCode = kitchenResult.Data.First().Code,
-                    Price = resultListComponents.Sum(x => x.TotalPrice),
+                    Price = resultListComponents.Sum(x => x.Price),
                     Width = maxWidth,
                     UserCode = kitchenResult.Data.First().UserLogin,
                     UserId = kitchenResult.Data.First().UserId
