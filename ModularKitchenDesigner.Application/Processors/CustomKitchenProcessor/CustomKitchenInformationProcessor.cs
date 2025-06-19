@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using ModularKitchenDesigner.Application.Processors.CommonProcessors;
+﻿using ModularKitchenDesigner.Application.Processors.CommonProcessors;
 using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Dto.Kustom;
 using ModularKitchenDesigner.Domain.Entityes;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
 using Result;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
 {

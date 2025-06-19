@@ -55,7 +55,7 @@ namespace ModularKitchenDesigner.Domain.Dto
                 }
                 else if (dto.Parents.FindIndex(x => x.Code == "00080200117") == 1)
                 {   //Ящики
-                    PriceSegment = "default";
+                    PriceSegment = dto.Parents[0].Title;
                     Material = "default";
                     ComponentType = dto.Parents[1].Title;
                 }
