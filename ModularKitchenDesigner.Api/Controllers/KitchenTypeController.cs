@@ -29,7 +29,9 @@ namespace ModularKitchenDesigner.Api.Controllers
 
         [HttpGet("GetByPriceSegmentCode/{priceSegmentCode}")]
         public async Task<IActionResult> GetByPriceSegmentCode(String priceSegmentCode)
-            => Ok(await _kitchenTypeProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<KitchenType, KitchenTypeDto>, KitchenType, KitchenTypeDto>().ProcessAsync(predicate: x=> x.PriceSegment.Code == priceSegmentCode && x.Enabled == true));
+            => Ok(await _kitchenTypeProcessorFactory
+                .GetLoaderProcessor<CommonDefaultLoaderProcessor<KitchenType, KitchenTypeDto>, KitchenType, KitchenTypeDto>()
+                .ProcessAsync(predicate: x=> x.PriceSegment.Code == priceSegmentCode && x.Enabled == true));
 
         [HttpGet("GetByPriceSegment/{priceSegmentTitle}")]
 
@@ -38,7 +40,9 @@ namespace ModularKitchenDesigner.Api.Controllers
 
         [HttpGet()]
         public async Task<IActionResult> GetAll()
-            => Ok(await _kitchenTypeProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<KitchenType, KitchenTypeDto>, KitchenType, KitchenTypeDto>().ProcessAsync(predicate: x => x.Enabled == true));
+            => Ok(await _kitchenTypeProcessorFactory
+                .GetLoaderProcessor<CommonDefaultLoaderProcessor<KitchenType, KitchenTypeDto>, KitchenType, KitchenTypeDto>()
+                .ProcessAsync(predicate: x => x.Enabled == true));
 
         [HttpGet("GetByCode/{code}")]
         public async Task<IActionResult> GetByCode(string code)

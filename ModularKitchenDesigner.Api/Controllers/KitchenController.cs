@@ -32,7 +32,9 @@ namespace ModularKitchenDesigner.Api.Controllers
 
         [HttpGet("GetByKitchenTypeCode/{KitchenTypeCode}")]
         public async Task<IActionResult> GetByKitchenTypeCode(String KitchenTypeCode)
-            => Ok(await _kitchenProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Kitchen, KitchenDto>, Kitchen, KitchenDto>().ProcessAsync(predicate: x => x.KitchenType.Code == KitchenTypeCode));
+            => Ok(await _kitchenProcessorFactory
+                .GetLoaderProcessor<CommonDefaultLoaderProcessor<Kitchen, KitchenDto>, Kitchen, KitchenDto>()
+                .ProcessAsync(predicate: x => x.KitchenType.Code == KitchenTypeCode));
 
         [HttpGet("GetByUserId/{Code}")]
         public async Task<IActionResult> GetByCode(String Code)

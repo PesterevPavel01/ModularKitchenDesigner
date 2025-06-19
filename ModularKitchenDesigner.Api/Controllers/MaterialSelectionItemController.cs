@@ -33,19 +33,35 @@ namespace ModularKitchenDesigner.Api.Controllers
 
         [HttpGet("GetByKitchenType/{KitchenTypeTitle}")]
         public async Task<IActionResult> GetByKitchenType(String KitchenTypeTitle)
-            => Ok(await _materialSelectionItemProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<MaterialSelectionItem, MaterialSelectionItemDto>, MaterialSelectionItem, MaterialSelectionItemDto>().ProcessAsync(predicate: x => x.KitchenType.Title == KitchenTypeTitle));
+            => Ok(await _materialSelectionItemProcessorFactory
+                .GetLoaderProcessor<CommonDefaultLoaderProcessor<MaterialSelectionItem, MaterialSelectionItemDto>, MaterialSelectionItem, MaterialSelectionItemDto>()
+                .ProcessAsync(predicate: 
+                    x => x.KitchenType.Title == KitchenTypeTitle
+                    && x.Enabled == true));
 
         [HttpGet("GetByComponentType/{ComponentTypeTitle}")]
         public async Task<IActionResult> GetByComponentType(String ComponentTypeTitle)
-            => Ok(await _materialSelectionItemProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<MaterialSelectionItem, MaterialSelectionItemDto>, MaterialSelectionItem, MaterialSelectionItemDto>().ProcessAsync(predicate: x => x.ComponentType.Title == ComponentTypeTitle));
+            => Ok(await _materialSelectionItemProcessorFactory
+                .GetLoaderProcessor<CommonDefaultLoaderProcessor<MaterialSelectionItem, MaterialSelectionItemDto>, MaterialSelectionItem, MaterialSelectionItemDto>()
+                .ProcessAsync(predicate: 
+                    x => x.ComponentType.Title == ComponentTypeTitle
+                    && x.Enabled == true));
 
         [HttpGet("GetByKitchenTypeCode/{KitchenTypeCode}")]
         public async Task<IActionResult> GetByKitchenTypeCode(String KitchenTypeCode)
-            => Ok(await _materialSelectionItemProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<MaterialSelectionItem, MaterialSelectionItemDto>, MaterialSelectionItem, MaterialSelectionItemDto>().ProcessAsync(predicate: x => x.KitchenType.Code == KitchenTypeCode));
+            => Ok(await _materialSelectionItemProcessorFactory
+                .GetLoaderProcessor<CommonDefaultLoaderProcessor<MaterialSelectionItem, MaterialSelectionItemDto>, MaterialSelectionItem, MaterialSelectionItemDto>()
+                .ProcessAsync(predicate: 
+                    x => x.KitchenType.Code == KitchenTypeCode
+                    && x.Enabled == true));
 
         [HttpGet("GetByComponentTypeCode/{ComponentTypeCode}")]
         public async Task<IActionResult> GetByComponentTypeCode(String ComponentTypeCode)
-            => Ok(await _materialSelectionItemProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<MaterialSelectionItem, MaterialSelectionItemDto>, MaterialSelectionItem, MaterialSelectionItemDto>().ProcessAsync(predicate: x => x.ComponentType.Code == ComponentTypeCode));
+            => Ok(await _materialSelectionItemProcessorFactory
+                .GetLoaderProcessor<CommonDefaultLoaderProcessor<MaterialSelectionItem, MaterialSelectionItemDto>, MaterialSelectionItem, MaterialSelectionItemDto>()
+                .ProcessAsync(predicate: 
+                    x => x.ComponentType.Code == ComponentTypeCode
+                    && x.Enabled == true));
 
         [HttpPost("CreateMultiple")]
         public async Task<IActionResult> CreateMultiple([FromBody] List<MaterialSelectionItemDto> models)

@@ -1,5 +1,4 @@
 ﻿using ModularKitchenDesigner.Application.Processors.CommonProcessors;
-using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Dto.Base;
 using ModularKitchenDesigner.Domain.Dto.Exchange;
 using ModularKitchenDesigner.Domain.Entityes.Base;
@@ -10,7 +9,7 @@ using ModularKitchenDesigner.Domain.Interfaces.Exchange;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
 using Result;
 
-namespace ModularKitchenDesigner.Application.Processors.Exchange
+namespace ModularKitchenDesigner.Application.Exchange.Processors
 {
     public class ExchangeProcessor<TEntity, TDto, TConverter> : IExchangeProcessor<TDto>
         where TDto : BaseDto, IExcangeDtoConvertable<TDto, NomanclatureDto>, IUniqueKeyQueryable<TDto>, new()
@@ -61,10 +60,10 @@ namespace ModularKitchenDesigner.Application.Processors.Exchange
 
                 //изменяем только те записи, у которых Title != "removed"
 
-                if (changedModels.Where(x => x.Title != "removed").Any())
+                if (changedModels.Any(x => x.Title != "removed" && x.Code != "removed"))
                     await _processorFactory
                         .GetCreatorProcessor<CommonMultipleUpdaterProcessor<TEntity, TDto, TConverter>, TEntity, TDto>()
-                        .ProcessAsync(changedModels.Where(x => x.Title != "removed").ToList());
+                        .ProcessAsync(changedModels.Where(x => x.Title != "removed" && x.Code != "removed").ToList());
 
                 // Получаем сущности, которые деактивированы на момент обновления, у modelsBeforeUpdate точно есть код, т.к. они загружены из EF
 
@@ -82,7 +81,7 @@ namespace ModularKitchenDesigner.Application.Processors.Exchange
                     .ToList();
 
                 //Добавляем к ним модели, которые пришли с Title = "removed"
-                changeEnableModels.AddRange(changedModels.Where(x => x.Title == "removed").ToList());
+                changeEnableModels.AddRange(changedModels.Where(x => x.Title == "removed" || x.Code == "removed").ToList());
 
                 /* Активация не требуется, т.к. при обновлении сущности через метод Update() она автоматически становится Enable = true*/
 

@@ -1,5 +1,6 @@
 ﻿using ModularKitchenDesigner.Application.Converters;
-using ModularKitchenDesigner.Application.Processors.Exchange;
+using ModularKitchenDesigner.Application.Exchange.Interpritators;
+using ModularKitchenDesigner.Application.Exchange.Processors;
 using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Dto.Exchange;
 using ModularKitchenDesigner.Domain.Entityes;
@@ -12,9 +13,11 @@ namespace ModularKitchenDesigner.Application.Services
     public class ExchengeWith1СService : IExchangeService<NomanclatureDto>
     {
         private readonly IProcessorFactory _processorFactory;
-        public ExchengeWith1СService(IProcessorFactory processorFactory)
+        private readonly MaterialSelectionItemInterpritator _materialSelectionItemMapper;
+        public ExchengeWith1СService(IProcessorFactory processorFactory, MaterialSelectionItemInterpritator materialSelectionItemMapper)
         {
             _processorFactory = processorFactory;
+            _materialSelectionItemMapper = materialSelectionItemMapper;
         }
         public async Task<CollectionResult<NomanclatureDto>> ExchangeAsync(List<NomanclatureDto> models)
         {
@@ -60,9 +63,14 @@ namespace ModularKitchenDesigner.Application.Services
                 .SetProcessorFactory(_processorFactory)
                 .ProcessAsync(models, x => x.Parents.FindIndex(x => x.Code == "00080202189") == 1);
 
+            //т.к. в системе, реализованной в 1с не реализована возможность добавления одного и того же материала в разные виды кухонь, что неправильно (является серьезным недочетом, который необходимо исправить),
+            //а в модели приложения эта возможность реализована, необходимо предварительно пропустить пришедший Material через MaterialSelectionItemAdapter 
+
+            var materialSelectionItemModels = await _materialSelectionItemMapper.MapAsync([..models.Where(x => x.Parents.FindIndex(x => x.Code == "00080200115") == 2)]);
+
             var materialSelectionItemExchangeProcessor = await new ExchangeProcessor<MaterialSelectionItem, MaterialSelectionItemDto, MaterialSelectionItemConverter>()
                 .SetProcessorFactory(_processorFactory)
-                .ProcessAsync(models, x => x.Parents.FindIndex(x => x.Code == "00080200115") == 2);
+                .ProcessAsync([..materialSelectionItemModels.Data], x => x.Parents.FindIndex(x => x.Code == "00080200115") == 2);
 
             // чтобы обновить modelItems, которые содержатся в списке 
             // нужно сделать чтобы у обновляемых модулей все существующие ModelItem стали Enabled = false

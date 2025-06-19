@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using ModularKitchenDesigner.Application.Converters;
+using ModularKitchenDesigner.Application.Exchange.Interpritators;
 using ModularKitchenDesigner.Application.Handlers;
 using ModularKitchenDesigner.Application.Processors;
 using ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor;
@@ -41,6 +42,8 @@ namespace ModularKitchenDesigner.Application.Extensions
             services.AddSingleton<IExceptionHandlerService, ExceptionHandlerService>();
 
             services.AddScoped<CustomKitchenInformationProcessor>();
+
+            services.AddScoped<MaterialSelectionItemInterpritator>();
 
 
             return services;
