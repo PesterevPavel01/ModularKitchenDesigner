@@ -13,11 +13,11 @@ namespace ModularKitchenDesigner.Application.Services
     public class ExchengeWith1СService : IExchangeService<NomanclatureDto>
     {
         private readonly IProcessorFactory _processorFactory;
-        private readonly MaterialSelectionItemInterpritator _materialSelectionItemMapper;
-        public ExchengeWith1СService(IProcessorFactory processorFactory, MaterialSelectionItemInterpritator materialSelectionItemMapper)
+        private readonly MaterialSelectionItemInterpreter _materialSelectionItemInterpreter;
+        public ExchengeWith1СService(IProcessorFactory processorFactory, MaterialSelectionItemInterpreter materialSelectionItemInterpreter)
         {
             _processorFactory = processorFactory;
-            _materialSelectionItemMapper = materialSelectionItemMapper;
+            _materialSelectionItemInterpreter = materialSelectionItemInterpreter;
         }
         public async Task<CollectionResult<NomanclatureDto>> ExchangeAsync(List<NomanclatureDto> models)
         {
@@ -66,8 +66,8 @@ namespace ModularKitchenDesigner.Application.Services
             //т.к. в системе, реализованной в 1с не реализована возможность добавления одного и того же материала в разные виды кухонь, что неправильно (является серьезным недочетом, который необходимо исправить),
             //а в модели приложения эта возможность реализована, необходимо предварительно пропустить пришедший Material через MaterialSelectionItemAdapter 
 
-            var materialSelectionItemModels = await _materialSelectionItemMapper.MapAsync([..models.Where(x => x.Parents.FindIndex(x => x.Code == "00080200115") == 2)]);
-            materialSelectionItemModels = await _materialSelectionItemMapper.MapAsync(models);
+            var materialSelectionItemModels = await _materialSelectionItemInterpreter.MapAsync([..models.Where(x => x.Parents.FindIndex(x => x.Code == "00080200115") == 2)]);
+            materialSelectionItemModels = await _materialSelectionItemInterpreter.MapAsync(models);
 
             var materialSelectionItemExchangeProcessor = await new ExchangeProcessor<MaterialSelectionItem, MaterialSelectionItemDto, MaterialSelectionItemConverter>()
                 .SetProcessorFactory(_processorFactory)

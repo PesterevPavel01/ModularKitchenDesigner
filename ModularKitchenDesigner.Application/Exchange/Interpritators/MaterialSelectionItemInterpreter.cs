@@ -5,11 +5,11 @@ using Result;
 
 namespace ModularKitchenDesigner.Application.Exchange.Interpritators
 {
-    public class MaterialSelectionItemInterpritator
+    public class MaterialSelectionItemInterpreter
     {
         private IRepositoryFactory _repositoryFactory = null!;
 
-        public MaterialSelectionItemInterpritator(IRepositoryFactory repositoryFactory)
+        public MaterialSelectionItemInterpreter(IRepositoryFactory repositoryFactory)
         {
             _repositoryFactory = repositoryFactory;
         }

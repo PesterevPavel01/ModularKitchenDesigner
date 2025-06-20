@@ -43,7 +43,7 @@ namespace ModularKitchenDesigner.Application.Extensions
 
             services.AddScoped<CustomKitchenInformationProcessor>();
 
-            services.AddScoped<MaterialSelectionItemInterpritator>();
+            services.AddScoped<MaterialSelectionItemInterpreter>();
 
 
             return services;
