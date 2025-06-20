@@ -14,7 +14,7 @@ namespace ModularKitchenDesigner.Application.Exchange.Interpritators
             _repositoryFactory = repositoryFactory;
         }
 
-        public async Task<CollectionResult<NomanclatureDto>> MapAsync(List<NomanclatureDto> externalModels)
+        public async Task<CollectionResult<NomanclatureDto>> InterpretAsync(List<NomanclatureDto> externalModels)
         {
             if (externalModels is null || externalModels.Count < 1)
                 return new();

@@ -118,7 +118,7 @@ namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
 
             var ModuleTypes = kitchenMaterialSelectionItems.GroupBy(x => x.ModuleType).Select(x => x.First().ModuleType).ToList();
             
-            List<ComponentDto> resultListComponents = [];
+            List<SpecificationItem> resultListComponents = [];
             
             foreach (var item in ModuleTypes)
             {
@@ -137,15 +137,17 @@ namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
                     from models in currentModels.FindAll(x => x.ModuleType == item).ToList()
                     join components in componentResult.Data
                         on models.Title equals components.Model
-                    select new ComponentDto
+                    select new SpecificationItem
                         {
                             Code = components.Code,
                             Title = components.Title,
-                            PriceSegment = components.PriceSegment,
+                            //PriceSegment = components.PriceSegment,
+                            Quantity = models.Quantity,
+                            UnitPrice = components.Price,
                             Model = components.Model,
                             ComponentType = components.ComponentType,
                             Material = components.Material,
-                            Price = models.Quantity * components.Price,
+                            TotalPrice = models.Quantity * components.Price,
                         });
             }
 
@@ -155,10 +157,11 @@ namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
                 {
                     KitchenTitle = kitchenResult.Data.First().Title,
                     KitchenCode = kitchenResult.Data.First().Code,
-                    Price = resultListComponents.Sum(x => x.Price),
+                    Price = resultListComponents.Sum(x => x.TotalPrice),
                     Width = maxWidth,
                     UserCode = kitchenResult.Data.First().UserLogin,
-                    UserId = kitchenResult.Data.First().UserId
+                    UserId = kitchenResult.Data.First().UserId,
+                    Specification = resultListComponents
                 }
             };
 

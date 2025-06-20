@@ -45,6 +45,8 @@ namespace ModularKitchenDesigner.Application.Extensions
 
             services.AddScoped<MaterialSelectionItemInterpreter>();
 
+            services.AddScoped<ModelItemInterpreter>();
+
 
             return services;
         }

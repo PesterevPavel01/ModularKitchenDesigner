@@ -14,10 +14,13 @@ namespace ModularKitchenDesigner.Application.Services
     {
         private readonly IProcessorFactory _processorFactory;
         private readonly MaterialSelectionItemInterpreter _materialSelectionItemInterpreter;
-        public ExchengeWith1СService(IProcessorFactory processorFactory, MaterialSelectionItemInterpreter materialSelectionItemInterpreter)
+        private readonly ModelItemInterpreter _modelItemInterpreter;
+
+        public ExchengeWith1СService(IProcessorFactory processorFactory, MaterialSelectionItemInterpreter materialSelectionItemInterpreter, ModelItemInterpreter modelItemInterpreter)
         {
             _processorFactory = processorFactory;
             _materialSelectionItemInterpreter = materialSelectionItemInterpreter;
+            _modelItemInterpreter = modelItemInterpreter;
         }
         public async Task<CollectionResult<NomanclatureDto>> ExchangeAsync(List<NomanclatureDto> models)
         {
@@ -66,8 +69,7 @@ namespace ModularKitchenDesigner.Application.Services
             //т.к. в системе, реализованной в 1с не реализована возможность добавления одного и того же материала в разные виды кухонь, что неправильно (является серьезным недочетом, который необходимо исправить),
             //а в модели приложения эта возможность реализована, необходимо предварительно пропустить пришедший Material через MaterialSelectionItemAdapter 
 
-            var materialSelectionItemModels = await _materialSelectionItemInterpreter.MapAsync([..models.Where(x => x.Parents.FindIndex(x => x.Code == "00080200115") == 2)]);
-            materialSelectionItemModels = await _materialSelectionItemInterpreter.MapAsync(models);
+            var materialSelectionItemModels = await _materialSelectionItemInterpreter.InterpretAsync(models);
 
             var materialSelectionItemExchangeProcessor = await new ExchangeProcessor<MaterialSelectionItem, MaterialSelectionItemDto, MaterialSelectionItemConverter>()
                 .SetProcessorFactory(_processorFactory)
@@ -77,24 +79,12 @@ namespace ModularKitchenDesigner.Application.Services
             // нужно сделать чтобы у обновляемых модулей все существующие ModelItem стали Enabled = false
             // не удаляет неактивные modelItems
 
-            var modelItemsExchangeModels = models
-                .Where(x => x.Parents
-                    .FindIndex(x => x.Code == "00080202189") == 1 && x.Models is not null)
-                    .SelectMany(x => x.Models
-                        .Select(model =>
-                            new NomanclatureDto()
-                            {
-                                Code = x.Code,
-                                Models = [model],
-                                Parents = x.Parents,
-                                Title = model.Title != "removed" ? x.Title : "removed"
-                            }))
-                .ToList();
+            var modelItemsExchangeModels = await _modelItemInterpreter.InterpretAsync(models);
 
             var modelItemExchangeProcessor = await new ExchangeProcessor<ModelItem, ModelItemDto, ModelItemConverter>()
                 .SetProcessorFactory(_processorFactory)
                 .ProcessAsync(
-                    models: modelItemsExchangeModels, 
+                    models: [.. modelItemsExchangeModels.Data], 
                     isUniqueKeyEqual: x => x.Parents.FindIndex(x => x.Code == "00080202189") == 1);
 
             return new() 
