@@ -14,20 +14,21 @@ namespace ModularKitchenDesigner.Application.Exchange.Interpritators
             _repositoryFactory = repositoryFactory;
         }
 
-        public async Task<CollectionResult<NomanclatureDto>> MapAsync(List<NomanclatureDto> ExternalModels)
+        public async Task<CollectionResult<NomanclatureDto>> MapAsync(List<NomanclatureDto> externalModels)
         {
-            if (ExternalModels is null || ExternalModels.Count < 1)
+            if (externalModels is null || externalModels.Count < 1)
                 return new();
 
             var existingModels =  await _repositoryFactory.GetRepository<MaterialSelectionItem>().GetAllAsync(
                         include: MaterialSelectionItem.IncludeRequaredField(),
-                        predicate: x => ExternalModels.Select(model => model.Code).Contains(x.Material.Code));
+                        predicate: x => externalModels.Select(model => model.Code).Contains(x.Material.Code));
 
             List<NomanclatureDto> result = [];
-            result.AddRange(ExternalModels);
+            result.AddRange(externalModels);
 
             if (existingModels.Count > 0)
-                result.AddRange(existingModels.Where(model => model.KitchenType.Code != ExternalModels.FirstOrDefault(x => x.Code == model.Material.Code)?.Parents[0].Code)
+                //может быть ситуация, при которой у externalModel нет элемента Parents[0]
+                result.AddRange(existingModels.Where(model => externalModels.FirstOrDefault(x => x.Code == model.Material.Code)?.Parents.FindIndex(parent => parent.Code == model.KitchenType.Code) != 0)
                     .Select(model => new NomanclatureDto
                     {
                         Title = model.Material.Title,
@@ -39,7 +40,7 @@ namespace ModularKitchenDesigner.Application.Exchange.Interpritators
                                 Title = model.KitchenType.Title,
                                 Code = model.KitchenType.Code
                             },
-                            ExternalModels.FirstOrDefault(x => x.Code == model.Material.Code)?.Parents[1],
+                            new(),
                             new()
                             {
                                 Title = model.ComponentType.Title,

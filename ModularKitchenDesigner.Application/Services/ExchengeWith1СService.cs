@@ -67,6 +67,7 @@ namespace ModularKitchenDesigner.Application.Services
             //а в модели приложения эта возможность реализована, необходимо предварительно пропустить пришедший Material через MaterialSelectionItemAdapter 
 
             var materialSelectionItemModels = await _materialSelectionItemMapper.MapAsync([..models.Where(x => x.Parents.FindIndex(x => x.Code == "00080200115") == 2)]);
+            materialSelectionItemModels = await _materialSelectionItemMapper.MapAsync(models);
 
             var materialSelectionItemExchangeProcessor = await new ExchangeProcessor<MaterialSelectionItem, MaterialSelectionItemDto, MaterialSelectionItemConverter>()
                 .SetProcessorFactory(_processorFactory)
