@@ -8,7 +8,7 @@ using ModularKitchenDesigner.Domain.Interfaces;
 
 namespace ModularKitchenDesigner.Domain.Entityes
 {
-    public sealed class Kitchen : Identity, IAuditable, IDtoConvertible<Kitchen, KitchenDto>
+    public sealed class Kitchen : BaseEntity, IAuditable, IDtoConvertible<Kitchen, KitchenDto>
     {
         public Kitchen(){}
         private Kitchen(string userLogin, string userId, string title, KitchenType kitchenType, string code)
@@ -19,13 +19,8 @@ namespace ModularKitchenDesigner.Domain.Entityes
             KitchenTypeId = kitchenType.Id;
             Code = code ?? Guid.NewGuid().ToString();
         }
-
-        public DateTime CreatedAt { get ; set; }
-        public DateTime UpdatedAt { get ; set; }
-        public string Title { get; private set; }
         public string UserLogin { get; private set; }
         public string UserId { get; private set; }
-        public string Code { get; set; }
 
         public KitchenType KitchenType { get; private set; }
         public Guid KitchenTypeId { get; private set; }

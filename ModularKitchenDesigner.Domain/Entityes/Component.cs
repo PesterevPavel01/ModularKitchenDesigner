@@ -11,25 +11,19 @@ namespace ModularKitchenDesigner.Domain.Entityes
     public sealed class Component : BaseEntity, IAuditable, IDtoConvertible<Component, ComponentDto>
     {
         private Component() { }
-        private Component(string title, string code, double price, ComponentType componentType, PriceSegment priceSegment, Material material, Model model, bool enabled = true)
+        private Component(string title, string code, double price, PriceSegment priceSegment, Material material, Model model, bool enabled = true)
         {
             Title = title;
             Code = code;
             Price = price;
-            ComponentTypeId = componentType.Id;
             PriceSegmentId = priceSegment.Id;
             MaterialId = material.Id;
             ModelId = model.Id;
             Enabled = enabled;
         }
 
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-
         public double Price { get; private set; }
 
-        public ComponentType ComponentType { get; private set; }
-        public Guid ComponentTypeId { get; private set; }
         public PriceSegment PriceSegment { get; private set; }
         public Guid PriceSegmentId { get; private set; }
         public Material Material { get; private set; }
@@ -43,21 +37,19 @@ namespace ModularKitchenDesigner.Domain.Entityes
                 Title = Title,
                 Code = Code,
                 Price = Price,
-                ComponentType = ComponentType.Title,
                 PriceSegment = PriceSegment.Title,
                 Material = Material.Title,
                 Model = Model.Title,
             };
 
-        public static Component Create(string title, string code, double price, ComponentType componentType, PriceSegment priceSegment, Material material, Model model, bool enabled = true)
-            => new Component(title, code, price, componentType, priceSegment, material, model, enabled);
+        public static Component Create(string title, string code, double price, PriceSegment priceSegment, Material material, Model model, bool enabled = true)
+            => new (title, code, price, priceSegment, material, model, enabled);
 
-        public Component Update(string title, string code, double price, ComponentType componentType, PriceSegment priceSegment, Material material, Model model, bool enabled = true)
+        public Component Update(string title, string code, double price, PriceSegment priceSegment, Material material, Model model, bool enabled = true)
         {
             Title = title;
             Code = code;
             Price = price;
-            ComponentTypeId = componentType.Id;
             PriceSegmentId = priceSegment.Id;
             MaterialId = material.Id;
             ModelId = model.Id;
@@ -69,7 +61,6 @@ namespace ModularKitchenDesigner.Domain.Entityes
         public static Func<IQueryable<Component>, IIncludableQueryable<Component, object>> IncludeRequaredField()
             =>  
             query => query
-                .Include(x => x.ComponentType)
                 .Include(x => x.PriceSegment)
                 .Include(x => x.Material)
                 .Include(x => x.Model);

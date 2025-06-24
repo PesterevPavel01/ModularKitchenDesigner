@@ -18,6 +18,9 @@ namespace ModularKitchenDesigner.Domain.Entityes.Base
             Id = id;
         }
 
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+
         [Required(ErrorMessage = "Title cannot be null or empty.")]
         public string Title { get; set; }
 

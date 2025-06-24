@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using ModularKitchenDesigner.Application.Converters;
+using ModularKitchenDesigner.Application.Exchange.Interpreter;
 using ModularKitchenDesigner.Application.Exchange.Interpritators;
+using ModularKitchenDesigner.Application.Exchange.Processors;
 using ModularKitchenDesigner.Application.Handlers;
 using ModularKitchenDesigner.Application.Processors;
 using ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor;
@@ -46,6 +48,9 @@ namespace ModularKitchenDesigner.Application.Extensions
             services.AddScoped<MaterialSelectionItemInterpreter>();
 
             services.AddScoped<ModelItemInterpreter>();
+
+            services.AddScoped<ComponentInterpreter>();
+            services.AddScoped<RulesProcessor>();
 
 
             return services;

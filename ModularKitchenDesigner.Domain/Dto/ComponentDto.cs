@@ -14,7 +14,6 @@ namespace ModularKitchenDesigner.Domain.Dto
             Title = newComponent.Title;
             Code = newComponent.Code;
             Price = newComponent.Price;
-            ComponentType = newComponent.ComponentType.Title;
             PriceSegment = newComponent.PriceSegment.Title;
             Material = newComponent.Material.Title;
             Model = newComponent.Model.Title;
@@ -23,9 +22,6 @@ namespace ModularKitchenDesigner.Domain.Dto
         public ComponentDto() { }
         
         public double Price { get; set; }
-        
-        [Required(ErrorMessage = "ComponentType cannot be null or empty.")]
-        public string ComponentType { get; set; }
 
         [Required(ErrorMessage = "PriceSegment cannot be null or empty.")]
         public string PriceSegment { get; set; }
@@ -41,36 +37,12 @@ namespace ModularKitchenDesigner.Domain.Dto
             Title = dto.Title;
             Code = dto.Code;
             Price = dto.Price;
-            Model = dto.Template?.Title ?? "default";
+            Model = dto.Template?.Title;
 
-            if (dto.Parents?.Count > 0)
+            if (dto.Parents?.Count > 1)
             {
-                ComponentType = dto.Parents.Last().Title;
-
-                if (dto.Parents.FindIndex(x => x.Code == "00080200115") == 3)
-                {   //Фасады
-                    PriceSegment = dto.Parents[2].Title;
-                    Material = dto.Parents[0].Title;
-                    ComponentType = dto.Parents[3].Title;
-                }
-                else if (dto.Parents.FindIndex(x => x.Code == "00080200117") == 1)
-                {   //Ящики
-                    PriceSegment = dto.Parents[0].Title;
-                    Material = "default";
-                    ComponentType = dto.Parents[1].Title;
-                }
-                else if (dto.Parents.FindIndex(x => x.Code == "00080200116") == 1)
-                {   //Полки
-                    PriceSegment = "default";
-                    Material = "default";
-                    ComponentType = dto.Parents[1].Title;
-                }
-                else if (dto.Parents.FindIndex(x => x.Code == "00080200112") == 1)
-                {   //Корпуса
-                    PriceSegment = "default";
-                    Material = "default";
-                    ComponentType = dto.Parents[1].Title;
-                }
+                Material = dto.Parents[0].Title;
+                PriceSegment = dto.Parents[1].Title;
             }
             return this;
         }

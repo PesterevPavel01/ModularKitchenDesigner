@@ -1,5 +1,4 @@
 ﻿using System.Linq.Expressions;
-using Interceptors;
 using Microsoft.EntityFrameworkCore.Query;
 using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes.Base;
@@ -10,9 +9,8 @@ namespace ModularKitchenDesigner.Domain.Entityes
     public class ComponentType : SimpleEntity, IDtoConvertible<ComponentType, SimpleDto>
     {
         public ComponentType(){}
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-        public List<Component> Components { get; set; } = [];
+
+        public List<Model> Models { get; set; } = [];
         public List<MaterialSelectionItem> MaterialItems { get; set; } = [];
 
         public static Expression<Func<ComponentType, bool>> ContainsByUniqueKeyPredicate(List<SimpleDto> models)

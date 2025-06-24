@@ -1,19 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using ModularKitchenDesigner.Domain.Entityes;
+using ModularKitchenDesigner.DAL.Configurations.Base;
 
 namespace ModularKitchenDesigner.DAL.Configurations
 {
-    public class MaterialConfiguration : IEntityTypeConfiguration<Material>
+    public class MaterialConfiguration : BaseEntityConfiguration<Material>
     {
-        public void Configure(EntityTypeBuilder<Material> builder)
+        protected override void AddBuilder(EntityTypeBuilder<Material> builder)
         {
-            builder.Property(x => x.Id).ValueGeneratedOnAdd();
-            builder.Property(x => x.Code).IsRequired().HasMaxLength(50);
-            builder.HasIndex(x => x.Code).IsUnique();
-            builder.Property(x => x.Title).IsRequired().HasMaxLength(255);
-            builder.HasIndex(x => x.Title).IsUnique();
-
             builder.HasMany(x => x.Components)
                 .WithOne(x => x.Material)
                 .HasForeignKey(x => x.MaterialId)
@@ -26,5 +21,8 @@ namespace ModularKitchenDesigner.DAL.Configurations
                 .HasPrincipalKey(x => x.Id)
                 .OnDelete(DeleteBehavior.Restrict);
         }
+
+        protected override string TableName()
+            => "materials";
     }
 }

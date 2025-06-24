@@ -8,6 +8,8 @@ namespace ModularKitchenDesigner.DAL.Configurations
     {
         public void Configure(EntityTypeBuilder<Section> builder)
         {
+            builder.ToTable("sections");
+
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
             builder.Property(x => x.Quantity).IsRequired();
             builder.Property(x => x.Code).IsRequired().HasMaxLength(50);

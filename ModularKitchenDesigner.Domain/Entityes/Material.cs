@@ -9,9 +9,6 @@ namespace ModularKitchenDesigner.Domain.Entityes
 {
     public sealed class Material : SimpleEntity, IDtoConvertible<Material, SimpleDto>
     {
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-
         public List<Component> Components { get; set; } = [];
         public List<MaterialSelectionItem> MaterialItems { get; set; } = [];
 

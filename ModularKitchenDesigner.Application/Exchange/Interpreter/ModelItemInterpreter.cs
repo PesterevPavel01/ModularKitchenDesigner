@@ -1,4 +1,6 @@
-﻿using ModularKitchenDesigner.Domain.Dto.Exchange;
+﻿using ModularKitchenDesigner.Application.Exchange.Processors;
+using ModularKitchenDesigner.Domain.Dto;
+using ModularKitchenDesigner.Domain.Dto.Exchange;
 using ModularKitchenDesigner.Domain.Entityes;
 using Repository;
 using Result;
@@ -8,10 +10,12 @@ namespace ModularKitchenDesigner.Application.Exchange.Interpritators
     public class ModelItemInterpreter
     {
         private IRepositoryFactory _repositoryFactory = null!;
+        private readonly RulesProcessor _exchangeRulesProcessor;
 
-        public ModelItemInterpreter(IRepositoryFactory repositoryFactory)
+        public ModelItemInterpreter(IRepositoryFactory repositoryFactory, RulesProcessor exchangeRulesProcessor)
         {
             _repositoryFactory = repositoryFactory;
+            _exchangeRulesProcessor = exchangeRulesProcessor;
         }
 
         public async Task<CollectionResult<NomanclatureDto>> InterpretAsync(List<NomanclatureDto> externalModels)
@@ -20,8 +24,6 @@ namespace ModularKitchenDesigner.Application.Exchange.Interpritators
                 return new();
 
             var result = externalModels
-                .Where(x => x.Parents
-                    .FindIndex(x => x.Code == "00080202189") == 1 && x.Models is not null)
                 .SelectMany(x => x.Models
                     .Select(model =>
                         new NomanclatureDto()
@@ -33,14 +35,19 @@ namespace ModularKitchenDesigner.Application.Exchange.Interpritators
                         }))
                 .ToList();
 
-            var existingModels = await _repositoryFactory.GetRepository<ModelItem>().GetAllAsync(
-                include: ModelItem.IncludeRequaredField(),
-                predicate: x => externalModels.Select(model => model.Code).Contains(x.Module.Code));
+            var existingModels = await _repositoryFactory
+                .GetRepository<ModelItem>()
+                    .GetAllAsync(
+                        include: ModelItem.IncludeRequaredField(),
+                        predicate: x => externalModels.Select(model => model.Code).Contains(x.Module.Code));
 
             // если в Models не будет какой-то модели, которая в системе привязана к модулю через ModelItem, то существующая модель будет включена в входной пакет моделей с пометкой удаления "removed" 
             // для установки у нее флага Enabled = false при дальнейшем переносе данных
 
             if (existingModels.Count > 0)
+            {
+                var modelRules = _exchangeRulesProcessor.GetModelRules<ModelItem>();
+
                 result.AddRange(existingModels
                     .Where(model => result.FirstOrDefault(x => x.Code == model.Module.Code && x.Models.Count > 0 && x.Models[0].Code == model.Model.Code) is null)
                     .Select(model => new NomanclatureDto
@@ -50,20 +57,19 @@ namespace ModularKitchenDesigner.Application.Exchange.Interpritators
                         Models =
                         [
                             new()
-                            { 
+                            {
                                 Code = model.Model.Code,
                                 Title = "removed",
                             }
                         ],
-                        Parents = 
-                        [
-                                new(),
-                                new()
-                                {
-                                    Code = "00080202189"
-                                }
-                        ]
+                        Parents = Enumerable.Range(0, modelRules.First().Parent+1)
+                            .Select(item => new SimpleDto() 
+                            {
+                                Code = modelRules.First(rule => rule.Parent == item)?.Code ?? string.Empty 
+                            })
+                            .ToList()
                     }).ToList());
+            }
 
             return
             new()

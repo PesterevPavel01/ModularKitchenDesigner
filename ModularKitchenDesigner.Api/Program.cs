@@ -1,6 +1,7 @@
 using HttpConnector.DependencyInjection;
 using ModularKitchenDesigner.Api;
 using ModularKitchenDesigner.Api.Middlewares;
+using ModularKitchenDesigner.Application.Exchange;
 using ModularKitchenDesigner.Application.Extensions;
 using ModularKitchenDesigner.DAL;
 using ModularKitchenDesigner.DAL.Dependencies;
@@ -18,7 +19,7 @@ builder.Services.AddSwagger();
 
 builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
 builder.Services.AddHttpConnector();
-
+builder.Services.Configure<ExchangeRules>(builder.Configuration.GetSection("ExchangeRules"));
 builder.Services.AddTelegramService();
 builder.Services.AddDataAccessLayer(builder.Configuration);
 builder.Services.AddRepositoryFactory<ApplicationDbContext>();

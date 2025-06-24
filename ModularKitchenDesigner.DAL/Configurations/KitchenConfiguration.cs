@@ -1,19 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using ModularKitchenDesigner.Domain.Entityes;
+using ModularKitchenDesigner.DAL.Configurations.Base;
 
 namespace ModularKitchenDesigner.DAL.Configurations
 {
-    public class KitchenConfiguration : IEntityTypeConfiguration<Kitchen>
+    public class KitchenConfiguration : BaseEntityConfiguration<Kitchen>
     {
-        public void Configure(EntityTypeBuilder<Kitchen> builder)
+        protected override void AddBuilder(EntityTypeBuilder<Kitchen> builder)
         {
-            builder.Property(x => x.Id).ValueGeneratedOnAdd();
             builder.Property(x => x.UserId).IsRequired().HasMaxLength(50);
             builder.Property(x => x.UserLogin).IsRequired().HasMaxLength(255);
-            builder.Property(x => x.Title).IsRequired().HasMaxLength(255);
-            builder.Property(x => x.Code).IsRequired().HasMaxLength(50);
-            builder.HasIndex(x => x.Code).IsUnique();
 
             builder.HasOne(x => x.KitchenType)
                 .WithMany(x => x.Kitchens)
@@ -33,5 +30,8 @@ namespace ModularKitchenDesigner.DAL.Configurations
                 .HasPrincipalKey(x => x.Id)
                 .OnDelete(DeleteBehavior.Restrict);
         }
+
+        protected override string TableName()
+            => "kitchens";
     }
 }

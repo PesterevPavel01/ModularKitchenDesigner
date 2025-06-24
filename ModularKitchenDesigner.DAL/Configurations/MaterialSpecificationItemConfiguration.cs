@@ -8,6 +8,8 @@ namespace ModularKitchenDesigner.DAL.Configurations
     {
         public void Configure(EntityTypeBuilder<MaterialSpecificationItem> builder)
         {
+            builder.ToTable("material_specification_items");
+
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
             builder.HasIndex(x => new { x.ModuleTypeId, x.MaterialSelectionItemId,x.KitchenId }).IsUnique();
             builder.Property(x => x.Code).IsRequired().HasMaxLength(50);

@@ -21,9 +21,6 @@ namespace ModularKitchenDesigner.Domain.Entityes
             ModuleTypeId = moduleType.Id;
             Enabled = enabled;
         }
-
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
         public string PreviewImageSrc { get; private set; }
         public double Width { get; private set; }
 

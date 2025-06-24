@@ -21,9 +21,6 @@ namespace ModularKitchenDesigner.Domain.Entityes
             Enabled = enabled;
             Title = title is null ? "N/A" : title;
         }
-
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
         public ComponentType ComponentType { get; private set; }
         public Guid ComponentTypeId { get; private set; }
         public Material Material { get; private set; }

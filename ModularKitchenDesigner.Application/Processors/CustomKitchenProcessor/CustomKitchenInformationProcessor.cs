@@ -65,7 +65,7 @@ namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
                 .ProcessAsync(predicate: x => x.Enabled == true && currentSectionModuleStructure.Select(item => item.Code).Contains(x.Module.Code));
 
             var modelsResult = await _processorFactory
-                .GetLoaderProcessor<CommonDefaultLoaderProcessor<Model, SimpleDto>, Model, SimpleDto>()
+                .GetLoaderProcessor<CommonDefaultLoaderProcessor<Model, ModelDto>, Model, ModelDto>()
                 .ProcessAsync(predicate:
                     x => x.Enabled == true
                     && modelItemsResult.Data.Select(item => item.ModelCode).Contains(x.Code));
@@ -76,6 +76,7 @@ namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
                      on modelItems.ModelCode equals models.Code
                  select new
                  {
+                     models.ComponentType,
                      models.Title,
                      models.Code,
                      modelItems.Quantity,
@@ -92,7 +93,8 @@ namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
                      modules.ModuleType,
                      Quantity = modules.Quantity * models.Quantity,
                      models.Title,
-                     models.Code
+                     models.Code,
+                     models.ComponentType
                  }).ToList();
 
             //Строю реальную структуру кухни
@@ -134,21 +136,23 @@ namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
 
                 //переношу реальные компоненты на абстрактную структуру
                 resultListComponents.AddRange(
-                    from models in currentModels.FindAll(x => x.ModuleType == item).ToList()
-                    join components in componentResult.Data
-                        on models.Title equals components.Model
-                    select new SpecificationItem
-                        {
-                            Code = components.Code,
-                            Title = components.Title,
-                            //PriceSegment = components.PriceSegment,
-                            Quantity = models.Quantity,
-                            UnitPrice = components.Price,
-                            Model = components.Model,
-                            ComponentType = components.ComponentType,
-                            Material = components.Material,
-                            TotalPrice = models.Quantity * components.Price,
-                        });
+                (from models in currentModels.Where(x => x.ModuleType == item).ToList()
+                 join components in componentResult.Data
+                     on models.Title equals components.Model
+                 group new { models, components } by components.Code into g
+                 where g.Any() // проверка на пустые группы
+                 select new SpecificationItem
+                 {
+                     Code = g.Key,
+                     Title = g.First().components.Title ?? string.Empty,
+                     Quantity = g.Sum(x => x.models.Quantity),
+                     UnitPrice = g.First().components.Price, // или Average
+                     Model = g.First().components.Model,
+                     ComponentType = g.First().models.ComponentType,
+                     Material = g.First().components.Material ?? string.Empty,
+                     TotalPrice = g.Sum(x => x.models.Quantity * x.components.Price)
+                 }).Where(x => x != null) // дополнительная фильтрация
+            );
             }
 
             return new()

@@ -7,8 +7,6 @@ namespace ModularKitchenDesigner.Domain.Entityes.Base
     public class SimpleEntity : BaseEntity, ISimpleEntity, IAuditable
     {
         protected SimpleEntity(){ }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
 
         private SimpleEntity(string title, string code, bool enabled = true, Guid id = default)
         {

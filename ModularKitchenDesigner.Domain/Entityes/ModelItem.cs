@@ -22,8 +22,6 @@ namespace ModularKitchenDesigner.Domain.Entityes
             Enabled = enabled;
         }
 
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
         public short Quantity { get; private set; }
 
         public Module Module { get; private set; }

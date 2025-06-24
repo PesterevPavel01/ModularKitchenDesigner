@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using ModularKitchenDesigner.Domain.Dto;
+﻿using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes;
 using ModularKitchenDesigner.Domain.Interfaces.Converters;
 using ModularKitchenDesigner.Domain.Interfaces.Validators;
-using Newtonsoft.Json;
 using Repository;
 
 namespace ModularKitchenDesigner.Application.Converters

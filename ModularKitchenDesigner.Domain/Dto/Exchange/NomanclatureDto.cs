@@ -9,10 +9,11 @@ namespace ModularKitchenDesigner.Domain.Dto.Exchange
 
         [Required(ErrorMessage = "Code cannot be null or empty.")]
         public string Code { get; set; }
-        public double Price { get; set; }
 
         [Required(ErrorMessage = "Parents cannot be null or empty.")]
         public List<SimpleDto> Parents { get; set; }
+
+        public double Price { get; set; }
         public List<TemplateDto> Models { get; set; }
         public double Widht { get; set; }
         public SimpleDto Template { get; set; }

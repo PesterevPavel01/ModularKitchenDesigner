@@ -20,8 +20,6 @@ namespace ModularKitchenDesigner.Domain.Entityes
             Enabled = enabled;
         }
 
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
         public PriceSegment PriceSegment { get; private set; }
         public Guid PriceSegmentId { get; private set; }
         public List<MaterialSelectionItem> MaterialSelectionItems { get; set; } = [];

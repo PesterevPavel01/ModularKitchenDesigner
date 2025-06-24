@@ -24,13 +24,6 @@ namespace ModularKitchenDesigner.Application.Converters
         }
         public async Task<List<Component>> Convert(List<ComponentDto> models, List<Component> entities)
         {
-            var componentTypeResult = _validatorFactory
-                .GetObjectNullValidator()
-                .Validate(
-                    model: await _repositoryFactory.GetRepository<ComponentType>().GetAllAsync(predicate: x => models.Select(model => model.ComponentType).Contains(x.Title)),
-                    methodArgument: models,
-                    callerObject: GetType().Name);
-
             var priceSegmentResult = _validatorFactory
                 .GetObjectNullValidator()
                 .Validate(
@@ -59,13 +52,6 @@ namespace ModularKitchenDesigner.Application.Converters
                 var title = componentModel.Title;
                 var code = componentModel.Code;
                 var price = componentModel.Price;
-                
-                var componentType = _validatorFactory
-                    .GetObjectNullValidator()
-                    .Validate(
-                        model: componentTypeResult.Find(type => type.Title == componentModel.ComponentType),
-                        methodArgument: models,
-                        callerObject: GetType().Name);
 
                 var priceSegment = _validatorFactory
                     .GetObjectNullValidator()
@@ -93,7 +79,6 @@ namespace ModularKitchenDesigner.Application.Converters
                             title: title,
                             code: code,
                             price: price,
-                            componentType: componentType,
                             priceSegment: priceSegment,
                             material: material,
                             model: model));
@@ -104,7 +89,6 @@ namespace ModularKitchenDesigner.Application.Converters
                             title: title,
                             code: code,
                             price: price,
-                            componentType: componentType,
                             priceSegment: priceSegment,
                             material: material,
                             model: model));

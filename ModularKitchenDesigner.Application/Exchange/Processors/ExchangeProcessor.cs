@@ -1,4 +1,5 @@
-﻿using ModularKitchenDesigner.Application.Processors.CommonProcessors;
+﻿using System.Data;
+using ModularKitchenDesigner.Application.Processors.CommonProcessors;
 using ModularKitchenDesigner.Domain.Dto.Base;
 using ModularKitchenDesigner.Domain.Dto.Exchange;
 using ModularKitchenDesigner.Domain.Entityes.Base;
@@ -34,6 +35,12 @@ namespace ModularKitchenDesigner.Application.Exchange.Processors
 
         public async Task<CollectionResult<NomanclatureDto>> ProcessAsync(List<NomanclatureDto> models, Func<NomanclatureDto, bool> isUniqueKeyEqual)
         {
+            if(models is null)
+                return new()
+                {
+                    Data = models
+                };
+
             List<TDto> modelsForCreation = [];
             
             // Получаю все элементы, которые на момент обновления являются элементами TEntity и должны быть обновлены,
@@ -49,6 +56,19 @@ namespace ModularKitchenDesigner.Application.Exchange.Processors
                 .Where(isUniqueKeyEqual)
                 .Select(model => new TDto().Convert(model))
                 .ToList();
+
+            //x => x.Parents is not null && modelRules
+            //        .Any(rule =>
+            //            (predicat is null || predicat(x))
+            //            && (rule.Limit == 0 || x.Parents.Count == rule.Limit)
+            //            && x.Parents.FindIndex(p => p.Code == rule.Code) == rule.Parent));
+
+            /*
+            var newAndUpdatedModelsAfterExchange = models
+                .Where(model => model.Parents.FindIndex(x => x.Code == "00080200115") == 2)
+                .Select(model => new TDto().Convert(model))
+                .ToList();
+             */
 
             if (modelsForUpdate.Count != 0)
             {
