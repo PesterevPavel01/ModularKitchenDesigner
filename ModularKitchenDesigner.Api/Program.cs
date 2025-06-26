@@ -27,6 +27,8 @@ builder.Services.AddServices();
 
 var app = builder.Build();
 
+await AddDatabaseSchemaInitializer.InitializeAsync(app.Services);
+
 app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseMiddleware<ResponseLoggingMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();

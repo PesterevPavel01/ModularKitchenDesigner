@@ -151,7 +151,7 @@ namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
                      ComponentType = g.First().models.ComponentType,
                      Material = g.First().components.Material ?? string.Empty,
                      TotalPrice = g.Sum(x => x.models.Quantity * x.components.Price)
-                 }).Where(x => x != null) // дополнительная фильтрация
+                 }).Where(x => x != null).OrderBy(x => x.ComponentType) // дополнительная фильтрация
             );
             }
 
