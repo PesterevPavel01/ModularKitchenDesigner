@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MySqlConnector;
 
@@ -17,16 +18,41 @@ namespace ModularKitchenDesigner.DAL
             var services = scope.ServiceProvider;
 
             var context = services.GetRequiredService<ApplicationDbContext>();
+            await CreateMysqlLogsTableAsync(context);
             await CreateEventsAsync(context);
-            await CreateTriggersAsync(context);
         }
 
-        private static async Task CreateEventsAsync(ApplicationDbContext _context)
+        private static async Task CreateMysqlLogsTableAsync(ApplicationDbContext context)
         {
-            var dbName = _context.Database.GetDbConnection().Database;
+            // Проверяем существование таблицы через information_schema
+            var tableExists = await context.Database.SqlQueryRaw<Result>(
+                "SELECT COUNT(*) FROM information_schema.TABLES " +
+                "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'error_logs'")
+                .ToListAsync();
+
+            if (tableExists[0].Value == 0)
+            {
+                var sql = ReadEmbeddedResource("CreateErrorLogsTable.sql");
+                await context.Database.ExecuteSqlRawAsync(sql);
+            };
+        }
+
+        private static string ReadEmbeddedResource(string fileName)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = $"ModularKitchenDesigner.DAL.SqlScripts.{fileName}";
+
+            using var stream = assembly.GetManifestResourceStream(resourceName);
+            using var reader = new StreamReader(stream);
+            return reader.ReadToEnd();
+        }
+
+        private static async Task CreateEventsAsync(ApplicationDbContext context)
+        {
+            var dbName = context.Database.GetDbConnection().Database;
 
             // Проверка и создание события
-            var eventExists = await _context.Database.SqlQueryRaw<Result>(
+            var eventExists = await context.Database.SqlQueryRaw<Result>(
                 "SELECT COUNT(*) FROM information_schema.EVENTS " +
                 "WHERE EVENT_SCHEMA = @dbName " +
                 "AND EVENT_NAME = 'remove_outdated_kitchens_event'",
@@ -34,51 +60,13 @@ namespace ModularKitchenDesigner.DAL
 
             if (eventExists[0].Value == 0)
             {
-                await _context.Database.ExecuteSqlRawAsync(@"
-                    CREATE EVENT remove_outdated_kitchens_event
-                    ON SCHEDULE EVERY 1 HOUR
-                    STARTS CURRENT_TIMESTAMP
-                    DO 
-                    BEGIN
-                        DELETE FROM kitchens WHERE CreatedAt < NOW() - INTERVAL 1 DAY;
-                    END;
-                    
-                    ALTER EVENT remove_outdated_kitchens_event ENABLE;");
-            }
-        }
+                var sql = ReadEmbeddedResource("CreateRemoveOutdatedKitchensEvent.sql");
+                await context.Database.ExecuteSqlRawAsync(sql);
 
-        private static async Task CreateTriggersAsync(ApplicationDbContext _context)
-        {
-            var dbName = _context.Database.GetDbConnection().Database;
-
-            // Проверка и создание триггера
-            var triggerExists = await _context.Database.SqlQueryRaw<Result>(
-                "SELECT COUNT(*) FROM information_schema.TRIGGERS " +
-                "WHERE TRIGGER_SCHEMA = @dbName " +
-                "AND TRIGGER_NAME = 'keep_only_latest_kitchen'",
-                new MySqlParameter("@dbName", dbName)).ToListAsync();
-
-            if (triggerExists[0].Value == 0)
-            {
-                await _context.Database.ExecuteSqlRawAsync(@"
-                    CREATE TRIGGER keep_only_latest_kitchen
-                    BEFORE INSERT ON kitchens
-                    FOR EACH ROW
-                    BEGIN
-                        DELETE FROM material_specification_items
-                        WHERE KitchenId IN (
-                            SELECT k.Id FROM kitchens k 
-                            WHERE k.UserId = NEW.UserId 
-                            AND k.Id != NEW.Id
-                        );
-                        
-                        DELETE FROM sections
-                        WHERE KitchenId IN (
-                            SELECT k.Id FROM kitchens k 
-                            WHERE k.UserId = NEW.UserId 
-                            AND k.Id != NEW.Id
-                        );
-                    END;");
+                await context.Database.ExecuteSqlRawAsync(
+                    "ALTER EVENT modular_kitchen_designer.remove_outdated_kitchens_event " +
+                    "ON SCHEDULE EVERY 1 HOUR "+
+                    "STARTS CURRENT_TIMESTAMP;");
             }
         }
     }

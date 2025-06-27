@@ -7,6 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="SqlScripts\CreateErrorLogsTable.sql" />
+    <None Remove="SqlScripts\CreateRemoveOutdatedKitchensEvent.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="SqlScripts\CreateErrorLogsTable.sql" />
+    <EmbeddedResource Include="SqlScripts\CreateRemoveOutdatedKitchensEvent.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.13" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.3" />
   </ItemGroup>

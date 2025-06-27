@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS error_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    event_name VARCHAR(100) NOT NULL,
+    error_code INT NOT NULL,
+    error_message TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    additional_info JSON DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
