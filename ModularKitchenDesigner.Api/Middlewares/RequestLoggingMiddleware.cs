@@ -1,6 +1,4 @@
-﻿using System;
-using System.Text;
-using ModularKitchenDesigner.Domain.Interfaces.Logging;
+﻿using ModularKitchenDesigner.Domain.Interfaces.Logging;
 using TelegramService.Interfaces;
 
 namespace ModularKitchenDesigner.Api.Middlewares

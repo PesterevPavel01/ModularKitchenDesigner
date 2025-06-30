@@ -65,8 +65,8 @@ namespace ModularKitchenDesigner.DAL
 
                 await context.Database.ExecuteSqlRawAsync(
                     "ALTER EVENT modular_kitchen_designer.remove_outdated_kitchens_event " +
-                    "ON SCHEDULE EVERY 1 HOUR "+
-                    "STARTS CURRENT_TIMESTAMP;");
+                    "ON SCHEDULE EVERY 1 HOUR " +
+                    $"STARTS '{DateTime.Now.AddHours(6):yyyy-MM-dd HH:mm:ss}';");
             }
         }
     }

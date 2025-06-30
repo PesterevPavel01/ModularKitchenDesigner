@@ -69,7 +69,7 @@ namespace Repository
             if (entities.Count == 0)
                 throw new ArgumentNullException("Entities not found");
 
-            _dbContext.AddRange(entities);
+            await _dbContext.AddRangeAsync(entities);
 
             await _dbContext.SaveChangesAsync();
 

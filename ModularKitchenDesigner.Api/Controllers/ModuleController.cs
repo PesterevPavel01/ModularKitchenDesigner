@@ -5,6 +5,7 @@ using ModularKitchenDesigner.Application.Processors.CommonProcessors;
 using ModularKitchenDesigner.Domain.Dto;
 using ModularKitchenDesigner.Domain.Entityes;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
+using Result;
 
 namespace ModularKitchenDesigner.Api.Controllers
 {
@@ -28,15 +29,43 @@ namespace ModularKitchenDesigner.Api.Controllers
 
         [HttpGet()]
         public async Task<IActionResult> GetAll()
-        => Ok(await _moduleProcessorFactory
-            .GetLoaderProcessor<CommonDefaultLoaderProcessor<Module, ModuleDto>, Module, ModuleDto>()
-            .ProcessAsync(
-                predicate: x => x.Enabled == true
-            ));
+        {
+            var result = await _moduleProcessorFactory
+                .GetLoaderProcessor<CommonDefaultLoaderProcessor<Module, ModuleDto>, Module, ModuleDto>()
+                .ProcessAsync(predicate: x => x.Enabled == true);
+
+            if (result.IsSuccess) {            
+                return Ok(
+                    new CollectionResult<ModuleDto>() { 
+                        Data = result.Data.OrderByDescending(x=>x.Width),
+                        Count = result.Data.Count()
+                    });        
+            }
+
+            return BadRequest();
+        }
 
         [HttpGet("GetByType/{ModuleType}")]
         public async Task<IActionResult> GetByModuleType(String ModuleType)
-        => Ok(await _moduleProcessorFactory.GetLoaderProcessor<CommonDefaultLoaderProcessor<Module, ModuleDto>, Module, ModuleDto>().ProcessAsync(predicate: x => x.ModuleType.Title == ModuleType));
+        {
+            var result = await _moduleProcessorFactory
+                .GetLoaderProcessor<CommonDefaultLoaderProcessor<Module, ModuleDto>, Module, ModuleDto>()
+                .ProcessAsync(predicate: 
+                    x => x.ModuleType.Title == ModuleType 
+                    && x.Enabled == true);
+
+            if (result.IsSuccess)
+            {
+                return Ok(
+                    new CollectionResult<ModuleDto>()
+                    {
+                        Data = result.Data.OrderByDescending(x => x.Width),
+                        Count = result.Data.Count()
+                    });
+            }
+
+            return BadRequest();
+        }
 
         [HttpPost("CreateMultiple")]
         public async Task<IActionResult> CreateMultiple([FromBody] List<ModuleDto> models)
