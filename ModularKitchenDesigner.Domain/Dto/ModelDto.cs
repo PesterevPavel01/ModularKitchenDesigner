@@ -24,8 +24,8 @@ namespace ModularKitchenDesigner.Domain.Dto
         {
             Title = dto.Title;
             Code = dto.Code;
-            ComponentType = dto.Parents?.Count >= 2
-                ? dto.Parents[^2].Title
+            ComponentType = dto.Parents?.Count >= 3
+                ? dto.Parents[^3].Title
                 : null;
             return this;
         }

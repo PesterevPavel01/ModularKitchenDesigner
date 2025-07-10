@@ -27,7 +27,7 @@ namespace ModularKitchenDesigner.Api.Controllers.Exchange
         public async Task<IActionResult> CreateMultiple([FromBody] List<NomanclatureDto> models)
             => Ok(await _exchangeService.ExchangeAsync(models));
 
-        [HttpPost("error")]
+        [HttpPost("Error")]
         public async Task<IActionResult> SendMessage([FromBody] ErrorMessage message)
             => Ok(await _telegramService.SendMessageAsync(JsonConvert.SerializeObject(message, Formatting.Indented)));
 

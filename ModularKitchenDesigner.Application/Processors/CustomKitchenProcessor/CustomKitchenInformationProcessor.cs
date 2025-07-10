@@ -151,7 +151,7 @@ namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
                      ComponentType = g.First().models.ComponentType,
                      Material = g.First().components.Material ?? string.Empty,
                      TotalPrice = g.Sum(x => x.models.Quantity * x.components.Price)
-                 }).Where(x => x != null).OrderBy(x => x.ComponentType) // дополнительная фильтрация
+                 }).Where(x => x != null)// дополнительная фильтрация
             );
             }
 
@@ -165,7 +165,7 @@ namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
                     Width = maxWidth,
                     UserCode = kitchenResult.Data.First().UserLogin,
                     UserId = kitchenResult.Data.First().UserId,
-                    Specification = resultListComponents
+                    Specification = resultListComponents.OrderBy(x => x.ComponentType).ToList(),
                 }
             };
 

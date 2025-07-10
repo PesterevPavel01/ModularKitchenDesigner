@@ -2,15 +2,15 @@
 using Microsoft.AspNetCore.Mvc;
 using ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor;
 
-namespace ModularKitchenDesigner.Api.Controllers.KustomKitchen
+namespace ModularKitchenDesigner.Api.Controllers.CustomKitchen
 {
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
-    public class KustomKitchenController : ControllerBase
+    public class CustomKitchenController : ControllerBase
     {
         private readonly CustomKitchenInformationProcessor _customKitchenInformationProcessor;
-        public KustomKitchenController(CustomKitchenInformationProcessor customKitchenInformationProcessor)
+        public CustomKitchenController(CustomKitchenInformationProcessor customKitchenInformationProcessor)
         {
             _customKitchenInformationProcessor = customKitchenInformationProcessor;
         }

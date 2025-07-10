@@ -42,7 +42,7 @@ namespace ModularKitchenDesigner.Application.Services
 
             var materialExchangeProcessor = await ProcessAsync<Material, SimpleDto, SimpleEntityConverter<Material>>(models);
 
-            var modelExchangeProcessor =await ProcessAsync<Model, ModelDto, ModelConverter>(models);
+            var modelExchangeProcessor = await ProcessAsync<Model, ModelDto, ModelConverter>(models);
 
             var moduleTypeExchangeProcessor = await ProcessAsync<ModuleType, SimpleDto, SimpleEntityConverter<ModuleType>>(models);
 

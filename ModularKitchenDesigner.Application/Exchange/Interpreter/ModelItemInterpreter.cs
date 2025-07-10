@@ -35,7 +35,7 @@ namespace ModularKitchenDesigner.Application.Exchange.Interpritators
                         }))
                 .ToList();
 
-            var existingModels = await _repositoryFactory
+            var existingEntities = await _repositoryFactory
                 .GetRepository<ModelItem>()
                     .GetAllAsync(
                         include: ModelItem.IncludeRequaredField(),
@@ -44,12 +44,14 @@ namespace ModularKitchenDesigner.Application.Exchange.Interpritators
             // если в Models не будет какой-то модели, которая в системе привязана к модулю через ModelItem, то существующая модель будет включена в входной пакет моделей с пометкой удаления "removed" 
             // для установки у нее флага Enabled = false при дальнейшем переносе данных
 
-            if (existingModels.Count > 0)
+            if (existingEntities.Count > 0)
             {
                 var modelRules = _exchangeRulesProcessor.GetModelRules<ModelItem>();
 
-                result.AddRange(existingModels
-                    .Where(model => result.FirstOrDefault(x => x.Code == model.Module.Code && x.Models.Count > 0 && x.Models[0].Code == model.Model.Code) is null)
+                var removedEntities = existingEntities
+                    .Where(model => result.FirstOrDefault(x => x.Code == model.Module.Code && x.Models.Count > 0 && x.Models[0].Code == model.Model.Code) is null).ToList();
+
+                var removedModels = removedEntities
                     .Select(model => new NomanclatureDto
                     {
                         Title = model.Module.Title,
@@ -62,13 +64,14 @@ namespace ModularKitchenDesigner.Application.Exchange.Interpritators
                                 Title = "removed",
                             }
                         ],
-                        Parents = Enumerable.Range(0, modelRules.First().Parent+1)
-                            .Select(item => new SimpleDto() 
+                        Parents = [.. Enumerable.Range(0, modelRules.First().Parent + 1)
+                            .Select(item => new SimpleDto()
                             {
-                                Code = modelRules.First(rule => rule.Parent == item)?.Code ?? string.Empty 
-                            })
-                            .ToList()
-                    }).ToList());
+                                Code = modelRules.FirstOrDefault(rule => rule.Parent == item)?.Code ?? string.Empty
+                            })]
+                    }).ToList();
+
+                result.AddRange(removedModels);
             }
 
             return

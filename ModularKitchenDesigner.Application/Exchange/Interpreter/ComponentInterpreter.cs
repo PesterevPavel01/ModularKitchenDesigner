@@ -57,6 +57,7 @@ namespace ModularKitchenDesigner.Application.Exchange.Interpreter
                                 throw new InvalidOperationException(
                                     $"Модель (Code: {model.Code}), определенная как Component, " +
                                     $"не содержит требуемых параметров (Parents), указанных в ExchangeRules");
+
                             material = model.Parents[materialValue].Title;
                         }
 
@@ -66,6 +67,7 @@ namespace ModularKitchenDesigner.Application.Exchange.Interpreter
                                 throw new InvalidOperationException(
                                     $"Модель (Code: {model.Code}), определенная как Component, " +
                                     $"не содержит требуемых параметров (Parents), указанных в ExchangeRules");
+
                             priceSegment = model.Parents[priceSegmentValue].Title;
                         }
                     }
