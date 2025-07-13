@@ -20,19 +20,56 @@ namespace ModularKitchenDesigner.Application.Exchange.Interpreter
 
         public async Task<CollectionResult<NomanclatureDto>> InterpretAsync(List<NomanclatureDto> externalModels)
         {
-            if (externalModels is null || externalModels.Count < 1)
+            
+            List<NomanclatureDto> createOrUpdateComponents = [.. externalModels.Where(model => model.Template is not null && !string.IsNullOrEmpty(model.Template.Code))];
+
+            var result = await GetCreateOrUpdateComponentAsync(createOrUpdateComponents);
+
+            var notComponentModels = externalModels.Where(model => model.Template == null || string.IsNullOrWhiteSpace(model.Template.Code)).ToList();
+
+            result.AddRange(await GetRemovedComponentAsync(notComponentModels));
+
+            return
+                new()
+                {
+                    Count = result.Count,
+                    Data = result
+                };
+        }
+
+        async Task<List<NomanclatureDto>> GetRemovedComponentAsync(List<NomanclatureDto> notComponentModels)
+        {
+            if (notComponentModels.Any())
+            {
+                var removedComponent = (await _repositoryFactory
+                        .GetRepository<Component>()
+                            .GetAllAsync(
+                                include: Component.IncludeRequaredField(),
+                                predicate: x => notComponentModels.Select(model => model.Code).Contains(x.Code)))
+                    ?.Select(component => new NomanclatureDto() { Code = component.Code, Title = "removed" });
+
+                if (removedComponent is not null)
+                    return [.. removedComponent];
+            }
+
+            return [];
+        }
+
+            async Task<List<NomanclatureDto>> GetCreateOrUpdateComponentAsync(List<NomanclatureDto> createOrUpdateComponents) 
+        {
+            if (createOrUpdateComponents is null || createOrUpdateComponents.Count < 1)
                 return new();
 
             var templateResult = await _repositoryFactory
                 .GetRepository<Model>()
                     .GetAllAsync(
                         include: Model.IncludeRequaredField(),
-                        predicate: x => externalModels.Select(model => model.Template.Code).Contains(x.Code));
+                        predicate: x => createOrUpdateComponents.Select(model => model.Template.Code).Contains(x.Code));
 
             // Создаем список для сбора ошибок (потокобезопасный)
             var exceptions = new ConcurrentQueue<Exception>();
 
-            Parallel.ForEach(externalModels, model =>
+            Parallel.ForEach(createOrUpdateComponents, model =>
             {
                 try
                 {
@@ -86,19 +123,13 @@ namespace ModularKitchenDesigner.Application.Exchange.Interpreter
                     exceptions.Enqueue(ex);
                 }
             });
-            
+
             if (!exceptions.IsEmpty)
             {
                 throw new AggregateException("Ошибки при обработке моделей", exceptions);
             }
 
-
-            return
-                new()
-                {
-                    Count = externalModels.Count,
-                    Data = externalModels
-                };
+            return createOrUpdateComponents;
         }
     }
 }

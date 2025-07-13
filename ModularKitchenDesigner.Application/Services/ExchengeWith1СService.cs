@@ -49,7 +49,8 @@ namespace ModularKitchenDesigner.Application.Services
             var priceSegmentExchangeProcessor = await ProcessAsync<PriceSegment, SimpleDto, SimpleEntityConverter<PriceSegment>>(models);
 
             //Свой метод определения по шаблону
-            var componentModels = await _componentInterpreter.InterpretAsync([.. models.Where(model => model.Template is not null && !string.IsNullOrEmpty(model.Template.Code))]);
+            //Необходимо добавить в _componentInterpreter.InterpretAsync проверку: нет ли во входящем пакете элементов, у которых раньше был шаблон, а теперь его нет!!!
+            var componentModels = await _componentInterpreter.InterpretAsync(models);
 
             if(componentModels.Data is not null)
                 await new ExchangeProcessor<Component, ComponentDto, ComponentConverter>()

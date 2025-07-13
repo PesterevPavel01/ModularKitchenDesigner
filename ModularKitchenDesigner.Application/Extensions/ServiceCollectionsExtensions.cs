@@ -33,6 +33,8 @@ namespace ModularKitchenDesigner.Application.Extensions
 
             services.AddScoped<IExchangeService<NomanclatureDto>, ExchengeWith1СService>();
 
+            services.AddScoped<IExchangeService<CompopnentPriceDto>, ExchangeComponentPricesService>();
+
             services.AddScoped<IProcessorFactory, ProcessorFactory>();
 
             services.AddScoped<ISimpleEntityProcessorFactory, SimpleEntityProcessorFactory>();
@@ -50,6 +52,7 @@ namespace ModularKitchenDesigner.Application.Extensions
             services.AddScoped<ModelItemInterpreter>();
 
             services.AddScoped<ComponentInterpreter>();
+
             services.AddScoped<RulesProcessor>();
 
 

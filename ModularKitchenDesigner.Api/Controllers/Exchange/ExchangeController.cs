@@ -15,17 +15,23 @@ namespace ModularKitchenDesigner.Api.Controllers.Exchange
     public class ExchangeController : ControllerBase
     {
         private readonly IExchangeService<NomanclatureDto> _exchangeService;
+        private readonly IExchangeService<CompopnentPriceDto> _exchangePriceService;
         private readonly ITelegramService _telegramService;
 
-        public ExchangeController(IExchangeService<NomanclatureDto> exchangeService, ITelegramService telegramService)
+        public ExchangeController(IExchangeService<NomanclatureDto> exchangeService, ITelegramService telegramService, IExchangeService<CompopnentPriceDto> exchangePriceService)
         {
             _exchangeService = exchangeService;
             _telegramService = telegramService;
+            _exchangePriceService = exchangePriceService;
         }
 
         [HttpPost()]
         public async Task<IActionResult> CreateMultiple([FromBody] List<NomanclatureDto> models)
-            => Ok(await _exchangeService.ExchangeAsync(models));
+            => Ok(await _exchangeService.ExchangeAsync(models));                
+
+        [HttpPost("Prices")]
+        public async Task<IActionResult> updateComponentPrices([FromBody] List<CompopnentPriceDto> models)
+            => Ok(await _exchangePriceService.ExchangeAsync(models));
 
         [HttpPost("Error")]
         public async Task<IActionResult> SendMessage([FromBody] ErrorMessage message)

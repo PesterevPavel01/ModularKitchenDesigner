@@ -32,6 +32,12 @@ namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
                 predicate: predicate,
                 trackingType: TrackingType.Tracking);
 
+            if (models is null)
+                return new()
+                {
+                    Count = 0
+                };
+
             return new()
             {
                 Count = models.Count,

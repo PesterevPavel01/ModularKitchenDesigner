@@ -50,5 +50,13 @@ namespace ModularKitchenDesigner.Domain.Dto
         public bool HasMatchingUniqueKey(IEnumerable<ComponentDto> models)
             =>
                 models.Select(model => model.Code).Contains(this.Code);
+
+        public ComponentDto UpdatePrice(double price)
+        {
+            Price = price;
+
+            return this;
+        }
+
     }
 }
