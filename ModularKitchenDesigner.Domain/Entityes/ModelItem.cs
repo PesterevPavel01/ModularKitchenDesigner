@@ -38,14 +38,33 @@ namespace ModularKitchenDesigner.Domain.Entityes
             => this.Model.Code == model.ModelCode
             && this.Module.Code == model.ModuleCode;
 
-        public bool ContainsByUniqueKey(List<ModelItemDto> models)
-            => models.Select(model => model.ModelCode).Contains(this.Model.Code)
-            && models.Select(model => model.ModuleCode).Contains(this.Module.Code);
-
         public static Expression<Func<ModelItem, bool>> ContainsByUniqueKeyPredicate(List<ModelItemDto> models)
-            => entity
-                => models.Select(model => model.ModelCode).Contains(entity.Model.Code)
-                && models.Select(model => model.ModuleCode).Contains(entity.Module.Code);
+        {
+            var codeParam = Expression.Parameter(typeof(ModelItem), "entity");
+
+            var orExpressions = models.Select(model =>
+            {
+                var modelProperty = Expression.Property(codeParam, nameof(ModelItem.Model));
+                var modelCodeProperty = Expression.Property(modelProperty, nameof(Model.Code));
+
+                var modelCondition = Expression.Equal(
+                    modelCodeProperty,
+                    Expression.Constant(model.ModelCode));
+
+                var moduleProperty = Expression.Property(codeParam, nameof(ModelItem.Module));
+                var moduleCodeProperty = Expression.Property(moduleProperty, nameof(Module.Code));
+
+                var moduleCondition = Expression.Equal(
+                    moduleCodeProperty,
+                    Expression.Constant(model.ModuleCode));
+
+                return Expression.AndAlso(modelCondition, moduleCondition);
+            });
+
+            var finalCondition = orExpressions.Aggregate((accum, current) => Expression.OrElse(accum, current));
+
+            return Expression.Lambda<Func<ModelItem, bool>>(finalCondition, codeParam);
+        }
 
         public ModelItemDto ConvertToDto()
         => new()

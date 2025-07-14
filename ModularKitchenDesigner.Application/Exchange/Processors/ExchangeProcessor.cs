@@ -48,7 +48,8 @@ namespace ModularKitchenDesigner.Application.Exchange.Processors
 
             CollectionResult<TDto> modelsForUpdate = await _processorFactory
                     .GetLoaderProcessor<CommonLoaderWithoutValidationProcessor<TEntity, TDto>, TEntity, TDto>()
-                    .ProcessAsync( predicate : TEntity.ContainsByUniqueKeyPredicate(models.Select(x => new TDto().Convert(x)).ToList()));
+                    .ProcessAsync( predicate : 
+                        TEntity.ContainsByUniqueKeyPredicate([.. models.Select(x => new TDto().Convert(x))]));
 
             // Выбираем пришедшие номенклатурные позиции, только те, которые должны быть элементами TEntity ПОСЛЕ обновления
 
@@ -56,19 +57,6 @@ namespace ModularKitchenDesigner.Application.Exchange.Processors
                 .Where(isUniqueKeyEqual)
                 .Select(model => new TDto().Convert(model))
                 .ToList();
-
-            //x => x.Parents is not null && modelRules
-            //        .Any(rule =>
-            //            (predicat is null || predicat(x))
-            //            && (rule.Limit == 0 || x.Parents.Count == rule.Limit)
-            //            && x.Parents.FindIndex(p => p.Code == rule.Code) == rule.Parent));
-
-            /*
-            var newAndUpdatedModelsAfterExchange = models
-                .Where(model => model.Parents.FindIndex(x => x.Code == "00080200115") == 2)
-                .Select(model => new TDto().Convert(model))
-                .ToList();
-             */
 
             if (modelsForUpdate.Count != 0)
             {

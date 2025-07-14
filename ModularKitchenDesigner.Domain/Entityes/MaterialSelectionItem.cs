@@ -43,10 +43,40 @@ namespace ModularKitchenDesigner.Domain.Entityes
             && this.KitchenType.Title == model.KitchenType;
 
         public static Expression<Func<MaterialSelectionItem, bool>> ContainsByUniqueKeyPredicate(List<MaterialSelectionItemDto> models)
-            => entity
-                => models.Select(model => model.ComponentType).Contains(entity.ComponentType.Title)
-                && models.Select(model => model.Material).Contains(entity.Material.Title)
-                && models.Select(model => model.KitchenType).Contains(entity.KitchenType.Title);
+        {
+            var codeParam = Expression.Parameter(typeof(MaterialSelectionItem), "entity");
+
+            var orExpressions = models.Select(model =>
+            {
+                var kitchenTypeProperty = Expression.Property(codeParam, nameof(MaterialSelectionItem.KitchenType));
+                var kitchenTitleProperty = Expression.Property(kitchenTypeProperty, nameof(KitchenType.Title)); 
+
+                var kitchenTypeCondition = Expression.Equal(
+                    kitchenTitleProperty,
+                    Expression.Constant(model.KitchenType));
+
+                var materialProperty = Expression.Property(codeParam, nameof(MaterialSelectionItem.Material));
+                var materialTitleProperty = Expression.Property(materialProperty, nameof(Material.Title));
+
+                var materialCondition = Expression.Equal(
+                    materialTitleProperty,
+                    Expression.Constant(model.Material));
+
+                var componentTypeProperty = Expression.Property(codeParam, nameof(MaterialSelectionItem.ComponentType));
+                var componentTypeTitleProperty = Expression.Property(componentTypeProperty, nameof(ComponentType.Title));
+
+                var componentTypeCondition = Expression.Equal(
+                    componentTypeTitleProperty,
+                    Expression.Constant(model.ComponentType));
+
+                return Expression.AndAlso(componentTypeCondition,
+                    Expression.AndAlso(kitchenTypeCondition, materialCondition));
+            });
+
+            var finalCondition = orExpressions.Aggregate((accum, current) => Expression.OrElse(accum, current));
+
+            return Expression.Lambda<Func<MaterialSelectionItem, bool>>(finalCondition, codeParam);
+        }
 
         public MaterialSelectionItemDto ConvertToDto()
         => new()

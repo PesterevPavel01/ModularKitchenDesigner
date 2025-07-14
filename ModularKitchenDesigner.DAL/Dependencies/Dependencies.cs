@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace ModularKitchenDesigner.DAL.Dependencies
 {
@@ -15,7 +16,8 @@ namespace ModularKitchenDesigner.DAL.Dependencies
 
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+                options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+                    .LogTo(Console.WriteLine, LogLevel.Information);
             });
         }
 
