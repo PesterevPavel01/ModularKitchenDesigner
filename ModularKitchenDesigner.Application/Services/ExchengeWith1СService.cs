@@ -86,8 +86,8 @@ namespace ModularKitchenDesigner.Application.Services
 
             return new() 
             {
-                Count = models.Count,
-                Data = models
+                Count = models != null ? models.Count : 0,
+                //Data = models
             };
         }
 

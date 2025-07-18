@@ -49,7 +49,7 @@ namespace ModularKitchenDesigner.Application.Handlers
             if (!httpContext.Response.HasStarted && httpContext.Response.Body.CanWrite)
             {
                 httpContext.Response.ContentType = "application/json";
-                httpContext.Response.StatusCode = (int)result.ErrorCode;
+                httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 await httpContext.Response.WriteAsync(JsonConvert.SerializeObject(result, Formatting.Indented));
             }
         }

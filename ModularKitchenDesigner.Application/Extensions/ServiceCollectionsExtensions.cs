@@ -55,6 +55,8 @@ namespace ModularKitchenDesigner.Application.Extensions
 
             services.AddScoped<RulesProcessor>();
 
+            services.AddScoped<CompleteShutdownService>();
+
 
             return services;
         }

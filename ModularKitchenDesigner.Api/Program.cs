@@ -32,7 +32,7 @@ await AddDatabaseSchemaInitializer.InitializeAsync(app.Services);
 app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseMiddleware<ResponseLoggingMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
-// Configure the HTTP request pipeline.
+
 
 app.UseSwagger();
 
@@ -48,6 +48,8 @@ app.UseSwaggerUI(c =>
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseRouting();
 
 app.MapControllers();
 

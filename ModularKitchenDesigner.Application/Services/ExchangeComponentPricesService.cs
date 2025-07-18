@@ -18,6 +18,7 @@ namespace ModularKitchenDesigner.Application.Services
         {
             _processorFactory = processorFactory;
         }
+
         public async Task<CollectionResult<CompopnentPriceDto>> ExchangeAsync(List<CompopnentPriceDto> models)
         {
             var components = await _processorFactory
@@ -41,7 +42,8 @@ namespace ModularKitchenDesigner.Application.Services
 
             return new()
             {
-                Data = models
+                //Data = models,
+                Count = models != null? models.Count : 0,
             };
         }
     }
