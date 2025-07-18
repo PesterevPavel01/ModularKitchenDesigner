@@ -24,8 +24,9 @@ namespace ModularKitchenDesigner.Application.Exchange.Interpritators
                 return new();
 
             var result = externalModels
-                .SelectMany(x => x.Models
-                    .Select(model =>
+                .SelectMany(x => x.Models == null
+                    ? []
+                    : x.Models.Select(model =>
                         new NomanclatureDto()
                         {
                             Code = x.Code,
