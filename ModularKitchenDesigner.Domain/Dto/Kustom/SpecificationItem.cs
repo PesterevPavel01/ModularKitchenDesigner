@@ -8,6 +8,9 @@
         public double UnitPrice { get; set; }
         public double TotalPrice { get; set; }
         public string Model { get; set; }
+        public string ModuleType { get; set; }
+        public string ModuleTitle { get; set; }
+        public string ModuleCode { get; set; }
         public string ComponentType { get; set; }
         public string Material { get; set; }
 

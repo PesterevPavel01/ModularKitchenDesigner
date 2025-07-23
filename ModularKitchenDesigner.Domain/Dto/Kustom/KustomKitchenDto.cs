@@ -13,6 +13,18 @@ namespace ModularKitchenDesigner.Domain.Dto.Kustom
         public double Width { get; set; }
         public double Price { get; set; }
 
-        public List<SpecificationItem> Specification { get; set; } = [];
+        public List<ModuleSpecification> ModuleSpecifications { get; set; } = [];
+
+
+        public class ModuleSpecification
+        {
+            public string Type { get; set; }
+            public string Code { get; set; }
+            public string Title { get; set; }
+            public double Quantity { get; set; }
+            public double Price { get; set; }
+            public double TotalPrice { get; set; }
+            public List<SpecificationItem> Specification { get; set; } = [];
+        }
     }
 }

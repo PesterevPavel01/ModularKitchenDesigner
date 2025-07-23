@@ -4,6 +4,7 @@ using ModularKitchenDesigner.Domain.Dto.Kustom;
 using ModularKitchenDesigner.Domain.Entityes;
 using ModularKitchenDesigner.Domain.Interfaces.Processors;
 using Result;
+using static ModularKitchenDesigner.Domain.Dto.Kustom.KustomKitchenDto;
 
 namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
 {
@@ -47,6 +48,7 @@ namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
                  select new
                  {
                      modules.Code,
+                     modules.Title,
                      modules.Width,
                      sections.Quantity,
                      SectionsWidth = sections.Quantity * modules.Width,
@@ -90,6 +92,8 @@ namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
                  select new
                  {
                      ModuleCode = modules.Code,
+                     ModuleTitle = modules.Title,
+                     ModulesQuantity = modules.Quantity,
                      modules.ModuleType,
                      Quantity = modules.Quantity * models.Quantity,
                      models.Title,
@@ -139,20 +143,20 @@ namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
                 (from models in currentModels.Where(x => x.ModuleType == item).ToList()
                  join components in componentResult.Data
                      on models.Title equals components.Model
-                 group new { models, components } by components.Code into g
-                 where g.Any() // проверка на пустые группы
-                 select new SpecificationItem
-                 {
-                     Code = g.Key,
-                     Title = g.First().components.Title ?? string.Empty,
-                     Quantity = g.Sum(x => x.models.Quantity),
-                     UnitPrice = g.First().components.Price, // или Average
-                     Model = g.First().components.Model,
-                     ComponentType = g.First().models.ComponentType,
-                     Material = g.First().components.Material ?? string.Empty,
-                     TotalPrice = g.Sum(x => x.models.Quantity * x.components.Price)
-                 }).Where(x => x != null)// дополнительная фильтрация
-            );
+                select new SpecificationItem
+                {
+                     Code = components.Code,
+                     Title = components.Title,
+                     Quantity = models.Quantity,
+                     UnitPrice = components.Price,
+                     Model = components.Model,
+                     ModuleTitle = models.ModuleTitle,
+                     ModuleCode = models.ModuleCode,
+                     ModuleType = item,
+                     ComponentType = models.ComponentType,
+                     Material = components.Material ?? string.Empty,
+                     TotalPrice = models.Quantity * components.Price
+                }).Where(x => x != null));// дополнительная фильтрация
             }
 
             return new()
@@ -165,10 +169,26 @@ namespace ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor
                     Width = maxWidth,
                     UserCode = kitchenResult.Data.First().UserLogin,
                     UserId = kitchenResult.Data.First().UserId,
-                    Specification = resultListComponents.OrderBy(x => x.ComponentType).ToList(),
+
+                    ModuleSpecifications = resultListComponents
+                        .GroupBy(x => x.ModuleCode) // Группируем по коду и названию модуля
+                        .Select(x => new ModuleSpecification
+                        {
+                            Code = x.First().ModuleCode,
+                            Title = x.First().ModuleTitle,
+                            Type = x.First().ModuleType,
+                            Quantity = x.First().Quantity,
+                            Price = x.Sum(item => item.TotalPrice) / x.First().Quantity,
+                            TotalPrice = x.Sum(item => item.TotalPrice),
+                            Specification = x
+                                .OrderBy(item=> item.ComponentType)    
+                                .ToList() // Все элементы группы становятся списком Specification
+                        })
+                        .OrderBy(x => x.Type)
+                        .ThenBy(x => x.Title)
+                        .ToList(),
                 }
             };
-
         }
 
     }
