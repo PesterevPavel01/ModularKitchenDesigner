@@ -20,15 +20,22 @@ namespace ModularKitchenDesigner.Application.Exchange.Interpritators
                 return new();
 
             var existingModels =  await _repositoryFactory.GetRepository<MaterialSelectionItem>().GetAllAsync(
-                        include: MaterialSelectionItem.IncludeRequaredField(),
-                        predicate: x => externalModels.Select(model => model.Code).Contains(x.Material.Code));
+                include: MaterialSelectionItem.IncludeRequaredField(),
+                predicate: x => externalModels.Select(model => model.Code).Contains(x.Material.Code));
 
             List<NomanclatureDto> result = [];
-            result.AddRange(externalModels);
+            List<MaterialSelectionItem> removedModels = [];
 
-            if (existingModels.Count > 0)
-                //может быть ситуация, при которой у externalModel нет элемента Parents[0]
-                result.AddRange(existingModels.Where(model => externalModels.FirstOrDefault(x => x.Code == model.Material.Code)?.Parents.FindIndex(parent => parent.Code == model.KitchenType.Code) != 0)
+            if (existingModels.Any())
+            {
+                removedModels.AddRange([.. existingModels.Where(model => externalModels.FirstOrDefault(x => x.Code == model.Material.Code)?.Parents.FindIndex(parent => parent.Code == model.KitchenType.Code) != 0)]);
+                removedModels.AddRange([.. existingModels.Where(model => externalModels.Where(x => x.Title == "removed").Select(x => x.Code).Contains(model.Material.Code))]);
+            }
+
+            if (removedModels.Count > 0)
+            {     //может быть ситуация, при которой у externalModel нет элемента Parents[0]
+
+                result.AddRange([.. removedModels
                     .Select(model => new NomanclatureDto
                     {
                         Title = model.Material.Title,
@@ -48,7 +55,10 @@ namespace ModularKitchenDesigner.Application.Exchange.Interpritators
                             }
                         ]
 
-                    }).ToList());
+                    })]);
+            }
+
+            result.AddRange(externalModels.Where(model => !removedModels.Select(x => x.Material.Code).Contains(model.Code)));
 
             return
                 new() 

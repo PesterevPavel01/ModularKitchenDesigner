@@ -17,6 +17,8 @@
         public int Parent { get; set; }
         public string Code { get; set; }
         public int Limit { get; set; }
+        public bool Models {  get; set; }
+        public bool Folder { get; set; }
     }
 
     public class ParametrizeComponent

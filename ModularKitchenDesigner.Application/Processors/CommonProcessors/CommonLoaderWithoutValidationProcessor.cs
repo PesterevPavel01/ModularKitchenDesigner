@@ -27,22 +27,30 @@ namespace ModularKitchenDesigner.Application.Processors.CommonProcessors
         }
         public async Task<CollectionResult<TDto>> ProcessAsync(Expression<Func<TEntity, bool>>? predicate = null)
         {
-            List<TEntity> models = await _repositoryFactory.GetRepository<TEntity>().GetAllAsync(
-                include: TEntity.IncludeRequaredField(),
-                predicate: predicate,
-                trackingType: TrackingType.Tracking);
 
-            if (models is null)
+            try
+            {
+                List<TEntity> models = await _repositoryFactory.GetRepository<TEntity>().GetAllAsync(
+                    include: TEntity.IncludeRequaredField(),
+                    predicate: predicate,
+                    trackingType: TrackingType.Tracking);
+
+                if (models is null)
+                    return new()
+                    {
+                        Count = 0
+                    };
+
                 return new()
                 {
-                    Count = 0
+                    Count = models.Count,
+                    Data = models.Select(x => x.ConvertToDto())
                 };
-
-            return new()
+            }
+            catch (Exception ex)
             {
-                Count = models.Count,
-                Data = models.Select(x => x.ConvertToDto())
-            };
+                throw new Exception(ex.Message);
+            }
         }
 
     }

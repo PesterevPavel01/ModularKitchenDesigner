@@ -36,7 +36,7 @@ namespace ModularKitchenDesigner.Domain.Dto
         {
             Title = dto.Title;
             Code = dto.Code;
-            Price = dto.Price;
+            Price = (double)(dto.Price is null ? 0 : dto.Price);
             Model = dto.Template?.Title;
 
             if (dto.Parents?.Count > 1)

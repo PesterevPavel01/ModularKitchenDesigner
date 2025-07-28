@@ -49,7 +49,6 @@ namespace ModularKitchenDesigner.Application.Services
             var priceSegmentExchangeProcessor = await ProcessAsync<PriceSegment, SimpleDto, SimpleEntityConverter<PriceSegment>>(models);
 
             //Свой метод определения по шаблону
-            //Необходимо добавить в _componentInterpreter.InterpretAsync проверку: нет ли во входящем пакете элементов, у которых раньше был шаблон, а теперь его нет!!!
             var componentModels = await _componentInterpreter.InterpretAsync(models);
 
             if(componentModels.Data is not null)
@@ -105,7 +104,10 @@ namespace ModularKitchenDesigner.Application.Services
                     .Any(rule =>
                         (predicat is null || predicat(x))
                         && (rule.Limit == 0 || x.Parents.Count == rule.Limit)
-                        && x.Parents.FindIndex(p => p.Code == rule.Code) == rule.Parent));
+                        && x.Parents.FindIndex(p => p.Code == rule.Code) == rule.Parent
+                        && (!rule.Models || (x.Models is not null && x.Models.Count != 0)) // если в правилах указано обязательное наличие моделей
+                        && (!rule.Folder || (x.Price is null && x.Widht is null)) // если в правилах указано обязательное наличие моделей
+                        ));
         }
     }
 }

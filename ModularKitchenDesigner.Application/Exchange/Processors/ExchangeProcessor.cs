@@ -42,14 +42,17 @@ namespace ModularKitchenDesigner.Application.Exchange.Processors
                 };
 
             List<TDto> modelsForCreation = [];
-            
+
             // Получаю все элементы, которые на момент обновления являются элементами TEntity и должны быть обновлены,
             // среди них будут в том числе те, которые перенесены в другую номенклатурную группу
 
+            List<TDto> dtoModels = [.. models.Select(x => new TDto().Convert(x))];
+
             CollectionResult<TDto> modelsForUpdate = await _processorFactory
-                    .GetLoaderProcessor<CommonLoaderWithoutValidationProcessor<TEntity, TDto>, TEntity, TDto>()
-                    .ProcessAsync( predicate : 
-                        TEntity.ContainsByUniqueKeyPredicate([.. models.Select(x => new TDto().Convert(x))]));
+                .GetLoaderProcessor<CommonLoaderWithoutValidationProcessor<TEntity, TDto>, TEntity, TDto>()
+                .ProcessAsync(predicate:
+                    TEntity.ContainsByUniqueKeyPredicate(dtoModels));
+
 
             // Выбираем пришедшие номенклатурные позиции, только те, которые должны быть элементами TEntity ПОСЛЕ обновления
 
