@@ -5,6 +5,7 @@ using ModularKitchenDesigner.Application.Exchange;
 using ModularKitchenDesigner.Application.Extensions;
 using ModularKitchenDesigner.DAL;
 using ModularKitchenDesigner.DAL.Dependencies;
+using ModularKitchenDesigner.Domain.Dto.Authorization;
 using Repository.Dependencies;
 using Serilog;
 using TelegramService.DependencyInjection;
@@ -15,14 +16,24 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+builder.Services.Configure<AuthorizationSetts>(builder.Configuration.GetSection("Authorization"));
+
+builder.Services.AddAutorization(builder.Configuration);
+
 builder.Services.AddSwagger();
 
 builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
+
 builder.Services.AddHttpConnector();
+
 builder.Services.Configure<ExchangeRules>(builder.Configuration.GetSection("ExchangeRules"));
+
 builder.Services.AddTelegramService();
+
 builder.Services.AddDataAccessLayer(builder.Configuration);
+
 builder.Services.AddRepositoryFactory<ApplicationDbContext>();
+
 builder.Services.AddServices();
 
 var app = builder.Build();
@@ -30,9 +41,10 @@ var app = builder.Build();
 await AddDatabaseSchemaInitializer.InitializeAsync(app.Services);
 
 app.UseMiddleware<RequestLoggingMiddleware>();
-app.UseMiddleware<ResponseLoggingMiddleware>();
-app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+app.UseMiddleware<ResponseLoggingMiddleware>();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseSwagger();
 
@@ -45,11 +57,13 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v5/swagger.json", "Api v5.0");
 });
 
-app.UseHttpsRedirection();
+app.UseRouting();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
-app.UseRouting();
+app.UseHttpsRedirection();
 
 app.MapControllers();
 

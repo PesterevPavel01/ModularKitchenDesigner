@@ -5,6 +5,7 @@ using ModularKitchenDesigner.Application.Exchange.Interpritators;
 using ModularKitchenDesigner.Application.Exchange.Processors;
 using ModularKitchenDesigner.Application.Handlers;
 using ModularKitchenDesigner.Application.Processors;
+using ModularKitchenDesigner.Application.Processors.AuthorizationProcessor;
 using ModularKitchenDesigner.Application.Processors.CustomKitchenProcessor;
 using ModularKitchenDesigner.Application.Services;
 using ModularKitchenDesigner.Application.Services.Logging;
@@ -57,6 +58,7 @@ namespace ModularKitchenDesigner.Application.Extensions
 
             services.AddScoped<CompleteShutdownService>();
 
+            services.AddScoped<AuthentificationProcessor>();
 
             return services;
         }

@@ -10,10 +10,17 @@ namespace ModularKitchenDesigner.Api.Controllers.CustomKitchen
     public class CustomKitchenController : ControllerBase
     {
         private readonly CustomKitchenInformationProcessor _customKitchenInformationProcessor;
+
         public CustomKitchenController(CustomKitchenInformationProcessor customKitchenInformationProcessor)
         {
             _customKitchenInformationProcessor = customKitchenInformationProcessor;
         }
+
+        /// <summary>
+        /// Метод для получения информации о кухне
+        /// </summary>
+        /// <param name="KitchenCode"></param>
+        /// <returns></returns>
 
         [HttpGet("GetByCode/{KitchenCode}")]
         public async Task<IActionResult> GetAll(string KitchenCode)

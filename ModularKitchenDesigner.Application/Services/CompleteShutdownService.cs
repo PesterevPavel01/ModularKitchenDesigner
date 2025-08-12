@@ -20,7 +20,7 @@ namespace ModularKitchenDesigner.Application.Services
             _processorFactory = processorFactory;
         }
 
-        public async Task ShutdownAll()
+        public async Task<String> ShutdownAll()
         {
             await ShutdownEntity<Component, ComponentDto>();
             await ShutdownEntity<ComponentType, SimpleDto>();
@@ -32,6 +32,8 @@ namespace ModularKitchenDesigner.Application.Services
             await ShutdownEntity<Module, ModuleDto>();
             await ShutdownEntity<ModuleType, SimpleDto>();
             await ShutdownEntity<PriceSegment, SimpleDto>();
+
+            return "Shutdown all entities";
         }
 
         private async Task ShutdownEntity<TEntity, TDto>()
